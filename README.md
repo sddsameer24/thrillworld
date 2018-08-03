@@ -1,7 +1,3 @@
-![MEANStore - ThrillWorld](https://raw.githubusercontent.com/mrlynn/meanstore/ThrillWorld/public/images/ThrillWorld-banner1.png)
-# MEANStore - ThrillWorld
-
-An example ecommerce / Retail software solution demonstrating the power and flexibility of MongoDB.
 
 ## Installation via Vagrant
 
@@ -153,28 +149,8 @@ This will expose the entire product catalog collection.
   ...
   ```
 
-## Screenshots
 
-- ![Main Catalog](https://raw.githubusercontent.com/mrlynn/meanstore/ThrillWorld/public/images/example_1.png)
-- ![Main Catalog](https://raw.githubusercontent.com/mrlynn/meanstore/ThrillWorld/public/images/example_2.png)
-- ![Main Catalog](https://raw.githubusercontent.com/mrlynn/meanstore/ThrillWorld/public/images/example_3.png)
 
-## Contributing
-
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request :D
-
-## History
-
-- Version 0.1 - 11/20/2016 - Michael Lynn
-- Version 1.0 - 01/01/2017 - Michael Lynn - Updated theme, new category, group and search mechanisms
-
-## Credits / Contributors
-
-- Michael Lynn <michael.lynn@mongodb.com>
 
 ## Next Steps
 
