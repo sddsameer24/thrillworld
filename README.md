@@ -1,11 +1,11 @@
-![MEANStore - MeanMart](https://raw.githubusercontent.com/mrlynn/meanstore/meanmart/public/images/meanmart-banner1.png)
-# MEANStore - MeanMart
+![MEANStore - ThrillWorld](https://raw.githubusercontent.com/mrlynn/meanstore/ThrillWorld/public/images/ThrillWorld-banner1.png)
+# MEANStore - ThrillWorld
 
 An example ecommerce / Retail software solution demonstrating the power and flexibility of MongoDB.
 
 ## Installation via Vagrant
 
-MEANStore leverages vagrant to deliver a fully functional virtual environment with MEANStore / MEANMart running.
+MEANStore leverages vagrant to deliver a fully functional virtual environment with MEANStore / ThrillWorld running.
 
 ```
 git clone https://github.com/mrlynn/meanstore.git
@@ -19,12 +19,12 @@ At this point, the application should be up and running and can be accessed from
 ```
 vagrant ssh # access the vagrant instance
 sudo su -   # become super user
-cd /home/vagrant/meanmart/meanstore # change to project directory
+cd /home/vagrant/ThrillWorld/meanstore # change to project directory
 npm run dev # run the application in developer mode
 
 ```
 
-At this point, the application should be up and running and can be accessed from your laptop/desktop by opening the url http://127.0.0.1:30000 depending on the specific settings in your .env.hackathon configuration file.
+At this point, the application should be up and running and can be accessed from your laptop/desktop by opening the url http://127.0.0.1:3000 depending on the specific settings in your .env.hackathon configuration file.
 
 
 ## Installation via local
@@ -120,7 +120,7 @@ MEANStore comes complete with an api that enables you to query, and manage the M
 To leverage postman, once you've gotten it installed, simply load the url for the API into postman.  For example, to review the products collection if you're using the vagrant-based install, use the following url in postman:
 
 ```
-http://localhost:30000/api/products
+http://localhost:3000/api/products
 ```
 
 This will expose the entire product catalog collection.
@@ -155,9 +155,9 @@ This will expose the entire product catalog collection.
 
 ## Screenshots
 
-- ![Main Catalog](https://raw.githubusercontent.com/mrlynn/meanstore/meanmart/public/images/example_1.png)
-- ![Main Catalog](https://raw.githubusercontent.com/mrlynn/meanstore/meanmart/public/images/example_2.png)
-- ![Main Catalog](https://raw.githubusercontent.com/mrlynn/meanstore/meanmart/public/images/example_3.png)
+- ![Main Catalog](https://raw.githubusercontent.com/mrlynn/meanstore/ThrillWorld/public/images/example_1.png)
+- ![Main Catalog](https://raw.githubusercontent.com/mrlynn/meanstore/ThrillWorld/public/images/example_2.png)
+- ![Main Catalog](https://raw.githubusercontent.com/mrlynn/meanstore/ThrillWorld/public/images/example_3.png)
 
 ## Contributing
 

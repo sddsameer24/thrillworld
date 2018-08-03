@@ -25,21 +25,20 @@ var uuid = require('uuid');
 var Config = require('../config/config');
 var Stats = require('../local_modules/stats');
 var meanlogger = require('../local_modules/meanlogger');
-var fileUpload = require('express-fileupload');
 // var csrfProtection = csrf();
 
 // router.use(csrfProtection);
 /* Get Stores for geo map */
-router.get('/stores', function(req, res, next) {
+router.get('/stores', function (req, res, next) {
     errorMsg = req.flash('error')[0];
-	successMsg = req.flash('success')[0];
-    var tot = totalSales(function(err,next) {
-    	if (err) {
-    		console.log(err.message);
-    		return res.error('err');
-    	}
+    successMsg = req.flash('success')[0];
+    var tot = totalSales(function (err, next) {
+        if (err) {
+            console.log(err.message);
+            return res.error('err');
+        }
     });
-    Store.find({}, function(err, docs) {
+    Store.find({}, function (err, docs) {
         res.render('admin/stores', {
             layout: 'admin-map.hbs',
             stores: docs,
@@ -55,16 +54,16 @@ router.get('/stores', function(req, res, next) {
     });
 })
 /* Get Relations for graph map */
-router.get('/relations', function(req, res, next) {
+router.get('/relations', function (req, res, next) {
     errorMsg = req.flash('error')[0];
     var adminPageTitle = "Relationships";
     var adminPageUrl = "/admin/relations";
-	successMsg = req.flash('success')[0];
-    var tot = totalSales(function(err,next) {
-    	if (err) {
-    		console.log(err.message);
-    		return res.error('err');
-    	}
+    successMsg = req.flash('success')[0];
+    var tot = totalSales(function (err, next) {
+        if (err) {
+            console.log(err.message);
+            return res.error('err');
+        }
     });
 
     res.render('admin/relations', {
@@ -80,18 +79,18 @@ router.get('/relations', function(req, res, next) {
     });
 })
 /* GET home page. */
-router.get('/',  isAdmin, function(req, res, next) {
-	errorMsg = req.flash('error')[0];
-	successMsg = req.flash('success')[0];
-    var tot = totalSales(function(err,next) {
-    	if (err) {
-    		console.log(err.message);
-    		return res.error('err');
-    	}
+router.get('/', isAdmin, function (req, res, next) {
+    errorMsg = req.flash('error')[0];
+    successMsg = req.flash('success')[0];
+    var tot = totalSales(function (err, next) {
+        if (err) {
+            console.log(err.message);
+            return res.error('err');
+        }
     });
-    Order.find({}, function(err, docs) {
-        meanlogger.log("check","Viewed",req.user);
-        Product.find(function(err, products) {
+    Order.find({}, function (err, docs) {
+        meanlogger.log("check", "Viewed", req.user);
+        Product.find(function (err, products) {
             productChunks = [];
             chunkSize = 5;
             for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
@@ -117,27 +116,27 @@ router.get('/',  isAdmin, function(req, res, next) {
     });
 });
 
-router.get('/orders:filter?', isAdmin, function(req, res, next) {
+router.get('/orders:filter?', isAdmin, function (req, res, next) {
     var filter = req.query.filter;
-    meanlogger.log("check","Viewed orders",req.user);
+    meanlogger.log("check", "Viewed orders", req.user);
 
-    if (!filter || filter=='allOrders') {
+    if (!filter || filter == 'allOrders') {
         var allOrders = true;
         var pendingOrders = false;
         var pickedUpOrders = false;
         qryFilter = {};
     } else {
-        if (filter=='pendingOrders') {
+        if (filter == 'pendingOrders') {
             var allOrders = false;
             var pendingOrders = true;
             var pickedUpOrders = false;
-            qryFilter = {$or: [{ receipt_status: 'pending'},{receipt_status: 'partial'}, {receipt_status: 'New'}, {receipt_status: ''}]};
+            qryFilter = { $or: [{ receipt_status: 'pending' }, { receipt_status: 'partial' }, { receipt_status: 'New' }, { receipt_status: '' }] };
         } else {
-            if (filter=='pickedUpOrders'|| filter=='complete') {
+            if (filter == 'pickedUpOrders' || filter == 'complete') {
                 var allOrders = false;
                 var pendingOrders = false;
                 var pickedUpOrders = true;
-                qryFilter = {receipt_status: 'complete'};
+                qryFilter = { receipt_status: 'complete' };
             }
         }
     }
@@ -146,11 +145,11 @@ router.get('/orders:filter?', isAdmin, function(req, res, next) {
     var adminPageTitle = "Orders";
     var adminPageUrl = "/admin/orders";
 
-    Order.find(qryFilter).sort({"created": -1}).exec(function(err, orders) {
-        Stats.getStats(function(err,stats){
+    Order.find(qryFilter).sort({ "created": -1 }).exec(function (err, orders) {
+        Stats.getStats(function (err, stats) {
             if (err) {
                 console.log(error.message);
-                res.send(500,"error fetching orders");
+                res.send(500, "error fetching orders");
             }
             res.render('admin/orders', {
                 adminPageTitle: adminPageTitle,
@@ -166,7 +165,7 @@ router.get('/orders:filter?', isAdmin, function(req, res, next) {
                 user: req.user,
                 stats: stats,
                 orders: orders,
-                isLoggedIn:req.isAuthenticated(),
+                isLoggedIn: req.isAuthenticated(),
                 successMsg: successMsg
             });
         })
@@ -174,21 +173,21 @@ router.get('/orders:filter?', isAdmin, function(req, res, next) {
     })
 });
 
-router.post('/delete-order',  isAdmin, function(req, res, next) {
+router.post('/delete-order', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var order_id = req.body._id;
-    meanlogger.log("trash","Deleting Order " + order_id,req.user);
+    meanlogger.log("trash", "Deleting Order " + order_id, req.user);
 
-    Order.remove({_id: order_id}, function(err) {
+    Order.remove({ _id: order_id }, function (err) {
         if (err) {
-            res.send(500,'Error deleting order.');
+            res.send(500, 'Error deleting order.');
         }
         return res.redirect('/admin/orders');
     })
 })
 
-router.post('/update-order',  isAdmin, function(req, res, next) {
+router.post('/update-order', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var status = req.body.status;
@@ -196,15 +195,15 @@ router.post('/update-order',  isAdmin, function(req, res, next) {
     var note = req.body.note;
     var order_id = req.body._id;
     var query = { '_id': order_id };
-    Order.findOne({_id: order_id}, function(err, order) {
+    Order.findOne({ _id: order_id }, function (err, order) {
         console.log("Order: " + order);
         if (err) {
-            res.send(500,'Error deleting order.');
+            res.send(500, 'Error deleting order.');
         }
         order.receipt_status = status;
         order.note = note;
         order.receiver = receiver;
-        order.save(function(err) {
+        order.save(function (err) {
             if (err)
                 console.log("ERROR: " + err.message);
         })
@@ -212,29 +211,29 @@ router.post('/update-order',  isAdmin, function(req, res, next) {
     })
 })
 
-router.get('/users:filter?', isAdmin, function(req, res, next) {
+router.get('/users:filter?', isAdmin, function (req, res, next) {
 
     var filter = req.query.filter;
     console.log("Filter " + filter);
     qryFilter = {};
 
-    if (!filter || filter=='allOrders') {
+    if (!filter || filter == 'allOrders') {
         var allUsers = true;
         var adminUsers = false;
         var nonAdminUsers = false;
         qryFilter = {};
     } else {
-        if (filter=='adminUsers') {
+        if (filter == 'adminUsers') {
             var allUsers = false;
             var adminUsers = true;
             var nonAdminUsers = false;
-            qryFilter = { role: 'admin'};
+            qryFilter = { role: 'admin' };
         } else {
-            if (filter=='nonAdminUsers') {
+            if (filter == 'nonAdminUsers') {
                 var allUsers = false;
                 var adminUsers = false;
                 var nonAdminUsers = true;
-                qryFilter = {$or: [{ role: ''},{role: 'user'}, {role: 'New'}, {role: 'visitor'}]};
+                qryFilter = { $or: [{ role: '' }, { role: 'user' }, { role: 'New' }, { role: 'visitor' }] };
             }
         }
     }
@@ -244,11 +243,11 @@ router.get('/users:filter?', isAdmin, function(req, res, next) {
     var adminPageUrl = "/admin/users";
 
     console.log("Stats in route " + JSON.stringify(res.locals.stats));
-    User.find(qryFilter, function(err, users) {
-        Stats.getStats(function(err,stats){
+    User.find(qryFilter, function (err, users) {
+        Stats.getStats(function (err, stats) {
             if (err) {
                 console.log(error.message);
-                res.send(500,"error fetching orders");
+                res.send(500, "error fetching orders");
             }
             res.render('admin/users', {
                 adminPageTitle: adminPageTitle,
@@ -264,7 +263,7 @@ router.get('/users:filter?', isAdmin, function(req, res, next) {
                 user: req.user,
                 stats: stats,
                 users: users,
-                isLoggedIn:req.isAuthenticated(),
+                isLoggedIn: req.isAuthenticated(),
                 successMsg: successMsg
             });
         })
@@ -273,11 +272,11 @@ router.get('/users:filter?', isAdmin, function(req, res, next) {
 });
 
 /* Edit User */
-router.post('/edit-user',isAdmin, function(req, res, next) {
+router.post('/edit-user', isAdmin, function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
     user = {};
-    User.findById(req.params.id, function(err, user) {
+    User.findById(req.params.id, function (err, user) {
         if (err) {
             console.log("ERROR: " + err.message);
         } else {
@@ -295,7 +294,7 @@ router.post('/edit-user',isAdmin, function(req, res, next) {
                 user.role = req.body.role || '';
             }
         }
-        user.save(function(err) {
+        user.save(function (err) {
             if (!err) {
                 console.log("updated");
             } else {
@@ -310,23 +309,23 @@ router.post('/edit-user',isAdmin, function(req, res, next) {
 
 /* Delete Users */
 
-router.post('/delete-user',  isAdmin, function(req, res, next) {
+router.post('/delete-user', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var user_id = req.body._id;
-    meanlogger.log("trash","Deleting User " + user_id,req.user);
+    meanlogger.log("trash", "Deleting User " + user_id, req.user);
 
-    User.remove({_id: user_id}, function(err) {
+    User.remove({ _id: user_id }, function (err) {
         if (err) {
-            res.send(500,'Error deleting user.');
+            res.send(500, 'Error deleting user.');
         }
         return res.redirect('/admin/users');
     })
 })
 /* Display all tickets purchased */
-router.get('/tickets', isAdmin, function(req, res, next) {
+router.get('/tickets', isAdmin, function (req, res, next) {
 
-    Ticket.find({},function(err,tickets) {
+    Ticket.find({}, function (err, tickets) {
         if (err) {
             console.log("Error: " + err.message);
         }
@@ -337,7 +336,7 @@ router.get('/tickets', isAdmin, function(req, res, next) {
             noErrorMsg: !errorMsg,
             errorMsg: errorMsg,
             user: req.user,
-            isLoggedIn:req.isAuthenticated(),
+            isLoggedIn: req.isAuthenticated(),
             successMsg: successMsg
         });
     })
@@ -345,26 +344,26 @@ router.get('/tickets', isAdmin, function(req, res, next) {
 });
 
 /* display logger activities */
-router.get('/activities:filter?', isAdmin, function(req, res, next) {
+router.get('/activities:filter?', isAdmin, function (req, res, next) {
     var filter = req.query.filter;
     console.log("Filter " + filter);
-    if (!filter || filter=='allOrders') {
+    if (!filter || filter == 'allOrders') {
         var allOrders = true;
         var pendingOrders = false;
         var pickedUpOrders = false;
         qryFilter = {};
     } else {
-        if (filter=='pendingOrders') {
+        if (filter == 'pendingOrders') {
             var allOrders = false;
             var pendingOrders = true;
             var pickedUpOrders = false;
-            qryFilter = {$or: [{ receipt_status: 'pending'},{receipt_status: 'partial'}, {receipt_status: 'New'}, {receipt_status: ''}]};
+            qryFilter = { $or: [{ receipt_status: 'pending' }, { receipt_status: 'partial' }, { receipt_status: 'New' }, { receipt_status: '' }] };
         } else {
-            if (filter=='pickedUpOrders'|| filter=='complete') {
+            if (filter == 'pickedUpOrders' || filter == 'complete') {
                 var allOrders = false;
                 var pendingOrders = false;
                 var pickedUpOrders = true;
-                qryFilter = {receipt_status: 'complete'};
+                qryFilter = { receipt_status: 'complete' };
             }
         }
     }
@@ -373,11 +372,11 @@ router.get('/activities:filter?', isAdmin, function(req, res, next) {
     var adminPageTitle = "Activity Log";
     var adminPageUrl = "/admin/activities";
 
-    Activity.find(qryFilter).sort({time: 'desc'}).exec( function(err, activities) {
-        Stats.getStats(function(err,stats){
+    Activity.find(qryFilter).sort({ time: 'desc' }).exec(function (err, activities) {
+        Stats.getStats(function (err, stats) {
             if (err) {
                 console.log(error.message);
-                res.send(500,"error fetching orders");
+                res.send(500, "error fetching orders");
             }
             res.render('admin/activities', {
                 adminPageTitle: adminPageTitle,
@@ -393,22 +392,22 @@ router.get('/activities:filter?', isAdmin, function(req, res, next) {
                 user: req.user,
                 stats: stats,
                 activities: activities,
-                isLoggedIn:req.isAuthenticated(),
+                isLoggedIn: req.isAuthenticated(),
                 successMsg: successMsg
             });
         });
     });
 });
 
-router.post('/delete-activity',  isAdmin, function(req, res, next) {
+router.post('/delete-activity', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var activity_id = req.body._id;
-    meanlogger.log("trash","Deleting Activity " + activity_id,req.user);
+    meanlogger.log("trash", "Deleting Activity " + activity_id, req.user);
 
-    Activity.remove({_id: activity_id}, function(err) {
+    Activity.remove({ _id: activity_id }, function (err) {
         if (err) {
-            res.send(500,'Error deleting activity.');
+            res.send(500, 'Error deleting activity.');
         }
         return res.redirect('/admin/activities');
     })
@@ -416,25 +415,25 @@ router.post('/delete-activity',  isAdmin, function(req, res, next) {
 
 
 /* display logger events */
-router.get('/events:filter?', isAdmin, function(req, res, next) {
+router.get('/events:filter?', isAdmin, function (req, res, next) {
 
     var filter = req.query.filter;
 
-    if (!filter || filter=='allEvents') {
+    if (!filter || filter == 'allEvents') {
         var allEvents = true;
         var likeEvents = false;
         var viewEvents = false;
         var purchaseEvents = false;
         qryFilter = {};
     } else {
-        if (filter=='likeEvents') {
+        if (filter == 'likeEvents') {
             var allEvents = false;
             var likeEvents = true;
             var viewEvents = false;
             var purchaseEvents = false;
             qryFilter = { action: 'like' };
         } else {
-            if (filter=='viewEvents') {
+            if (filter == 'viewEvents') {
                 var allEvents = false;
                 var likeEvents = false;
                 var viewEvents = true;
@@ -453,81 +452,82 @@ router.get('/events:filter?', isAdmin, function(req, res, next) {
     errorMsg = req.flash('error')[0];
     var adminPageTitle = "Event Log";
     var adminPageUrl = "/admin/events";
-/* main admin stats chart is as follows
-
-data: [
-    {x: '2016 Q1', tickets: 3, banquet: 7},
-    {x: '2016 Q2', tickets: 3, banquet: 4},
-    {x: '2016 Q3', tickets: null, banquet: 1},
-    {x: '2015 Q4', tickets: 2, banquet: 5},
-    {x: '2015 Q3', tickets: 8, banquet: 2},
-    {x: '2015 Q2', tickets: 4, banquet: 4}
-  ],
-
-  */
-Event.aggregate([
-    { "$group": {
-        "_id": {
-            "year": {"$year": "$when" },
-            "month": {"$month": "$when" }
-            },
-          "count": { "$sum": 1 }
-        }
-    },
-  ], function(err,yearmos){
-    var data = [];
-
-    if (err) {
-        console.log("error: " + err.message);
-    } else {
-        var i = 0;
-        async.each(yearmos,function(yearmo,next) {
-            data.push({
-                x: yearmo._id.year + '-' + yearmo._id.month,
-                purchases: yearmo.count
-            })
-        })
-    }
-
-
-
-    Event.find(qryFilter).sort({when: 'desc'}).exec( function(err, events) {
-        Stats.getStats(function(err,stats){
-            if (err) {
-                console.log(error.message);
-                res.send(500,"error fetching orders");
+    /* main admin stats chart is as follows
+    
+    data: [
+        {x: '2016 Q1', tickets: 3, banquet: 7},
+        {x: '2016 Q2', tickets: 3, banquet: 4},
+        {x: '2016 Q3', tickets: null, banquet: 1},
+        {x: '2015 Q4', tickets: 2, banquet: 5},
+        {x: '2015 Q3', tickets: 8, banquet: 2},
+        {x: '2015 Q2', tickets: 4, banquet: 4}
+      ],
+    
+      */
+    Event.aggregate([
+        {
+            "$group": {
+                "_id": {
+                    "year": { "$year": "$when" },
+                    "month": { "$month": "$when" }
+                },
+                "count": { "$sum": 1 }
             }
-            res.render('admin/events', {
-                adminPageTitle: adminPageTitle,
-                adminPageUrl: adminPageUrl,
-                layout: 'admin-page.hbs',
-                // csrfToken: req.csrfToken(),
-                yearmo: data,
-                noMessage: !successMsg,
-                noErrorMsg: !errorMsg,
-                allEvents: allEvents,
-                likeEvents: likeEvents,
-                viewEvents: viewEvents,
-                purchaseEvents: purchaseEvents,
-                errorMsg: errorMsg,
-                user: req.user,
-                stats: stats,
-                events: events,
-                isLoggedIn:req.isAuthenticated(),
-                successMsg: successMsg
+        },
+    ], function (err, yearmos) {
+        var data = [];
+
+        if (err) {
+            console.log("error: " + err.message);
+        } else {
+            var i = 0;
+            async.each(yearmos, function (yearmo, next) {
+                data.push({
+                    x: yearmo._id.year + '-' + yearmo._id.month,
+                    purchases: yearmo.count
+                })
+            })
+        }
+
+
+
+        Event.find(qryFilter).sort({ when: 'desc' }).exec(function (err, events) {
+            Stats.getStats(function (err, stats) {
+                if (err) {
+                    console.log(error.message);
+                    res.send(500, "error fetching orders");
+                }
+                res.render('admin/events', {
+                    adminPageTitle: adminPageTitle,
+                    adminPageUrl: adminPageUrl,
+                    layout: 'admin-page.hbs',
+                    // csrfToken: req.csrfToken(),
+                    yearmo: data,
+                    noMessage: !successMsg,
+                    noErrorMsg: !errorMsg,
+                    allEvents: allEvents,
+                    likeEvents: likeEvents,
+                    viewEvents: viewEvents,
+                    purchaseEvents: purchaseEvents,
+                    errorMsg: errorMsg,
+                    user: req.user,
+                    stats: stats,
+                    events: events,
+                    isLoggedIn: req.isAuthenticated(),
+                    successMsg: successMsg
+                });
             });
         });
     });
 });
-});
 
-router.post('/delete-event',  isAdmin, function(req, res, next) {
+router.post('/delete-event', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
-    meanlogger.log("trash","Deleting Event " + req.body.id,req.user);
-    Event.remove({_id: req.body.id}, function(err) {
+    meanlogger.log("trash", "Deleting Event " + req.body.id, req.user);
+    Event.remove({ _id: req.body.id }, function (err) {
         if (err) {
-            res.send(500,'Error deleting event.');
+            res.send(500, 'Error deleting event.');
         }
         return res.redirect('/admin/events');
     })
@@ -535,59 +535,59 @@ router.post('/delete-event',  isAdmin, function(req, res, next) {
 
 
 /* Render file upload for data input */
-router.get('/import',  isAdmin, function(req, res, next) {
+router.get('/import', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0]
     res.render('admin/import', {
-	    layout: 'admin-page.hbs',
-		// csrfToken: req.csrfToken(),
-	    noMessage: !successMsg,
-	    noErrorMsg: !errorMsg,
-	    errorMsg: errorMsg,
-	    user: req.user,
-	    isLoggedIn:req.isAuthenticated(),
-	    successMsg: successMsg
-	});
+        layout: 'admin-page.hbs',
+        // csrfToken: req.csrfToken(),
+        noMessage: !successMsg,
+        noErrorMsg: !errorMsg,
+        errorMsg: errorMsg,
+        user: req.user,
+        isLoggedIn: req.isAuthenticated(),
+        successMsg: successMsg
+    });
 });
 
 /* Recieve posted CSV */
-router.post('/import',  isAdmin, function(req, res, next) {
+router.post('/import', isAdmin, function (req, res, next) {
     var sampleFile;
     console.log('File name is ' + req.files.csvFile.name);
     console.log('File size is ' + req.files.csvFile.size);
     console.log('File size is ' + req.files.csvFile.path);
- 	var firstHeaders = req.body.header;
+    var firstHeaders = req.body.header;
     if (!req.files) {
-    	if (!req.body.csvPaste) {
-        	res.send('No files were uploaded and no data pasted.');
-        	return;
-    	}
+        if (!req.body.csvPaste) {
+            res.send('No files were uploaded and no data pasted.');
+            return;
+        }
     }
     csvFile = req.files.csvFile;
     tmpFile = uuid.v4() + '.csv'
-    csvFile.mv('/var/tmp/' + tmpFile, function(err) {
+    csvFile.mv('/var/tmp/' + tmpFile, function (err) {
         if (err) {
             res.status(500).send(err);
         } else {
-        	// req.flash('success','File successfully uploaded');
+            // req.flash('success','File successfully uploaded');
             // res.send('File uploaded!');
             var reader = csv.createCsvFileReader('/var/tmp/' + tmpFile, {
-			    'separator': ',',
-			    'quote': '"',
-			    'escape': '"',
-			    'comment': '',
-			    'columnsFromHeader': firstHeaders
-			});
-			reader.addListener('data', function(data) {
-			    writer.writeRecord([ data[0] ]);
-			});
-			console.log(data);
+                'separator': ',',
+                'quote': '"',
+                'escape': '"',
+                'comment': '',
+                'columnsFromHeader': firstHeaders
+            });
+            reader.addListener('data', function (data) {
+                writer.writeRecord([data[0]]);
+            });
+            console.log(data);
         }
     });
 });
 
 /* GET home page. */
-router.get('/products:filter?', isAdmin,function(req, res, next) {
+router.get('/products:filter?', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var adminPageTitle = "Products";
@@ -596,26 +596,26 @@ router.get('/products:filter?', isAdmin,function(req, res, next) {
     var filter = req.query.filter;
     console.log("Filter " + filter);
     qryFilter = {};
-    if (!filter || filter=='allProducts') {
+    if (!filter || filter == 'allProducts') {
         var allProducts = true;
         var deletedProducts = false;
         // qryFilter = {status: { $ne: 'deleted'}};
         qryFilter = {};
     } else {
-        if (filter=='deletedProducts') {
+        if (filter == 'deletedProducts') {
             var allOrders = false;
             var deletedProducts = true;
             // qryFilter = { status: 'deleted'};
-            qryFilter = { };
+            qryFilter = {};
         }
     }
-    Product.find(qryFilter,function(err, products) {
-        Category.find({},function(err,allcats) {
+    Product.find(qryFilter, function (err, products) {
+        Category.find({}, function (err, allcats) {
 
-            Stats.getStats(function(err,stats){
+            Stats.getStats(function (err, stats) {
                 if (err) {
                     console.log(error.message);
-                    res.send(500,"error fetching products");
+                    res.send(500, "error fetching products");
                 }
                 res.render('admin/products', {
                     adminPageTitle: adminPageTitle,
@@ -631,36 +631,51 @@ router.get('/products:filter?', isAdmin,function(req, res, next) {
                     stats: stats,
                     products: products,
                     allcats: allcats,
-                    isLoggedIn:req.isAuthenticated(),
+                    isLoggedIn: req.isAuthenticated(),
                     successMsg: successMsg
                 });
             })
         });
     });
 });
+router.post('/delete-activity', isAdmin, function (req, res, next) {
+    successMsg = req.flash('success')[0];
+    errorMsg = req.flash('error')[0];
+    var activity_id = req.body._id;
+    meanlogger.log("trash", "Deleting Activity " + activity_id, req.user);
 
-router.post('/delete-product',  isAdmin, function(req, res, next) {
+    Activity.remove({ _id: activity_id }, function (err) {
+        if (err) {
+            res.send(500, 'Error deleting activity.');
+        }
+        return res.redirect('/admin/activities');
+    })
+})
+
+
+router.post('/delete-product', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var product_id = req.body._id;
-
-    Product.findOne({_id: product_id}, function(err, product) {
+    meanlogger.log("trash", "Deleting Activity " + activity_id, req.user);
+    Product.remove({ _id: product_id }, function (err, product) {
         if (err) {
-            res.send(500,'Error deleting order.');
+            res.send(500, 'Error deleting order.');
         }
         product.status = 'deleted';
-        product.save(function(err) {
+        product.save(function (err) {
             if (!err) {
                 console.log("updated");
             } else {
                 console.log(err);
             }
-            return res.redirect('/admin/products');
+
         });
+        return res.redirect('/admin/products');
     })
 })
 
-router.post('/edit-product',isAdmin, function(req, res, next) {
+router.post('/edit-product', isAdmin, function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
     var imageFile;
@@ -676,7 +691,7 @@ router.post('/edit-product',isAdmin, function(req, res, next) {
     }
     if (req.files) {
         imageFile = req.files.imageFile;
-        imageFile.mv(process.env.imagePath + '/' + req.body.name + '.png' , function(err) {
+        imageFile.mv(process.env.imagePath + '/' + req.body.name + '.png', function (err) {
             if (err) {
                 res.status(500).send(err);
             }
@@ -684,19 +699,20 @@ router.post('/edit-product',isAdmin, function(req, res, next) {
         updated.imagePath = '/images/' + req.body.name + '.png'
 
     }
-    Product.findOneAndUpdate({_id: req.body._id}, { $set: updated }, function(err,product) {
-            if (err) {
-                console.log("Unable to update product - " + err.message);
-                req.flash('error',"Unable to update product - " + err.message);
-                return res.redirect('/admin/products');
-            };
-            console.log("Product " + req.body.name + " Updated");
-            req.flash('success','Product ' + req.body.name + ' Updated!');
+    Product.findOneAndUpdate({ _id: req.body._id }, { $set: updated }, function (err, product) {
+        if (err) {
+            console.log("Unable to update product - " + err.message);
+            req.flash('error', "Unable to update product - " + err.message);
             return res.redirect('/admin/products');
+        };
+        console.log("Product " + req.body.name + " Updated");
+        req.flash('success', 'Product ' + req.body.name + ' Updated!');
+        return res.redirect('/admin/products');
     });
 });
 
-router.post('/add-product',isAdmin, function(req, res, next) {
+router.post('/add-product', isAdmin, function (req, res, next) {
+    console.log(req.files);
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
     var imageFile;
@@ -707,7 +723,7 @@ router.post('/add-product',isAdmin, function(req, res, next) {
     }
 
     imageFile = req.files.imageFile;
-    imageFile.mv(process.env.imagePath + '/' + req.body.name + '.png' , function(err) {
+    imageFile.mv(process.env.imagePath + '/' + req.body.name + '.png', function (err) {
         if (err) {
             res.status(500).send(err);
         }
@@ -723,9 +739,9 @@ router.post('/add-product',isAdmin, function(req, res, next) {
             category: req.body.category,
             imagePath: '/images/' + req.body.name + '.png'
         })
-        product.save(function(err) {
+        product.save(function (err) {
             if (err) {
-                req.flash('error','Error: ' + err.message);
+                req.flash('error', 'Error: ' + err.message);
                 return res.redirect('/admin/products');
             }
             console.log("product: " + product);
@@ -734,7 +750,35 @@ router.post('/add-product',isAdmin, function(req, res, next) {
     });
 });
 
-router.get('/categories:filter?', isAdmin,function(req, res, next) {
+router.post('/add-category', isAdmin, function (req, res, next) {
+    console.log(req.files);
+    errorMsg = req.flash('error')[0];
+    successMsg = req.flash('success')[0];
+    var imageFile;
+
+    if (!req.files) {
+        res.send('No files were uploaded.');
+        return;
+    }
+
+    category = new Category({
+        description: req.body.description,
+        name: req.body.name,
+        slug: req.body.slug,
+        layout: req.body.layout
+
+    })
+    product.save(function (err) {
+        if (err) {
+            req.flash('error', 'Error: ' + err.message);
+            return res.redirect('/admin/category');
+        }
+        console.log("category: " + category);
+        return res.redirect('/admin/category');
+    });
+});
+
+router.get('/categories:filter?', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var adminPageTitle = "Categories";
@@ -742,22 +786,22 @@ router.get('/categories:filter?', isAdmin,function(req, res, next) {
 
     var filter = req.query.filter;
     qryFilter = {};
-    if (!filter || filter=='allCategories') {
+    if (!filter || filter == 'allCategories') {
         var allCategories = true;
         var deletedCategories = false;
         qryFilter = {};
     } else {
-        if (filter=='deletedCategories') {
+        if (filter == 'deletedCategories') {
             var allCategories = false;
             var deletedCategories = true;
-            qryFilter = { status: 'deleted'};
+            qryFilter = { status: 'deleted' };
         }
     }
-    Category.find(qryFilter,function(err, categories) {
-        Stats.getStats(function(err,stats){
+    Category.find(qryFilter, function (err, categories) {
+        Stats.getStats(function (err, stats) {
             if (err) {
                 console.log(error.message);
-                res.send(500,"error fetching categories");
+                res.send(500, "error fetching categories");
             }
             res.render('admin/categories', {
                 adminPageTitle: adminPageTitle,
@@ -772,18 +816,18 @@ router.get('/categories:filter?', isAdmin,function(req, res, next) {
                 user: req.user,
                 stats: stats,
                 categories: categories,
-                isLoggedIn:req.isAuthenticated(),
+                isLoggedIn: req.isAuthenticated(),
                 successMsg: successMsg
             });
         });
     });
 });
 
-router.post('/edit-category',isAdmin, function(req, res, next) {
+router.post('/edit-category', isAdmin, function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
     category = {};
-    Category.findById(req.body.id, function(err, category) {
+    Category.findById(req.body.id, function (err, category) {
 
         if (err) {
             console.log("ERROR: " + err.message);
@@ -803,9 +847,9 @@ router.post('/edit-category',isAdmin, function(req, res, next) {
                 category.updated = Date.now();
             }
         }
-                                console.log("Found: " + JSON.stringify(category));
+        console.log("Found: " + JSON.stringify(category));
 
-        category.save(function(err) {
+        category.save(function (err) {
             if (!err) {
                 console.log("updated");
             } else {
@@ -817,40 +861,40 @@ router.post('/edit-category',isAdmin, function(req, res, next) {
 
 });
 
-router.post('/delete-category',isAdmin, function(req, res, next) {
+router.post('/delete-category', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
 
-    Category.findOne({_id: req.body.id}, function(err, category) {
+    Category.findOne({ _id: req.body.id }, function (err, category) {
         if (err) {
-            res.send(500,'Error deleting category.');
+            res.send(500, 'Error deleting category.');
         }
         category.status = 'deleted';
-        category.save(function(err) {
+        category.save(function (err) {
             if (!err) {
                 console.log("updated");
-                req.flash('success','Category deleted.');
+                req.flash('success', 'Category deleted.');
 
             } else {
                 console.log(err);
-                req.flash('error','Unable to delete category');
+                req.flash('error', 'Unable to delete category');
             }
             return res.redirect('/admin/categories');
         });
     })
 })
 
-router.get('/configuration',isAdmin, function(req, res, next) {
+router.get('/configuration', isAdmin, function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
     var adminPageTitle = "Configuration";
     var adminPageUrl = "/admin/configuration";
-    Configuration.findOne({}, function(err, config) {
+    Configuration.findOne({}, function (err, config) {
         if (err) {
-            req.flash('error','Error: ' + err.message);
+            req.flash('error', 'Error: ' + err.message);
             return res.redirect('/admin');
         }
-        res.render('admin/configuration',{
+        res.render('admin/configuration', {
             config: config,
             adminPageTitle: adminPageTitle,
             adminPageUrl: adminPageUrl,
@@ -862,24 +906,24 @@ router.get('/configuration',isAdmin, function(req, res, next) {
         })
     });
 })
-router.get('/setup', isAdmin, function(req, res, next) {
-	errorMsg = req.flash('error')[0];
-	successMsg = req.flash('success')[0];
-	res.render('admin/setup',{
-		config: Config
-	})
+router.get('/setup', isAdmin, function (req, res, next) {
+    errorMsg = req.flash('error')[0];
+    successMsg = req.flash('success')[0];
+    res.render('admin/setup', {
+        config: Config
+    })
 })
 
 /* display logger activities */
-router.get('/dashboard', isAdmin, function(req, res, next) {
+router.get('/dashboard', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var adminPageTitle = "Dashboard";
     var adminPageUrl = "/admin/dashboard";
-    Stats.getStats(function(err,stats){
+    Stats.getStats(function (err, stats) {
         if (err) {
             console.log(error.message);
-            res.send(500,"error fetching orders");
+            res.send(500, "error fetching orders");
         }
         res.render('admin/dashboard', {
             adminPageTitle: adminPageTitle,
@@ -891,7 +935,7 @@ router.get('/dashboard', isAdmin, function(req, res, next) {
             errorMsg: errorMsg,
             user: req.user,
             stats: stats,
-            isLoggedIn:req.isAuthenticated(),
+            isLoggedIn: req.isAuthenticated(),
             successMsg: successMsg
         });
     });
@@ -899,7 +943,7 @@ router.get('/dashboard', isAdmin, function(req, res, next) {
 
 module.exports = router;
 function isAdmin(req, res, next) {
-    if (!req.isAuthenticated()|| !req.user) {
+    if (!req.isAuthenticated() || !req.user) {
         return res.redirect('/');
     } else {
         if (req.user.role == 'admin') {
@@ -924,24 +968,24 @@ function notLoggedIn(req, res, next) {
     res.redirect('/');
 }
 
-var totalSales = function() {
+var totalSales = function () {
     Order.aggregate({
         $match: {
             "status": "approved"
         }
     }, {
-        $group: {
-            _id: null,
-            'Total': {
-                $sum: 'cart.total'
+            $group: {
+                _id: null,
+                'Total': {
+                    $sum: 'cart.total'
+                }
             }
-        }
-    }, function(err, doc) {
-    	if (err) {
-    		console.log("err: " + err.message);
-            return err;
-    	}
-		return doc;
+        }, function (err, doc) {
+            if (err) {
+                console.log("err: " + err.message);
+                return err;
+            }
+            return doc;
 
-    });
+        });
 }

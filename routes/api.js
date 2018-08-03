@@ -31,7 +31,7 @@ router.get('/buckauto', function(req, res, next) {
 		}],function(err,product) {
 			if (err) {
 				console.log("Error: " + err.message);
-				res.send(500, "Problem fetching products");
+				res.send(1000, "Problem fetching products");
 			}
 			res.json(product);
 		})
@@ -152,7 +152,7 @@ router.get('/categories/:id', function(req, res, next) {
 	});
 	categrory.save(function(err,category) {
 		if (err) {
-			res.send(500,'Problem saving category.');
+			res.send(1000,'Problem saving category.');
 		}
 		res.send(category);
 	})
@@ -268,7 +268,7 @@ router.get('/products/:id', function(req, res, next) {
  */
 router.post('/api/products', function (req, res){
   var product;
-
+  console.log(res);
   product = new Product({
     code: req.body.code,
     description: req.body.description,
@@ -353,12 +353,12 @@ router.get('/tax/:id/:user', function(req, res, next) {
 	var productId = req.params.id;
 	Product.findById(productId,function(err,product) {
 		if (err) {
-			res.send(500,'Problem retrieving product.');
+			res.send(1000,'Problem retrieving product.');
 		}
 		if (product.taxable == 'Yes' || product.taxable == true) {
 			User.findById(req.params.user, function(err,user) {
 				if (err) {
-					return res.send(500, 'Problem retrieiving user by id.');
+					return res.send(1000, 'Problem retrieiving user by id.');
 				}
 				if (!user.state || !user.city) {
 					res.json({
@@ -434,7 +434,7 @@ router.post('/order', function(req, res, next) {
 	});
 	order.save(function(err,order) {
 		if (err) {
-			res.send(500,'Problem saving order.');
+			res.send(1000,'Problem saving order.');
 		}
 		res.send(category);
 	})

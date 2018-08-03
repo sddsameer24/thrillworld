@@ -176,7 +176,7 @@ app.use(function(req,res,next) {
         $sortByCount: "$category"
         }], function(err, navcats) {
         if (err || !navcats) {
-          res.send('500','Error retrieving categories.');
+          res.send('1000','Error retrieving categories.');
         }
         app.set('navcats',navcats);
         // console.log("Navcats in app.js " + JSON.stringify(navcats));

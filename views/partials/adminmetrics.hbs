@@ -32,7 +32,7 @@
                     </div>
                     <div class="col-xs-9 text-right">
                         {{!--<div class="huge">{{stats.totalAmountReceived}}</div>--}}
-                        <div class="huge">339,010</div>
+                        <div class="huge">3310</div>
                         <div>Total Collected</div>
                     </div>
                 </div>
@@ -138,12 +138,13 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-lg-6 col-md-6">
+<div class="col-lg-6 col-md-6">
         <div class="panel panel-primary">
             <div id="chart001">
             </div>
         </div>
+{{!-- <div class="row">
+    
         <div class="panel panel-footer">
             <p data-placement="top" data-toggle="tooltip" title="View Aggregation ">
                 <button class="ui left pull-left floated btn btn-warning btn-lg" data-title="view" data-toggle="modal" data-target="#view-chart-agg"> <span class="glyphicon glyphicon-eye-open"></span> View Aggregation Command
@@ -264,7 +265,7 @@ db.events.aggregate([
 
 <!-- /.modal-dialog -->
             </div>
-        </div>
+        </div> --}}
 <!-- Add Dialog -->
 <div class="modal fade" id="view-donut-data" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
     <div class="modal-dialog">
@@ -322,7 +323,7 @@ db.events.aggregate([
                                                    $.ajax({
                                                        'async': false,
                                                        'global': false,
-                                                       'url': 'http://localhost:3001/api/purchases-by-yearmo',
+                                                       'url': 'http://localhost:3000/api/purchases-by-yearmo',
                                                        'dataType': "json",
                                                        'success': function (data) {
                                                            json = data;
@@ -340,7 +341,7 @@ db.events.aggregate([
                                                    $.ajax({
                                                        'async': false,
                                                        'global': false,
-                                                       'url': 'http://localhost:3001/api/donut-chart',
+                                                       'url': 'http://localhost:3000/api/donut-chart',
                                                        'dataType': 'json',
                                                        'success': function (data) {
                                                            json = data;

@@ -1,4 +1,4 @@
-var app = angular.module('meanMartAdmin', ['ngRoute']);
+var app = angular.module('ThrillWorldAdmin', ['ngRoute']);
 app.factory("services", ['$http', function($http) {
   var serviceBase = 'api/'
     var obj = {};
@@ -37,6 +37,7 @@ app.controller('listCtrl', function ($scope, services) {
 });
 
 app.controller('editCtrl', function ($scope, $rootScope, $location, $routeParams, services, product) {
+    console.log("hello");
     var productID = ($routeParams.productID) ? parseInt($routeParams.productID) : 0;
     $rootScope.title = (productID > 0) ? 'Edit Product' : 'Add Product';
     $scope.buttonText = (productID > 0) ? 'Update Product' : 'Add New Product';

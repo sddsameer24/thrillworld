@@ -1,24 +1,24 @@
 #
 Approved orders by day by year# result:
-    // {
-    //   "result": [
-    //     {
-    //       "_id": {
-    //         "day": 346,
-    //         "year": 2016
-    //       },
-    //       "totalAmount": 11183,
-    //       "count": 14
-    //     },
-    //     {
-    //       "_id": {
-    //         "day": 327,
-    //         "year": 2016
-    //       },
-    //       "totalAmount": 160,
-    //       "count": 2
-    //     },
-    //     ...
+    {
+      "result": [
+        {
+          "_id": {
+            "day": 346,
+            "year": 2016
+          },
+          "totalAmount": 11183,
+          "count": 14
+        },
+        {
+          "_id": {
+            "day": 327,
+            "year": 2016
+          },
+          "totalAmount": 160,
+          "count": 2
+        },
+        ...
     db.orders.aggregate([{
         $group: {
             _id: {

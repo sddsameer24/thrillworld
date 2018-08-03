@@ -25,7 +25,7 @@ function initialize() {
 // Fill map with markers
 function populateMarkers(dataType) {
     //apiLoc = typeof apiLoc !== 'undefined' ? apiLoc : '/data/' + dataType + '.json';
-    apiLoc = 'http://localhost:3001/api/stores';
+    apiLoc = 'http://localhost:3000/api/stores';
     // jQuery AJAX call for JSON
     var uluru = {lat: -25.363, lng: 131.044};
 

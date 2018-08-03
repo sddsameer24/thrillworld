@@ -13,7 +13,7 @@
     <!-- Optional theme -->
     <link rel="stylesheet" href="/stylesheets/mongostrap-theme.css">
     \    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <script src="https://use.fontawesome.com/0f323c4f82.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.2.0/js/all.js" integrity="sha384-4oV5EgaV02iISL2ban6c/RmotsABqE4yZxZLcYMAdG7FAPsyHYAPpywE9PJo+Khy" crossorigin="anonymous"></script
     
     <link href="/stylesheets/sb-admin.css" rel="stylesheet">
     <!-- Morris Charts CSS -->
@@ -32,13 +32,11 @@
     <![endif]-->
     <script type="text/javascript" src="/javascripts/bootstrap-multiselect.js"></script>
     <link rel="stylesheet" href="/stylesheets/bootstrap-multiselect.css" type="text/css"/>
-    <script src="/javascripts/plugins/morris/raphael.min.js"></script>
-    <script src="/javascripts/plugins/morris/morris.min.js"></script>
-    <script src="/javascripts/plugins/morris/morris-data.js"></script>
+   
     <script> 
         
     function showStores() { 
-        $.getJSON( "http://localhost:3001/api/stores", function( data ) { 
+        $.getJSON( "http://localhost:3000/api/stores", function( data ) { 
             var lat=39.820913027470006;
             var lon=-97.470703125; 
             var myLatlng = new google.maps.LatLng(lat, lon); 
@@ -75,6 +73,9 @@
         });
       }
     </script>
+     <script src="/javascripts/plugins/morris/raphael.min.js"></script>
+    <script src="/javascripts/plugins/morris/morris.min.js"></script>
+    <script src="/javascripts/plugins/morris/morris-data.js"></script>
 </head>
   <!--<body onload='showStores()'>-->
   <body>

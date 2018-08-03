@@ -19,8 +19,8 @@ Product.find({}, function(err,products) {
     products.forEach(function(product) {
       allProducts[product._id] = product;
       cnt++;
-      customers = product.
-    });
+      customers = product;
+	});
 
     console.log('Total Products: ' + cnt );
 

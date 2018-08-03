@@ -43,7 +43,7 @@ router.get('/categories', function(req, res, next) {
 		var fieldNames = ['Name', 'Slug', 'Updated'];
 		var data = json2csv({ data: categories, fields: fields, fieldNames: fieldNames });
 		res.set('Content-Disposition', ["attachment; filename='", filename].join(''))
-		res.end(data);
+		res.end(JSON.stringify(someObject));
 	});
 
 });
@@ -62,7 +62,7 @@ router.get('/products', function (req, res){
 		var fieldNames = ['Name', 'Title', 'Description', 'Ship?','Tax?','Price','Cost','Product_Group','Options'];
 		var data = json2csv({ data: products, fields: fields, fieldNames: fieldNames });
 		res.set('Content-Disposition', ["attachment; filename=", filename, '.csv'].join(''))
-		res.end(data);
+		res.end(JSON.stringify(someObject));
 	});
 
 });
@@ -81,7 +81,7 @@ router.get('/users', function (req, res){
 		var fieldNames = ['first_name', 'last_name', 'email', 'name','ordered','sku','status'];
 		var data = json2csv({ data: users, fields: fields, fieldNames: fieldNames });
 		res.set('Content-Disposition', ["attachment; filename=", filename, '.csv'].join(''))
-		res.end(data);
+		res.end(JSON.stringify(someObject));
 	});
 
 });
@@ -99,7 +99,7 @@ router.get('/orders', function (req, res){
 		var fieldNames = ['ID','First name', 'Last Name', 'Email', 'Status','Ordered','Item','Option','Price','Ticket Name','Ticket Email'];
 		var data = json2csv({ data: orders, fields: fields, fieldNames: fieldNames });
 		res.set('Content-Disposition', ["attachment; filename=", filename, '.csv'].join(''))
-		res.end(data);
+		res.end(JSON.stringify(someObject));
 	});
 
 });

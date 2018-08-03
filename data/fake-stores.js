@@ -51,7 +51,7 @@ async.times(20, function (i, next) {
 			}],
 			function (err, randdocs) {
 				console.log(JSON.stringify(randdocs));
-				title = 'MEANMart Store ' + randdocs[0].properties.storeNumber;
+				title = 'ThrillWorld Store ' + randdocs[0].properties.storeNumber;
 				slug = title.toString().toLowerCase()
 					.replace(/\s+/g, '-') // Replace spaces with -
 					.replace(/[^\w\-]+/g, '') // Remove all non-word chars
@@ -60,7 +60,7 @@ async.times(20, function (i, next) {
 					.replace(/-+$/, ''); // Trim - from end of text
 				store = new Store({
 					storeId: randdocs[0].properties.storeNumber,
-					name: 'MEANMart Store ' + randdocs[0].properties.storeNumber,
+					name: 'ThrillWorld Store ' + randdocs[0].properties.storeNumber,
 					slug: slug,
 					manager: {
 						first_name: faker.name.firstName(),

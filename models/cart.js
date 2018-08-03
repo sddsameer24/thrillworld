@@ -4,7 +4,7 @@ var Ticket = require('../models/ticket');
 var taxCalc = require('../local_modules/tax-calculator');
 var async = require('async');
 var shippingCalc = require('../local_modules/shipping-calculator');
-var taxCalc = require('../local_modules/tax-calculator');
+
 var taxConfig = require('../config/tax-config');
 "use strict"
 
@@ -74,7 +74,7 @@ module.exports = function Cart(oldCart) {
 		storedItem.itemTotal = Number((price*100) * storedItem.qty);
 		console.log("Stored Item Item Total: " + JSON.stringify(storedItem));
 // this.totalShipping = result.totalShipping;
-// storedItem.taxAmount = result.taxAmount;
+        // storedItem.taxAmount = result.taxAmount;
 		storedItem.type = type;
 		if (option!=null) {
 			storedItem.option = option;
@@ -109,7 +109,7 @@ module.exports = function Cart(oldCart) {
 	};
 
 	/* Reduce the qty of a specific item in the cart by 1 */
-	this.reduce = function(item, id, price, option) {
+	this.reduce = function(item, id, price, option,taxcalc) {
 		var storedItem = this.items[id];
 		if (!storedItem) {
 			// create a new entry

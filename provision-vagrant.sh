@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Bash script for provisioning the MeanMart ECommerce Vagrant Instance
+# Bash script for provisioning the ThrillWorld ECommerce Vagrant Instance
 
 set -e
 set -x
@@ -22,15 +22,15 @@ function config(){
 }
 
 function prep_env() {
-	echo "Setting up MEANMart Application..."
+	echo "Setting up ThrillWorld Application..."
 
-	mkdir -p /home/vagrant/meanmart
-	cd /home/vagrant/meanmart
+	mkdir -p /home/vagrant/ThrillWorld
+	cd /home/vagrant/ThrillWorld
 
 	echo "Cloning meanstore repository..."
 	sudo apt-get install -y git
 	git clone https://github.com/mrlynn/meanstore.git
-	cd /home/vagrant/meanmart/meanstore
+	cd /home/vagrant/ThrillWorld/meanstore
 
 	mkdir -p log/hackathon
 	sudo chmod -R 777 log
@@ -70,7 +70,7 @@ function prep_env() {
 	echo "|.'--------------'.||.'--------------'.||.'--------------'.||.'--------------'.|"
 	echo ".'----------------'..'----------------'..'----------------'..'----------------'"
 	echo
-	echo "DONE: Setting up MEANMart Application"
+	echo "DONE: Setting up ThrillWorld Application"
 
 }
 
@@ -100,8 +100,8 @@ function install_mongod(){
 function install_mongosqld() {
 	echo "Installing BI Connector"
 	sudo apt-get install -y wget
-	mkdir /home/vagrant/meanmart/bi
-	cd /home/vagrant/meanmart/bi
+	mkdir /home/vagrant/ThrillWorld/bi
+	cd /home/vagrant/ThrillWorld/bi
 	wget https://info-mongodb-com.s3.amazonaws.com/mongodb-bi/v2/mongodb-bi-linux-x86_64-ubuntu1404-v2.0.0.tgz
 	tar xvf mongodb-bi-linux-x86_64-ubuntu1404-v2.0.0.tgz
 	cd mongodb-bi-linux-x86_64-ubuntu1404-v2.0.0
@@ -132,7 +132,7 @@ function install_nodejs() {
 
 function generate_data() {
 	echo "Generating data..."
-	cd /home/vagrant/meanmart/meanstore
+	cd /home/vagrant/ThrillWorld/meanstore
 	node data/fake-refrigerators.js
 	node data/fake-televisions.js
 	node data/fake-cameras.js
@@ -148,8 +148,8 @@ function generate_data() {
 
 function create_schema() {
 	echo "Create DRDL Files from MongoDB Collections..."
-	mkdir -p /home/vagrant/meanmart/bi/schema
-	cd /home/vagrant/meanmart/bi
+	mkdir -p /home/vagrant/ThrillWorld/bi/schema
+	cd /home/vagrant/ThrillWorld/bi
 	/usr/local/bin/mongodrdl --host localhost -d hackathon -c products -o schema/products_schema.drdl
 	/usr/local/bin/mongodrdl --host localhost -d hackathon -c categories -o schema/categories_schema.drdl
 	/usr/local/bin/mongodrdl --host localhost -d hackathon -c users -o schema/users_schema.drdl

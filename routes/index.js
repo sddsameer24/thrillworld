@@ -1660,7 +1660,7 @@ router.post('/search', function(req, res, next) {
 				}], function(err, Product_Group) {
 					if (err) {
 						console.log("Error fetching categories");
-						res.send(500, 'Error');
+						res.send(1000, 'Error');
 					}
 					if (frontPageCategory) {
 						categCondition = {

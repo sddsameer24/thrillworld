@@ -22,9 +22,6 @@ router.use(csrfProtection);
 
 module.exports = router;
 
-// Mindspace
-// https://www.youtube.com/watch?v=XVYApTfR6XE
-
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
         return next();

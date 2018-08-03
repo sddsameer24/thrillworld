@@ -87,9 +87,9 @@ var orderSchema = new Schema({
   },
 	paidBy: {
 		type: String,
-		default: 'Paypal',
-		enum: ['Paypal', 'Cash', 'Check'],
-		required: false
+		default: 'Instamojo',
+		enum: ['Paypal','Instamojo','Cash', 'Check'],
+		required: true
 	},
 	note: {
 		type: String

@@ -144,7 +144,6 @@
 										<input type="hidden" name="itemTotal_{{inc @index }}" value="{{this.itemTotal}}">
 										<input type="hidden" name="option[{{ @index}}]" value="{{this.option}}">
 
-
 										<input type="hidden" name="item_name[null]" value="" />
 										<input type="hidden" name="item_name[{{ @index }}]" value="{{this.item.name}}" />
 										<input type="hidden" name="item_title[{{ @index }}]" value="{{this.item.title}}" />
@@ -168,7 +167,7 @@
 													<ul class="dropdown-menu">
 														<li><a href="/reduce-qty/{{this.item._id}}">Reduce by 1</a></li>
 														<li><a href="/empty-cart">Remove all {{this.item.name}}</a></li>
-														<li><a href="/empty-cart">Remove All</a></li>
+														{{!-- <li><a href="/empty-cart">Remove All</a></li> --}}
 													</ul>
 												</div>
 											</td>
@@ -180,14 +179,14 @@
 										<td>&nbsp;</td>
 										<td>&nbsp;</td>
 										<td>Total: </td>
-										<td class="text-right" text-align="right">${{money subtotal}}</td>
+										<td class="text-right" text-align="right">Rs{{money subtotal}}</td>
 										<td>&nbsp;</td>
 									</tr>
 									<tr>
 										<td colspan=3>{{taxDesc}}</td>
 										<td>Tax: </td>
 										<td class='text-right' text-align="right">
-										${{money totalTax}}
+										Rs{{money totalTax}}
 										</td>
 										<td>&nbsp;</td>
 									</tr>
@@ -211,7 +210,9 @@
 							</table>
 							<li class="list-group-item">
 							<div class="text-right">
-								<input id='checkout' name='checkout' type='submit' value='Pay with Paypal >' class='btn btn-primary text-right'><br><a href='/whypaypal'>Why PayPal?</a>
+								<input id='checkout' name='checkout' type='submit' value='Pay with Paypal >' class='btn btn-primary text-right'><br>
+								<input id='checkout' name='checkout' type='submit' value='Pay with credit or debit card >' class='btn btn-primary text-right'><br>
+								<input id='checkout' name='checkout' type='submit' value='Pay On arrival >' class='btn btn-primary text-right'><br>
 								<div class="text-left">
 								{{#if ../enableShipping}}
 									<input id='update' name='update' type='submit' value='Update Shipping' class='btn btn-warning text-right'>
