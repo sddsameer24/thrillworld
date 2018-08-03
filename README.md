@@ -1,48 +1,14 @@
 
-## Installation via Vagrant
-
-MEANStore leverages vagrant to deliver a fully functional virtual environment with MEANStore / ThrillWorld running.
-
 ```
-git clone https://github.com/mrlynn/meanstore.git
-cd meanstore
-vagrant up
-```
-At this point, the application should be up and running and can be accessed from your laptop/desktop by opening the url http://localhost:30001
+At this point, the application should be up and running and can be accessed from your laptop/desktop by opening the url http://localhost:3001
 
 ### Note: If the application does not come up in your browser, vagrant ssh to your instance, and restart the application.  Ensure that MongoDB is running ###
 
-```
-vagrant ssh # access the vagrant instance
-sudo su -   # become super user
-cd /home/vagrant/ThrillWorld/meanstore # change to project directory
-npm run dev # run the application in developer mode
-
-```
 
 At this point, the application should be up and running and can be accessed from your laptop/desktop by opening the url http://127.0.0.1:3000 depending on the specific settings in your .env.hackathon configuration file.
 
 
-## Installation via local
 
-```
-git clone https://github.com/mrlynn/meanstore.git
-cd meanstore
-npm install
-# unicode doesn't install nicely first pass - try again
-npm install unicode
-# install faker to generate data
-npm install faker
-# Generate some data...
-node data/fake-refrigerators.js
-node data/fake-televisions.js
-node data/fake-cameras.js
-node data/fake-apparel.js
-# Create the categories...
-node data/category-seeder.js
-# Now run it...
-npm run dev
-```
 
 ## Usage
 
