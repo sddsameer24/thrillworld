@@ -723,7 +723,11 @@ router.post('/add-product', isAdmin, function (req, res, next) {
     }
 
     imageFile = req.files.imageFile;
-    imageFile.mv(process.env.imagePath + '/' + req.body.name + '.png', function (err) {
+//     console.log(process.env.imagePath);
+//     console.log(req.files);
+//    // console.log(req.files);
+//     console.log(__dirname +`\public`);
+    imageFile.mv('public/images/'+ req.body.name + '.png', function (err) {
         if (err) {
             res.status(500).send(err);
         }
