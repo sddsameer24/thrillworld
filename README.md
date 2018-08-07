@@ -71,10 +71,6 @@ The same goes for other providers.
 - Select **Website**
 - Enter `http://localhost:3000` under *Site URL*
 
-**Note:** After a successful sign in with Facebook, a user will be redirected back to home page with appended hash `#_=_` in the URL. It is *not* a bug. See this [Stack Overflow](https://stackoverflow.com/questions/7131909/facebook-callback-appends-to-return-url) discussion for ways to handle it.
-
-<hr>
-
 ## API
 
 MEANStore comes complete with an api that enables you to query, and manage the MongoDB database.  Should you want to review the internal data structures to discover how one might build a product catalog using MongoDB's document-based data storage methodology, a great way to start is by using Postman.  With Postman, you can construct requests quickly, save them for later use and analyze the responses sent by the API. Postman can dramatically cut down the time required to test and develop APIs. Postman adapts itself for individual developers, small teams or big organizations equally well.
