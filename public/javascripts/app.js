@@ -70,7 +70,7 @@ app.controller('editCtrl', function ($scope, $rootScope, $location, $routeParams
 app.config(['$routeProvider',
   function($routeProvider) {
     $routeProvider.
-      when('/', {
+      when('/Products', {
         title: 'Products',
         templateUrl: 'partials/products.html',
         controller: 'listCtrl'

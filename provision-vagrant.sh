@@ -28,10 +28,7 @@ function prep_env() {
 	cd /home/vagrant/ThrillWorld
 
 	echo "Cloning meanstore repository..."
-	sudo apt-get install -y git
-	git clone https://github.com/mrlynn/meanstore.git
-	cd /home/vagrant/ThrillWorld/meanstore
-
+	
 	mkdir -p log/hackathon
 	sudo chmod -R 777 log
 	mkdir -p ./pids
@@ -44,35 +41,7 @@ function prep_env() {
 	npm install
 	npm install -g pm2
 	npm install faker
-	# for some reason unicode doesn't install properly as part of the mass installation - try again.
-	npm install unicode
-	echo
-	echo "..----------------....----------------....----------------....-----------------."
-	echo "|..--------------..||..--------------..||..--------------..||..--------------..|"
-	echo "|.|.____....____.|.||.|.._________...|.||.|......__......|.||.|.____.._____..|.|"
-	echo "|.||_...\../..._||.||.|.|_...___..|..|.||.|...../..\.....|.||.||_...\|_..._|.|.|"
-	echo "|.|..|...\/...|..|.||.|...|.|_..\_|..|.||.|...././\.\....|.||.|..|...\.|.|...|.|"
-	echo "|.|..|.|\../|.|..|.||.|...|.._|.._...|.||.|.../.____.\...|.||.|..|.|\.\|.|...|.|"
-	echo "|.|._|.|_\/_|.|_.|.||.|.._|.|___/.|..|.||.|._/./....\.\_.|.||.|._|.|_\...|_..|.|"
-	echo "|.||_____||_____||.||.|.|_________|..|.||.||____|..|____||.||.||_____|\____|.|.|"
-	echo "|.|..............|.||.|..............|.||.|..............|.||.|..............|.|"
-	echo "|.'--------------'.||.'--------------'.||.'--------------'.||.'--------------'.|"
-	echo ".'----------------'..'----------------'..'----------------'..'----------------'"
-	echo "..----------------....----------------....----------------....----------------."
-	echo "|..--------------..||..--------------..||..--------------..||..--------------..|"
-	echo "|.|.____....____.|.||.|......__......|.||.|.._______.....|.||.|.._________...|.|"
-	echo "|.||_...\../..._||.||.|...../..\.....|.||.|.|_...__.\....|.||.|.|.._..._..|..|.|"
-	echo "|.|..|...\/...|..|.||.|...././\.\....|.||.|...|.|__).|...|.||.|.|_/.|.|.\_|..|.|"
-	echo "|.|..|.|\../|.|..|.||.|.../.____.\...|.||.|...|..__./....|.||.|.....|.|......|.|"
-	echo "|.|._|.|_\/_|.|_.|.||.|._/./....\.\_.|.||.|.._|.|..\.\_..|.||.|...._|.|_.....|.|"
-	echo "|.||_____||_____||.||.||____|..|____||.||.|.|____|.|___|.|.||.|...|_____|....|.|"
-	echo "|.|..............|.||.|..............|.||.|..............|.||.|..............|.|"
-	echo "|.'--------------'.||.'--------------'.||.'--------------'.||.'--------------'.|"
-	echo ".'----------------'..'----------------'..'----------------'..'----------------'"
-	echo
-	echo "DONE: Setting up ThrillWorld Application"
 
-}
 
 function update_repo(){
 	echo "Install MongoDB Enterprise Repository"
@@ -132,17 +101,7 @@ function install_nodejs() {
 
 function generate_data() {
 	echo "Generating data..."
-	cd /home/vagrant/ThrillWorld/meanstore
-	node data/fake-refrigerators.js
-	node data/fake-televisions.js
-	node data/fake-cameras.js
-	node data/fake-printers.js
-	node data/fake-apparel.js
-	node data/fake-users.js
-	node data/fake-events.js
-	#node data/fake-stores.js
-	node data/category-seeder.js
-	pm2 start startup.json
+	
 	echo "DONE: Generating data"
 }
 

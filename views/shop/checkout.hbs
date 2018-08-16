@@ -19,7 +19,7 @@
 					<h1>Provide Purchaser Details</h1>
 					<div class="panel-body">
 						<div class="table-responsive">
-							<form action="/create" method="post">
+							 <form action='/create' METHOD='post' encType="multipart/form-data">
 								<div class="panel-body">
 									<div class="form-group">
 										<label class="control-label">First Name</label>
@@ -143,7 +143,6 @@
 										<input type="hidden" name="amount_{{inc @index }}" value="{{this.price}}">
 										<input type="hidden" name="itemTotal_{{inc @index }}" value="{{this.itemTotal}}">
 										<input type="hidden" name="option[{{ @index}}]" value="{{this.option}}">
-
 										<input type="hidden" name="item_name[null]" value="" />
 										<input type="hidden" name="item_name[{{ @index }}]" value="{{this.item.name}}" />
 										<input type="hidden" name="item_title[{{ @index }}]" value="{{this.item.title}}" />
@@ -195,7 +194,7 @@
 										<td>&nbsp;</td>
 										<td>&nbsp;</td>
 										<td>Shipping: </td>
-										<td class='text-right' text-align="right">${{money shippingtotal}}</td>
+										<td class='text-right' text-align="right">{{money shippingtotal}}</td>
 										<td>&nbsp;</td>
 									</tr>
 									<tr>
@@ -203,16 +202,17 @@
 										<td>&nbsp;</td>
 										<td>&nbsp;</td>
 										<td>Total: </td>
-										<td class='text-right' text-align="right">${{money grandtotal}}</td>
+										<td class='text-right' text-align="right">{{money grandtotal}}</td>
 										<td>&nbsp;</td>
 									</tr>
 								</tbody>
 							</table>
 							<li class="list-group-item">
 							<div class="text-right">
-								<input id='checkout' name='checkout' type='submit' value='Pay with Paypal >' class='btn btn-primary text-right'><br>
-								<input id='checkout' name='checkout' type='submit' value='Pay with credit or debit card >' class='btn btn-primary text-right'><br>
-								<input id='checkout' name='checkout' type='submit' value='Pay On arrival >' class='btn btn-primary text-right'><br>
+								<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">pay by card</button>
+								<p></p>
+								<p></p>
+								<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">pay on arrival</button>
 								<div class="text-left">
 								{{#if ../enableShipping}}
 									<input id='update' name='update' type='submit' value='Update Shipping' class='btn btn-warning text-right'>
@@ -240,7 +240,7 @@
 				{{#if ../enableShipping}}
 				{{>shipping}}
 				{{/if}}
-<script>
+<script type="javascript">
   $("input[name='update']").hide();
   $("input[name='shipping_flag']").click(function() {
   		$("update").data('value')='UPDATE SHIPPING INFO';

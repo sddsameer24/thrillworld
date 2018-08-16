@@ -14,7 +14,7 @@
                     <li class="active">
                         <i class="fa fa-bar-chart-o"></i> {{adminPageTitle}}
                     </li>
-                    <h1>ThrillWorld Store Locations</h1>
+                    <h1>ThrillWorld Events Locations</h1>
 
                 </ol>
             </div>
@@ -35,42 +35,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <!-- main dashboard section -->
-                    <p data-placement="top" data-toggle="tooltip" title="View Stores Document Schema ">
-                        <button class="ui right floated btn btn-warning btn-lg" data-title="view" data-toggle="modal" data-target="#view-store"> <span class="glyphicon glyphicon-eye-open"> </span> View Geospatial Query
-                        </button>
-                    </p>
-                    <!-- Add Dialog -->
-                    <div class="modal fade" id="view-store" tabindex="-1" role="dialog" aria-labelledby="view" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                                    <h4 class="modal-title custom_align" id="Heading">Geospatial Query</h4>
-                                </div>
-                                <div class="modal-body text-left">
-                                    <pre><code class="prettyPrint">
-db.stores.find(
-   {
-     location:
-       { $near :
-          {
-            $geometry: { type: "Point",  coordinates: [ -73.9667, 40.78 ] },
-            $minDistance: 1000,
-            $maxDistance: 5000
-          }
-       }
-   }
-)    
-                                    </code></pre>
-                                </div>
-                                <!-- /.modal-content -->
-                            </div>
-                            <!-- /.modal-dialog -->
-                        </div>
-
-                    </div>
-                    <!--row-->
+                   
                     <div class="row">
                         <div class="col-md-12">
                             <form action="/admin/stores">
@@ -139,7 +104,7 @@ db.stores.find(
 
                                         </td>
                                         </tr>
-                                        {{!--
+                                        
                                         <tr>
                                             <td>ThrillWorld Store 002</td>
                                             <td>433 Eleventh Street<br>Parkerville, CA 50494</td>
@@ -181,7 +146,7 @@ db.stores.find(
                                             <td>442 Prosink Street<br>Ilven, ND 67874</td>
                                             <td>30.20330, -20.23223</td>
                                             <td>Bill Trip</td>
-                                        </tr>--}} {{/each}}
+                                        </tr> {{/each}}
                                     </tbody>
                                 </table>
                             </div>

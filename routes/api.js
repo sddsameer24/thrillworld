@@ -416,8 +416,9 @@ router.get('/order/:id', function(req, res, next) {
 	})
 });
 
-/* New Category */
+/* New order */
 router.post('/order', function(req, res, next) {
+	
 	order = new Order({
 		user: req.params.userId,
 		cart: req.params.cart,
@@ -432,6 +433,7 @@ router.post('/order', function(req, res, next) {
 		},
 		status: req.params.status
 	});
+	console.log(order);
 	order.save(function(err,order) {
 		if (err) {
 			res.send(1000,'Problem saving order.');

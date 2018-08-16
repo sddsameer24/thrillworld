@@ -16,8 +16,10 @@ var passport = require('passport');
 var moment = require('moment');
 var mongoose = require('mongoose');
 // var csrf = require('csurf');
+
 var User = require('../models/user');
 var Payment = require('../models/payment');
+var Insta = require('instamojo-nodejs');
 var fileUpload = require('express-fileupload');
 var fs = require('fs');
 var csv = require('ya-csv');
@@ -173,6 +175,26 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
     })
 });
 
+router.post('/order', function (req, res, next) {
+    console.log(req.files);
+    successMsg = req.flash('success')[0];
+    errorMsg = req.flash('error')[0];
+    var order_id = req.body._id;
+    var query = { '_id': order_id };
+
+    // Order = new Order({
+    // note = req.body.note,
+    // receiver = req.body.receiver,
+    // })
+    Order.save(function (err) {
+        console.log("Order: " + order);
+        if (err) {
+            res.send(500, 'Error deleting order.');
+        }
+      
+        return res.redirect('/admin/orders');
+    })
+})
 router.post('/delete-order', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
@@ -549,6 +571,105 @@ router.get('/import', isAdmin, function (req, res, next) {
         successMsg: successMsg
     });
 });
+/*payment instamojo */
+/*Create new payment request*/
+// Insta.setKeys('2bdd03b508f7f88c1abc9aed27de5aa9', '8eca226c24353bce2feb84db3aaa732c');
+
+// var data = new Insta.PaymentData();
+ 
+// data.purpose = "Test";            // REQUIRED
+// data.amount = 9;                  // REQUIRED
+// data.setRedirectUrl("http://localhost:3000");
+ 
+// Insta.createPayment(data, function(error, response) {
+//   if (error) {
+//     // some error
+//   } else {
+//     // Payment redirection link at response.payment_request.longurl
+//     console.log(response);
+//   }
+// });
+
+// /*seeAllLinks*/
+// Insta.seeAllLinks(function(error, response) {
+//     if (error) {
+//       // Some error
+//     } else {
+//       console.log(response);
+//     }
+//   });
+// /*getAllPaymentRequests*/
+// Insta.getAllPaymentRequests(function(error, response) {
+//     if (error) {
+//       // Some error
+//     } else {
+//       console.log(response);
+//     }
+//   });
+// /*getPaymentRequestStatus*/
+//   Insta.getPaymentRequestStatus("PAYMENT-REQUEST-ID", function(error, response) {
+//     if (error) {
+//       // Some error
+//     } else {
+//       console.log(response);
+//     }
+//   });
+
+//   /*getPaymentDetails*/
+
+//   Insta.getPaymentDetails("PAYMENT-REQUEST-ID", "PAYMENT-ID", function(error, response) {
+//     if (error) {
+//       // Some error
+//     } else {
+//       console.log(response);
+//     }
+//   });
+
+//  /*RefundRequest*/
+
+//   var refund = new Insta.RefundRequest();
+// refund.payment_id = '';     // This is the payment_id, NOT payment_request_id
+// refund.type       = '';     // Available : ['RFD', 'TNR', 'QFL', 'QNR', 'EWN', 'TAN', 'PTH']
+// refund.body       = '';     // Reason for refund
+// refund.setRefundAmount(8);  // Optional, if you want to refund partial amount
+// Insta.createRefund(refund, function(error, response) {
+//   console.log(response);
+// });
+ 
+
+// /*Get refund status for a refund id*/
+
+// Insta.getRefundDetails("REFUND-ID", function(error, response) {
+//   if (error) {
+//     // Some error
+//   } else {
+//     // Refund status at response.refund.status
+//     console.log(response);
+//   }
+// });
+
+// /*Get all refunds*/
+
+// Insta.getAllRefunds(function(error, response) {
+//   if (error) {
+//     // Some error
+//   } else {
+//     console.log(response);
+//   }
+// });
+
+// /*Additional Payment Data*/
+
+// data.currency                = 'INR';
+// data.buyer_name              = '<buyer name>';
+// data.email                   = '<buyer email>';
+// data.phone                   = 1234567890;
+// data.send_sms                = 'False';
+// data.send_email              = 'False';
+// data.allow_repeated_payments = 'False';
+// data.webhook                 = 'Your endpoint to capture POST data from a payment';
+// data.redirect_url            = 'Your endpoint where instamojo redirects user to after';
+
 
 /* Recieve posted CSV */
 router.post('/import', isAdmin, function (req, res, next) {
@@ -657,20 +778,20 @@ router.post('/delete-product', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var product_id = req.body._id;
-    meanlogger.log("trash", "Deleting Activity " + activity_id, req.user);
+    meanlogger.log("trash", "Deleting product " + product_id, req.user);
     Product.remove({ _id: product_id }, function (err, product) {
         if (err) {
             res.send(500, 'Error deleting order.');
         }
         product.status = 'deleted';
-        product.save(function (err) {
-            if (!err) {
-                console.log("updated");
-            } else {
-                console.log(err);
-            }
+        // product.save(function (err) {
+        //     if (!err) {
+        //         console.log("updated");
+        //     } else {
+        //         console.log(err);
+        //     }
 
-        });
+        // });
         return res.redirect('/admin/products');
     })
 })
@@ -691,7 +812,7 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
     }
     if (req.files) {
         imageFile = req.files.imageFile;
-        imageFile.mv(process.env.imagePath + '/' + req.body.name + '.png', function (err) {
+        imageFile.mv('public/images/'+ req.body.name + '.png', function (err) {
             if (err) {
                 res.status(500).send(err);
             }
@@ -760,11 +881,6 @@ router.post('/add-category', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     var imageFile;
 
-    if (!req.files) {
-        res.send('No files were uploaded.');
-        return;
-    }
-
     category = new Category({
         description: req.body.description,
         name: req.body.name,
@@ -772,13 +888,13 @@ router.post('/add-category', isAdmin, function (req, res, next) {
         layout: req.body.layout
 
     })
-    product.save(function (err) {
+    category.save(function (err) {
         if (err) {
             req.flash('error', 'Error: ' + err.message);
-            return res.redirect('/admin/category');
+            return res.redirect('/admin/categories');
         }
         console.log("category: " + category);
-        return res.redirect('/admin/category');
+        return res.redirect('/admin/categories');
     });
 });
 

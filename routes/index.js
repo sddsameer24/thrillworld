@@ -63,6 +63,8 @@ var paypal = require('paypal-rest-sdk');
 require('../config/pp-config.js');
 var config = {};
 
+
+
 /* PayPal Info Page */
 router.get('/whypaypal', function(req, res, next) {
 	res.render('shop/whypaypal');
@@ -1187,6 +1189,7 @@ router.post('/create', function(req, res, next) {
 	var method = req.body.method;
 	var telephone = req.body.telephone;
 	var email = req.body.email;
+
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	var first_name = req.body.first_name;
@@ -1221,7 +1224,7 @@ router.post('/create', function(req, res, next) {
 		},
 		"transactions": [{
 			"amount": {
-				"currency": "USD",
+				"currency": "Rupees",
 				"total": String(amount.toFixed(2)),
 				"details": {
 					"subtotal": String(subtotal.toFixed(2)),
@@ -1314,67 +1317,104 @@ router.post('/create', function(req, res, next) {
 	// When the user authorizes, paypal will callback our /execute route and we'll complete the transaction
 	//
 
-	paypal.payment.create(create_payment, function(err, payment) {
-		if (err) {
-			errorMsg = req.flash('error', err.message);
-			res.redirect('/')
-		} else {
-			req.session.paymentId = payment.id;
-			var ourPayment = payment;
-			ourPayment.user = req.user._id;
-			var newPayment = new Payment(ourPayment);
-			newPayment.save(function(err, newpayment) {
-				if (err) {
-					errorMsg = req.flash('error', err.message);
-					console.log('error: ' + err.message);
-					return res.redirect('/shopping-cart');
-				}
-				// Create Order Record with a pending status.
-				var order = new Order({
-					user: {
-						id: req.user._id,
-						first_name: req.user.first_name,
-						last_name: req.user.last_name,
-						email: req.user.email,
-						telephone: req.user.telephone
-					},
-					cart: orders,
-					shipping_address: req.body.shipping_addr1,
-					shipping_city: req.body.shipping_city,
-					shipping_state: req.body.shipping_state,
-					shipping_zipcode: req.body.shipping_zipcode,
-					billing_address: req.body.shipping_addr1,
-					billing_city: req.body.shipping_city,
-					billing_state: req.body.shipping_state,
-					billing_zipcode: req.body.shipping_zipcode,
-					paymentId: payment.id,
-					status: 'pending',
-					total: parseFloat(cart.grandTotal)
-				});
-				order.save(function(err) {
-					if (err) {
-						console.log("Error: " + err.message)
-						req.flash('error', 'Unable to save order... ' + err.message);
-						res.redirect('/');
-					}
-				})
-				var redirectUrl;
-				if (payment.payer.payment_method === 'paypal') {
-					var done = 0;
-					for (var i = 0; i < payment.links.length; i++) {
-						done++;
-						var link = payment.links[i];
-						if (link.method === 'REDIRECT') {
-							redirectUrl = link.href;
-						}
-						if (done == payment.links.length) {
-							return res.redirect(redirectUrl);
-						}
-					}
-				}
-			});
-		}
-	});
+	// STORE THE ORDER DATA TO DB
+		// Create Order Record with a pending status.
+		var order = new Order({
+			user: {
+				id: req.user._id,
+				first_name: req.user.first_name,
+				last_name: req.user.last_name,
+				email: req.user.email,
+				telephone: req.user.telephone
+			},
+			cart: orders,
+			shipping_address: req.body.shipping_addr1,
+			shipping_city: req.body.shipping_city,
+			shipping_state: req.body.shipping_state,
+			shipping_zipcode: req.body.shipping_zipcode,
+			billing_address: req.body.shipping_addr1,
+			billing_city: req.body.shipping_city,
+			billing_state: req.body.shipping_state,
+			billing_zipcode: req.body.shipping_zipcode,
+			paymentId: 1234, // Adding Dummmy payment id
+			status: 'pending',
+			total: parseFloat(cart.grandTotal)
+		});
+		order.save(function(err) {
+			if (err) {
+				console.log("Error: " + err.message)
+				req.flash('error', 'Unable to save order... ' + err.message);
+				res.redirect('/');
+			}
+			
+			req.flash('success', "Order Successful!");
+            return res.redirect('/');
+		})
+	
+
+
+	// paypal.payment.create(create_payment, function(err, payment) {
+	// 	if (err) {
+	// 		console.log("ERROR HIT");
+	// 		errorMsg = req.flash('error', err.message);
+	// 		res.redirect('/')
+	// 	} else {
+	// 		req.session.paymentId = payment.id;
+	// 		var ourPayment = payment;
+	// 		ourPayment.user = req.user._id;
+	// 		var newPayment = new Payment(ourPayment);
+	// 		newPayment.save(function(err, newpayment) {
+	// 			if (err) {
+	// 				errorMsg = req.flash('error', err.message);
+	// 				console.log('error: ' + err.message);
+	// 				return res.redirect('/shopping-cart');
+	// 			}
+	// 			// Create Order Record with a pending status.
+	// 			var order = new Order({
+	// 				user: {
+	// 					id: req.user._id,
+	// 					first_name: req.user.first_name,
+	// 					last_name: req.user.last_name,
+	// 					email: req.user.email,
+	// 					telephone: req.user.telephone
+	// 				},
+	// 				cart: orders,
+	// 				shipping_address: req.body.shipping_addr1,
+	// 				shipping_city: req.body.shipping_city,
+	// 				shipping_state: req.body.shipping_state,
+	// 				shipping_zipcode: req.body.shipping_zipcode,
+	// 				billing_address: req.body.shipping_addr1,
+	// 				billing_city: req.body.shipping_city,
+	// 				billing_state: req.body.shipping_state,
+	// 				billing_zipcode: req.body.shipping_zipcode,
+	// 				paymentId: payment.id,
+	// 				status: 'pending',
+	// 				total: parseFloat(cart.grandTotal)
+	// 			});
+	// 			order.save(function(err) {
+	// 				if (err) {
+	// 					console.log("Error: " + err.message)
+	// 					req.flash('error', 'Unable to save order... ' + err.message);
+	// 					res.redirect('/');
+	// 				}
+	// 			})
+	// 			var redirectUrl;
+	// 			if (payment.payer.payment_method === 'paypal') {
+	// 				var done = 0;
+	// 				for (var i = 0; i < payment.links.length; i++) {
+	// 					done++;
+	// 					var link = payment.links[i];
+	// 					if (link.method === 'REDIRECT') {
+	// 						redirectUrl = link.href;
+	// 					}
+	// 					if (done == payment.links.length) {
+	// 						return res.redirect(redirectUrl);
+	// 					}
+	// 				}
+	// 			}
+	// 		});
+	// 	}
+	// });
 });
 
 router.get('/like/:id', isLoggedIn, function(req, res, next) {

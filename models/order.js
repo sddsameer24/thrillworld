@@ -5,13 +5,11 @@ const dotenv = require('dotenv');
 const chalk = require('chalk');
 var mongodb = require("mongodb");
 
-// dotenv.load({
-// 	path: '.env.hackathon'
-// });
+dotenv.load({
+	path: '.env.hackathon'
+});
 
-//get instance of MongoClient to establish connection
-//Connecting to the Mongodb instance.
-//Make sure your mongodb daemon mongod is running on port 27017 on localhost
+
 
 var Schema = mongoose.Schema;
 

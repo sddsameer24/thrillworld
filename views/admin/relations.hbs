@@ -55,38 +55,7 @@
                                 <div class="tab-content">
                                     <div class="tab-pane fade in active" id="viewed-a">
                                         <div class="form-group">
-                                            <pre>
-db.products.aggregate(
-
-	// Pipeline
-	[
-		// Stage 1
-		{
-			$graphLookup: {
-			    from: "orders",
-			    startWith: "$code", // connectToField value(s) that recursive search starts with
-			    connectFromField: "cart.code",
-			    connectToField: "cart.code",
-			    as: "also_purchased"
-			    //maxDepth: 0
-			    //depthField: "depthField" // optional - name of field in output documents
-			}
-		},
-
-		// Stage 2
-		{
-			$project: {
-			    code: 1,
-			    
-			    "also_purchased.user.email": 1,
-			    "also_purchased.cart.code": 1
-			}
-		},
-
-	]
-
-);
-</pre>
+                                            
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="viewed-b">
@@ -108,10 +77,10 @@ db.products.aggregate(
                 </div>
                 <!--row-->
                 <div class="row">
-                    <h3>The chart below illustrates the connections between users and products. When a user completes a purchase,
+                    <h3>The chart below illustrates the connections between users and events. When a user completes an event,
                         the products purchased are added to the user record as well as to an orders document. By correlating
                         products to users and showing these relationships, we can begin to see how we may beging to increase
-                        sales of products by presenting those products frequently purchased together to users as they view
+                        sales of events by presenting those products frequently purchased together to users as they view
                         and purchase.</h3>
 
                     <div class="panel panel-default">
