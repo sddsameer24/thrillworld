@@ -1,4 +1,4 @@
 var smtpConfig = {
-	connectString: "smtps://yourname%40yourdomain.org:yourpass!@smtp.gmail.com"
+	connectString: "smtps://sdsameer24@gmail.com:22watch22!@smtp.gmail.com"
 };
 module.exports = smtpConfig;

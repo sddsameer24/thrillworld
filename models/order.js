@@ -130,7 +130,7 @@ orderSchema.post('save', function(doc) {
 		var incupdate = {
 			$inc: {}
 		};
-		incupdate.$inc['months.' + months[month] + '.sales'] = doc.cart.total;
+		incupdate.$inc['months.' + months[month] + '.sales'] = cart.total;
 		incupdate.$inc['ytd'] = doc.cart.total;
 		db.collection('sales', function(err, collection) {
 			if (err) {

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Cart = require('../models/cart');
+var nodemailer = require('nodemailer');
 var Category = require('../models/category');
 var Product = require('../models/product');
 var Event = require('../models/events');
@@ -417,8 +418,11 @@ router.get('/order/:id', function(req, res, next) {
 });
 
 /* New order */
-router.post('/order', function(req, res, next) {
+router.post('/order', (req, res, next) => {
 	
+	
+	
+	;
 	order = new Order({
 		user: req.params.userId,
 		cart: req.params.cart,
@@ -433,13 +437,40 @@ router.post('/order', function(req, res, next) {
 		},
 		status: req.params.status
 	});
-	console.log(order);
+	
 	order.save(function(err,order) {
 		if (err) {
 			res.send(1000,'Problem saving order.');
 		}
 		res.send(category);
 	})
+	const output='<p>order placed</p>'
+	var transporter = nodemailer.createTransport({
+		service: 'gmail',
+		auth: {
+		  user: 'sdsameer24@gmail.com',
+		  pass: '22watch22'
+		},
+		tls:{
+			rejectUnauthorized:false
+		}
+	  });
+	  
+	  var mailOptions = {
+		from: 'sdsameer24@gmail.com',
+		to: 'sdsameer24@gmail.com',
+		subject: 'Sending Email using Node.js',
+		text: 'That was easy!'
+	  };
+	  
+	  transporter.sendMail(mailOptions, function(error, info){
+		if (error) {
+		  console.log(error);
+		} else {
+		  console.log('Email sent: ' + info.response);
+		}
+	  });
+
 });
 router.get('/donut-chart', function(req, res, next) {
 	Event.aggregate([

@@ -573,103 +573,159 @@ router.get('/import', isAdmin, function (req, res, next) {
 });
 /*payment instamojo */
 /*Create new payment request*/
-// Insta.setKeys('2bdd03b508f7f88c1abc9aed27de5aa9', '8eca226c24353bce2feb84db3aaa732c');
+var request = require('request');
 
-// var data = new Insta.PaymentData();
- 
-// data.purpose = "Test";            // REQUIRED
-// data.amount = 9;                  // REQUIRED
-// data.setRedirectUrl("http://localhost:3000");
- 
-// Insta.createPayment(data, function(error, response) {
-//   if (error) {
-//     // some error
-//   } else {
-//     // Payment redirection link at response.payment_request.longurl
-//     console.log(response);
-//   }
-// });
+var HOSTS = {
+  'production' : "https://www.instamojo.com/api/1.1/",
+  'test'       : "https://test.instamojo.com/api/1.1/"
+};
 
-// /*seeAllLinks*/
-// Insta.seeAllLinks(function(error, response) {
-//     if (error) {
-//       // Some error
-//     } else {
-//       console.log(response);
-//     }
-//   });
-// /*getAllPaymentRequests*/
-// Insta.getAllPaymentRequests(function(error, response) {
-//     if (error) {
-//       // Some error
-//     } else {
-//       console.log(response);
-//     }
-//   });
-// /*getPaymentRequestStatus*/
-//   Insta.getPaymentRequestStatus("PAYMENT-REQUEST-ID", function(error, response) {
-//     if (error) {
-//       // Some error
-//     } else {
-//       console.log(response);
-//     }
-//   });
+var API = {
+  'createPayment' : 'payment-requests/',
+  'links'         : 'links/',
+  'paymentStatus' : 'payment-requests/',
+  'refunds'       : 'refunds/'
+};
 
-//   /*getPaymentDetails*/
+module.exports = {
+  HEADERS: {
+    'X-Api-Key'    : "2bdd03b508f7f88c1abc9aed27de5aa9",
+    'X-Auth-Token' : "8eca226c24353bce2feb84db3aaa732c"
+  },
 
-//   Insta.getPaymentDetails("PAYMENT-REQUEST-ID", "PAYMENT-ID", function(error, response) {
-//     if (error) {
-//       // Some error
-//     } else {
-//       console.log(response);
-//     }
-//   });
+  CURRENT_HOST : 'production',
 
-//  /*RefundRequest*/
+  isSandboxMode : function(isSandbox) {
+    if (isSandbox) {
+      this.CURRENT_HOST = 'test';
+    } else {
+      this.CURRENT_HOST = 'production';
+    }
+  },
 
-//   var refund = new Insta.RefundRequest();
-// refund.payment_id = '';     // This is the payment_id, NOT payment_request_id
-// refund.type       = '';     // Available : ['RFD', 'TNR', 'QFL', 'QNR', 'EWN', 'TAN', 'PTH']
-// refund.body       = '';     // Reason for refund
-// refund.setRefundAmount(8);  // Optional, if you want to refund partial amount
-// Insta.createRefund(refund, function(error, response) {
-//   console.log(response);
-// });
- 
+  setKeys: function(apiKey, authKey) {
+    this.HEADERS['X-Api-Key']  = apiKey;
+    this.HEADERS['X-Auth-Token'] = authKey;
+  },
 
-// /*Get refund status for a refund id*/
+  createPayment: function(data, callback) {
+    request.post({
+      headers : this.HEADERS,
+      url     : HOSTS[this.CURRENT_HOST] + API.createPayment,
+      form    : data
+    }, function(error, response, body){
+      var result = body;
+      callback(error, result);
+    });
+  },
 
-// Insta.getRefundDetails("REFUND-ID", function(error, response) {
-//   if (error) {
-//     // Some error
-//   } else {
-//     // Refund status at response.refund.status
-//     console.log(response);
-//   }
-// });
+  seeAllLinks: function(callback) {
+    request.get({
+      headers : this.HEADERS,
+      url     : HOSTS[this.CURRENT_HOST] + API.links
+    }, function(error, response, body){
+      var result = JSON.parse(body);
+      callback(error, result);
+    });
+  },
 
-// /*Get all refunds*/
+  getAllPaymentRequests: function(callback) {
+    request.get({
+      headers : this.HEADERS,
+      url     : HOSTS[this.CURRENT_HOST] + API.paymentStatus
+    }, function(error, response, body){
+      var result = JSON.parse(body);
+      callback(error, result);
+    });
+  },
 
-// Insta.getAllRefunds(function(error, response) {
-//   if (error) {
-//     // Some error
-//   } else {
-//     console.log(response);
-//   }
-// });
+  getPaymentRequestStatus: function(id, callback) {
+    request.get({
+      headers : this.HEADERS,
+      url     : HOSTS[this.CURRENT_HOST] + API.paymentStatus + id + '/'
+    }, function(error, response, body){
+      var result = JSON.parse(body);
+      callback(error, result);
+    });
+  },
 
-// /*Additional Payment Data*/
+  getPaymentDetails: function(payment_request_id, payment_id, callback) {
+    request.get({
+      headers : this.HEADERS,
+      url     : HOSTS[this.CURRENT_HOST] + API.paymentStatus + payment_request_id + '/' + payment_id + '/'
+    }, function(error, response, body){
+      var result = JSON.parse(body);
+      callback(error, result);
+    });
+  },
 
-// data.currency                = 'INR';
-// data.buyer_name              = '<buyer name>';
-// data.email                   = '<buyer email>';
-// data.phone                   = 1234567890;
-// data.send_sms                = 'False';
-// data.send_email              = 'False';
-// data.allow_repeated_payments = 'False';
-// data.webhook                 = 'Your endpoint to capture POST data from a payment';
-// data.redirect_url            = 'Your endpoint where instamojo redirects user to after';
+  createRefund: function(refundRequest, callback) {
+    request.post({
+      headers : this.HEADERS,
+      url     : HOSTS[this.CURRENT_HOST] + API.refunds + '/',
+      form    : refundRequest
+    }, function(error, response, body){
+      var result = JSON.parse(body);
+      callback(error, result);
+    });
+  },
 
+  getAllRefunds: function(callback) {
+    request.get({
+      headers: this.HEADERS,
+      url: HOSTS[this.CURRENT_HOST] + API.refunds
+    }, function(error, response, body){
+      var result = JSON.parse(body);
+      callback(error, result);
+    });
+  },
+
+  getRefundDetails: function(id, callback) {
+    request.get({
+      headers: this.HEADERS,
+      url: HOSTS[this.CURRENT_HOST] + API.refunds + id + '/'
+    }, function(error, response, body){
+      var result = JSON.parse(body);
+      callback(error, result);
+    });
+  },
+
+  PaymentData: function() {
+    return ({
+      'purpose'                 : '', // required
+      'amount'                  : 0,  // required
+      'currency'                : 'INR',
+      'buyer_name'              : '',
+      'email'                   : '',
+      'phone'                   : null,
+      'send_email'              : '',
+      'send_sms'                : '',
+      'allow_repeated_payments' : '',
+      'webhook'                 : '',
+      'redirect_url'            : '',
+
+      setWebhook: function(hook) {
+        this.webhook = hook;
+      },
+
+      setRedirectUrl: function(redirectUrl) {
+        this.redirect_url = redirectUrl;
+      }
+    });
+  },
+
+  RefundRequest: function() {
+    return ({
+      'payment_id'    : '',
+      'type'          : '',  // Available : ['RFD', 'TNR', 'QFL', 'QNR', 'EWN', 'TAN', 'PTH']
+      'body'          : '',
+
+      setRefundAmount: function(refundAmount) {
+        this.refund_amount = refundAmount;
+      }
+    });
+  }
+};
 
 /* Recieve posted CSV */
 router.post('/import', isAdmin, function (req, res, next) {

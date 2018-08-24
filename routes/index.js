@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Cart = require('../models/cart');
+var nodemailer = require('nodemailer');
 var Category = require('../models/category');
 var Product = require('../models/product');
 var Event = require('../models/events');
@@ -14,8 +15,7 @@ var mongoose = require('mongoose');
 var ObjectId = require('mongoose').Types.ObjectId;
 var validator = require('express-validator');
 var util = require('util');
-var nodemailer = require('nodemailer');
-var smtpConfig = require('../config/smtp-config.js');
+// var smtpConfig = require('../config/smtp-config.js');
 var taxCalc = require('../local_modules/tax-calculator');
 var shippingCalc = require('../local_modules/shipping-calculator');
 var taxConfig = require('../config/tax-config.js');
@@ -66,16 +66,16 @@ var config = {};
 
 
 /* PayPal Info Page */
-router.get('/whypaypal', function(req, res, next) {
+router.get('/whypaypal', function (req, res, next) {
 	res.render('shop/whypaypal');
 });
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-	if (!req.session.category===null) {
+router.get('/', function (req, res, next) {
+	if (!req.session.category === null) {
 		return res.redirect('/category/' + req.session.category);
 	}
-	if (!req.session.group===null) {
+	if (!req.session.group === null) {
 		return res.redirect('/group/' + req.session.group);
 	}
 	var successMsg = req.flash('success')[0];
@@ -107,27 +107,27 @@ router.get('/', function(req, res, next) {
 				order: 1
 			}
 		}],
-		function(err, Product_Group) {
+		function (err, Product_Group) {
 			if (frontPageCategory) {
 				categCondition = {
 					"$match": {
 						"$and": [{
-								"status": {
-									$ne: 'deleted'
-								}
-							},
-							{
-								"category": frontPageCategory
-							},
-							{
-								$or: [{
-									"inventory.onHand": {
-										$gt: 0
-									}
-								}, {
-									"inventory.disableOnZero": false
-								}]
+							"status": {
+								$ne: 'deleted'
 							}
+						},
+						{
+							"category": frontPageCategory
+						},
+						{
+							$or: [{
+								"inventory.onHand": {
+									$gt: 0
+								}
+							}, {
+								"inventory.disableOnZero": false
+							}]
+						}
 						]
 					}
 				}
@@ -163,60 +163,60 @@ router.get('/', function(req, res, next) {
 			// ]
 			Product.find({
 				"$and": [{
-							"status": {
-								"$ne": 'deleted'
-							}
-						}, {
-							$or: [{
-								"inventory.onHand": {
-									"$gt": 0
-								}
-							}, {
-								"inventory.disableOnZero": false
-							}]
-						}]
+					"status": {
+						"$ne": 'deleted'
+					}
+				}, {
+					$or: [{
+						"inventory.onHand": {
+							"$gt": 0
+						}
+					}, {
+						"inventory.disableOnZero": false
+					}]
+				}]
 			}
-			, function(err, docs) {
-				if (err) {
-					products = {}
-				}
+				, function (err, docs) {
+					if (err) {
+						products = {}
+					}
 
-				productChunks = [];
-				productJSON = [];
-				chunkSize = 4;
-				for (var i = (4 - chunkSize); i < docs.length; i += chunkSize) {
-					productChunks.push(docs.slice(i, i + chunkSize));
-				}
+					productChunks = [];
+					productJSON = [];
+					chunkSize = 4;
+					for (var i = (4 - chunkSize); i < docs.length; i += chunkSize) {
+						productChunks.push(docs.slice(i, i + chunkSize));
+					}
 
-				res.render('shop/eshop', {
-					layout: 'eshop/eshop',
-					title: title,
-					navcats: req.app.get('navcats'),
-					navgroups: req.app.get('navgroups'),
-					salegroups: req.app.get('salegroups'),
-					categoryrecord: JSON.stringify(categoryrecord),
-					showRecommendations: eval(res.locals.showRecommendations),
-					allcategories: res.locals.allcategories,
-					keywords: Config.keywords,
-					products: productChunks,
-					recommended: docs,
-					Product_Group: Product_Group,
-					user: req.user,
-					errorMsg: errorMsg,
-					noErrorMsg: !errorMsg,
-					successMsg: successMsg,
-					viewDocuments: viewDocuments,
-					tutorial: tutorial,
-					noMessage: !successMsg,
-					viewTour: viewTour,
-					isLoggedIn: req.isAuthenticated()
+					res.render('shop/eshop', {
+						layout: 'eshop/eshop',
+						title: title,
+						navcats: req.app.get('navcats'),
+						navgroups: req.app.get('navgroups'),
+						salegroups: req.app.get('salegroups'),
+						categoryrecord: JSON.stringify(categoryrecord),
+						showRecommendations: eval(res.locals.showRecommendations),
+						allcategories: res.locals.allcategories,
+						keywords: Config.keywords,
+						products: productChunks,
+						recommended: docs,
+						Product_Group: Product_Group,
+						user: req.user,
+						errorMsg: errorMsg,
+						noErrorMsg: !errorMsg,
+						successMsg: successMsg,
+						viewDocuments: viewDocuments,
+						tutorial: tutorial,
+						noMessage: !successMsg,
+						viewTour: viewTour,
+						isLoggedIn: req.isAuthenticated()
+					});
 				});
-			});
 		});
 });
 
 /* Get sale items */
-router.get('/sale', function(req, res, next) {
+router.get('/sale', function (req, res, next) {
 
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -248,7 +248,7 @@ router.get('/sale', function(req, res, next) {
 				_id: 1
 			}
 		}],
-		function(err, Product_Group) {
+		function (err, Product_Group) {
 			if (frontPageCategory) {
 				categCondition = {
 					category: frontPageCategory
@@ -256,7 +256,7 @@ router.get('/sale', function(req, res, next) {
 			} else {
 				categCondition = {};
 			}
-			Product.find(categCondition, function(err, docs) {
+			Product.find(categCondition, function (err, docs) {
 				productChunks = [];
 				productJSON = [];
 				chunkSize = 4;
@@ -291,7 +291,7 @@ router.get('/sale', function(req, res, next) {
 
 
 /* GET home page. */
-router.get('/group/:slug?', function(req, res, next) {
+router.get('/group/:slug?', function (req, res, next) {
 	var group_slug = req.params.slug;
 	req.session.group = req.params.slug; // Save Group for later
 	var q = req.query.q;
@@ -306,7 +306,7 @@ router.get('/group/:slug?', function(req, res, next) {
 	}
 	Product.find(
 		group_search,
-		function(err, products) {
+		function (err, products) {
 			if (err) {
 				console.log("Error finding group " + group_slug);
 				req.flash('error', 'Cannot find group');
@@ -343,7 +343,7 @@ router.get('/group/:slug?', function(req, res, next) {
 });
 
 /* GET home page. */
-router.get('/category/Television', function(req, res, next) {
+router.get('/category/Television', function (req, res, next) {
 	var category_slug = req.params.slug;
 	req.session.category = req.params.slug;
 	var q = req.query.q;
@@ -356,10 +356,10 @@ router.get('/category/Television', function(req, res, next) {
 		search = {
 			$match: {
 				$and: [{
-						$text: {
-							$search: q
-						}
+					$text: {
+						$search: q
 					}
+				}
 					// { category: new RegEx(category_slug, 'i')}
 				]
 			}
@@ -371,105 +371,105 @@ router.get('/category/Television', function(req, res, next) {
 			}
 		}
 	}
-	MongoClient.connect(url, function(err, db) {
-	var collection = db.collection( 'products' );
+	MongoClient.connect(url, function (err, db) {
+		var collection = db.collection('products');
 		collection.aggregate([{
-			"$match": {category: "Television"}
-			},
-			{ "$unwind": "$Attributes"},
-			{
-				"$facet": {
-					price: [
-						{
-							$bucket: {
-								groupBy: { 
-									"$divide": [ "$price", 100 ]
-								},
-								boundaries: [0, 200, 400, 500, 600, 700, 1000, 2000, 5000],
-								default: "Over 5000.00",
-								output: {"count": {$sum: 1}}
-							}
-						},
-						{
-							"$project": {
-								lowerPriceBound: "$_id",
-								count: 1,
-								_id: 0
-							}
+			"$match": { category: "Television" }
+		},
+		{ "$unwind": "$Attributes" },
+		{
+			"$facet": {
+				price: [
+					{
+						$bucket: {
+							groupBy: {
+								"$divide": ["$price", 100]
+							},
+							boundaries: [0, 200, 400, 500, 600, 700, 1000, 2000, 5000],
+							default: "Over 5000.00",
+							output: { "count": { $sum: 1 } }
 						}
-					],
-					brands: [
-						{
-							"$sortByCount": "$brand"
-						},
-						{
-							"$project": {
-								brand: "$_id",
-								count: 1,
-								_id: 0
-							}
+					},
+					{
+						"$project": {
+							lowerPriceBound: "$_id",
+							count: 1,
+							_id: 0
 						}
-					],
-					ScreenSize: [
-						{
-							"$match":{ "Attributes.Name": "ScreenSize" }
-						},
-						{
-							"$sortByCount": "$Attributes.Value"
-						},
-						{
-							"$project": {
-								ScreenSize: "$_id",
-								count: 1,
-								_id: 0
-							}
+					}
+				],
+				brands: [
+					{
+						"$sortByCount": "$brand"
+					},
+					{
+						"$project": {
+							brand: "$_id",
+							count: 1,
+							_id: 0
 						}
-					],
-					resolution: [
-						{
-							"$match": { "Attributes.Name": "Resolution" }
-						},
-						{
-							"$sortByCount": "$Attributes.Value"
-						},
-						{
-							"$project": {
-								resolution: "$_id",
-								count: 1,
-								_id: 0
-							}
+					}
+				],
+				ScreenSize: [
+					{
+						"$match": { "Attributes.Name": "ScreenSize" }
+					},
+					{
+						"$sortByCount": "$Attributes.Value"
+					},
+					{
+						"$project": {
+							ScreenSize: "$_id",
+							count: 1,
+							_id: 0
 						}
-					],
-					number_of_ports: [
-						{
-							"$match": {
-								"Attributes.Name": "NumberofPorts"
-							}
-						},
-						{
-							"$sortByCount": "$Attributes.Value"
-						},
-						{
-							"$project": {
-								ports: "$_id",
-								count: 1,
-								_id: 0
-							}
+					}
+				],
+				resolution: [
+					{
+						"$match": { "Attributes.Name": "Resolution" }
+					},
+					{
+						"$sortByCount": "$Attributes.Value"
+					},
+					{
+						"$project": {
+							resolution: "$_id",
+							count: 1,
+							_id: 0
 						}
-					]
-				}
+					}
+				],
+				number_of_ports: [
+					{
+						"$match": {
+							"Attributes.Name": "NumberofPorts"
+						}
+					},
+					{
+						"$sortByCount": "$Attributes.Value"
+					},
+					{
+						"$project": {
+							ports: "$_id",
+							count: 1,
+							_id: 0
+						}
+					}
+				]
 			}
-		], function(err, results) {
+		}
+		], function (err, results) {
 			console.log("Product-unwound: " + JSON.stringify(results));
 			console.log("Err-unwound: " + JSON.stringify(err));
-		Product.aggregate([{
+			Product.aggregate([{
 				$sortByCount: "$category"
-			}], function(err, allcats) {
+			}], function (err, allcats) {
 				Product.aggregate([
 					search, {
 						$sortByCount: "$category"
 					}
-				], function(err, navcats) {
+				], function (err, navcats) {
 					Category.findOne({
 						// slug: new RegExp(category_slug, 'i')
 						$or: [{
@@ -478,7 +478,7 @@ router.get('/category/Television', function(req, res, next) {
 							'name': new RegExp(category_slug, 'i')
 						}],
 
-					}, function(err, category) {
+					}, function (err, category) {
 						if (err) {
 							console.log("Error finding category " + category_slug);
 							req.flash('error', 'Cannot find category');
@@ -491,7 +491,7 @@ router.get('/category/Television', function(req, res, next) {
 						}
 						Product.aggregate([search, {
 							$sortByCount: "$Product_Group"
-						}], function(err, navgroups) {
+						}], function (err, navgroups) {
 							if (q) {
 								srch = {
 									$text: {
@@ -505,54 +505,54 @@ router.get('/category/Television', function(req, res, next) {
 							categCondition = {
 								$match: {
 									$and: [{
-											$or: [{
-												'category': 'Television'
-											}, {
-												'category': new RegExp(category.name, 'i')
-											}]
-										},
-										{
-											status: {
-												$ne: 'deleted'
-											}
-										},
-										{
-											$or: [{
-												"inventory.onHand": {
-													$gt: 0
-												}
-											}, {
-												"inventory.disableOnZero": false
-											}]
+										$or: [{
+											'category': 'Television'
+										}, {
+											'category': new RegExp(category.name, 'i')
+										}]
+									},
+									{
+										status: {
+											$ne: 'deleted'
 										}
+									},
+									{
+										$or: [{
+											"inventory.onHand": {
+												$gt: 0
+											}
+										}, {
+											"inventory.disableOnZero": false
+										}]
+									}
 									]
 								}
 							}
 							categCondition = {
 								$and: [{
-											$or: [{
-												'category': new RegExp(category.slug, 'i')
-											}, {
-												'category': new RegExp(category.name, 'i')
-											}]
-										},
-										{
-											status: {
-												$ne: 'deleted'
-											}
-										},
-										{
-											$or: [{
-												"inventory.onHand": {
-													$gt: 0
-												}
-											}, {
-												"inventory.disableOnZero": false
-											}]
+									$or: [{
+										'category': new RegExp(category.slug, 'i')
+									}, {
+										'category': new RegExp(category.name, 'i')
+									}]
+								},
+								{
+									status: {
+										$ne: 'deleted'
+									}
+								},
+								{
+									$or: [{
+										"inventory.onHand": {
+											$gt: 0
 										}
-									]
+									}, {
+										"inventory.disableOnZero": false
+									}]
+								}
+								]
 							}
-							Product.find({category: "Television"},function(err, products) {
+							Product.find({ category: "Television" }, function (err, products) {
 								if (err || !products || products === 'undefined') {
 									console.log("Error: " + err.message);
 									req.flash('error', 'Problem finding products');
@@ -590,7 +590,7 @@ router.get('/category/Television', function(req, res, next) {
 		})
 	})
 })
-router.get('/category/:slug', function(req, res, next) {
+router.get('/category/:slug', function (req, res, next) {
 	var category_slug = req.params.slug;
 	req.session.category = req.params.slug;
 	var q = req.query.q;
@@ -600,10 +600,10 @@ router.get('/category/:slug', function(req, res, next) {
 		search = {
 			$match: {
 				$and: [{
-						$text: {
-							$search: q
-						}
+					$text: {
+						$search: q
 					}
+				}
 					// { category: new RegEx(category_slug, 'i')}
 				]
 			}
@@ -619,12 +619,12 @@ router.get('/category/:slug', function(req, res, next) {
 
 	Product.aggregate([{
 		$sortByCount: "$category"
-	}], function(err, allcats) {
+	}], function (err, allcats) {
 		Product.aggregate([
 			search, {
 				$sortByCount: "$category"
 			}
-		], function(err, navcats) {
+		], function (err, navcats) {
 			Category.findOne({
 				// slug: new RegExp(category_slug, 'i')
 				$or: [{
@@ -633,7 +633,7 @@ router.get('/category/:slug', function(req, res, next) {
 					'name': new RegExp(category_slug, 'i')
 				}],
 
-			}, function(err, category) {
+			}, function (err, category) {
 				if (err) {
 					console.log("Error finding category " + category_slug);
 					req.flash('error', 'Cannot find category');
@@ -646,7 +646,7 @@ router.get('/category/:slug', function(req, res, next) {
 				}
 				Product.aggregate([search, {
 					$sortByCount: "$Product_Group"
-				}], function(err, navgroups) {
+				}], function (err, navgroups) {
 					if (q) {
 						srch = {
 							$text: {
@@ -661,66 +661,66 @@ router.get('/category/:slug', function(req, res, next) {
 					categCondition = {
 						$match: {
 							$and: [{
-									$or: [{
-										'category': new RegExp(category.slug, 'i')
-									}, {
-										'category': new RegExp(category.name, 'i')
-									}]
-								},
-								{
-									status: {
-										$ne: 'deleted'
-									}
-								},
-								{
-									$or: [{
-										"inventory.onHand": {
-											$gt: 0
-										}
-									}, {
-										"inventory.disableOnZero": false
-									}]
+								$or: [{
+									'category': new RegExp(category.slug, 'i')
+								}, {
+									'category': new RegExp(category.name, 'i')
+								}]
+							},
+							{
+								status: {
+									$ne: 'deleted'
 								}
+							},
+							{
+								$or: [{
+									"inventory.onHand": {
+										$gt: 0
+									}
+								}, {
+									"inventory.disableOnZero": false
+								}]
+							}
 							]
 						}
 					}
 					categCondition = {
 						$and: [{
-									$or: [{
-										'category': new RegExp(category.slug, 'i')
-									}, {
-										'category': new RegExp(category.name, 'i')
-									}]
-								},
-								{
-									status: {
-										$ne: 'deleted'
-									}
-								},
-								{
-									$or: [{
-										"inventory.onHand": {
-											$gt: 0
-										}
-									}, {
-										"inventory.disableOnZero": false
-									}]
+							$or: [{
+								'category': new RegExp(category.slug, 'i')
+							}, {
+								'category': new RegExp(category.name, 'i')
+							}]
+						},
+						{
+							status: {
+								$ne: 'deleted'
+							}
+						},
+						{
+							$or: [{
+								"inventory.onHand": {
+									$gt: 0
 								}
-							]
+							}, {
+								"inventory.disableOnZero": false
+							}]
+						}
+						]
 					}
-					Product.find(categCondition,function(err, products) {
-					// Product.aggregate([
-					// 	// $match: {
-					// 	//     $and: [{
-					// 	//         $or: [{
-					// 	//             'category': new RegExp(category.slug, 'i')
-					// 	//         }, {
-					// 	//             'category': new RegExp(category.name, 'i')
-					// 	//         }]
-					// 	//     }, srch]
-					// 	// }
-					// 	categCondition
-					// ], function(err, products) {
+					Product.find(categCondition, function (err, products) {
+						// Product.aggregate([
+						// 	// $match: {
+						// 	//     $and: [{
+						// 	//         $or: [{
+						// 	//             'category': new RegExp(category.slug, 'i')
+						// 	//         }, {
+						// 	//             'category': new RegExp(category.name, 'i')
+						// 	//         }]
+						// 	//     }, srch]
+						// 	// }
+						// 	categCondition
+						// ], function(err, products) {
 						if (err || !products || products === 'undefined') {
 							console.log("Error: " + err.message);
 							req.flash('error', 'Problem finding products');
@@ -757,7 +757,7 @@ router.get('/category/:slug', function(req, res, next) {
 	})
 });
 
-router.post('/add-to-cart', isLoggedIn, function(req, res, next) {
+router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	var ticket_name = req.body.ticket_name || null;
@@ -778,7 +778,7 @@ router.post('/add-to-cart', isLoggedIn, function(req, res, next) {
 			req.flash('error', 'Unable to accept donations greater than $1000.00');
 			return res.redirect('/');
 		}
-		if (price < 1||price==0) {
+		if (price < 1 || price == 0) {
 			req.flash('error', 'Unable to process negative donations.');
 			return res.redirect('/');
 		}
@@ -797,15 +797,15 @@ router.post('/add-to-cart', isLoggedIn, function(req, res, next) {
 	var option = req.body.option || null;
 	// if we have a cart, pass it - otherwise, pass an empty object
 	var cart = new Cart(req.session.cart ? req.session.cart : {});
-	Product.findById(productId, function(err, product) {
+	Product.findById(productId, function (err, product) {
 		if (err || product === 'undefined' || product == null) {
 			// replace with err handling
 			var errorMsg = req.flash('error', 'unable to find product');
 			return res.redirect('/');
 		}
 		if (product.Product_Group == 'DONATION') {
-			console.log("PRICE: " + parseFloat(price*100));
-			theprice = parseFloat(price*100);
+			console.log("PRICE: " + parseFloat(price * 100));
+			theprice = parseFloat(price * 100);
 		} else {
 			theprice = product.price;
 		}
@@ -820,14 +820,14 @@ router.post('/add-to-cart', isLoggedIn, function(req, res, next) {
 			cart.totalShipping = 0;
 			req.session.cart = cart;
 			req.flash('success', 'Item successfully added to cart. ');
-			if (!req.session.group===null) {
+			if (!req.session.group === null) {
 				res.redirect('/group/' + req.session.group);
 			} else {
-				if (!req.session.category===null) {
+				if (!req.session.category === null) {
 					res.redirect('/category/' + req.session.category);
 				}
 			}
-			if (!req.session.category===null) {
+			if (!req.session.category === null) {
 				res.redirect('/category/' + req.session.category);
 			} else {
 				if (!req.session.group === null) {
@@ -840,7 +840,7 @@ router.post('/add-to-cart', isLoggedIn, function(req, res, next) {
 	});
 });
 
-router.get('/add-to-cart/:id/', function(req, res, next) {
+router.get('/add-to-cart/:id/', function (req, res, next) {
 	var ticket_name = req.body.ticket_name || "";
 	var ticket_email = req.body.ticket_email || "";
 	var option = req.body.option || "";
@@ -848,13 +848,13 @@ router.get('/add-to-cart/:id/', function(req, res, next) {
 	// if we have a cart, pass it - otherwise, pass an empty object
 	var cart = new Cart(req.session.cart ? req.session.cart : {});
 
-	Product.findById(productId, function(err, product) {
+	Product.findById(productId, function (err, product) {
 		if (err) {
 			// replace with err handling
 			req.flash('error', err.message);
 			res.redirect('/');
 		}
-		taxCalc.calculateTax(productId, req.user._id, function(err, taxInfo) {
+		taxCalc.calculateTax(productId, req.user._id, function (err, taxInfo) {
 			if (err) {
 				taxAmount = 0;
 			} else {
@@ -871,7 +871,7 @@ router.get('/add-to-cart/:id/', function(req, res, next) {
 	});
 });
 
-router.get('/empty-cart', isLoggedIn, function(req, res, next) {
+router.get('/empty-cart', isLoggedIn, function (req, res, next) {
 	var cart = new Cart({});
 	cart.empty();
 	req.session.cart = cart;
@@ -881,11 +881,11 @@ router.get('/empty-cart', isLoggedIn, function(req, res, next) {
 
 });
 
-router.get('/reduce-qty/:id/', function(req, res, next) {
+router.get('/reduce-qty/:id/', function (req, res, next) {
 	var productId = req.params.id;
 	// if we have a cart, pass it - otherwise, pass an empty object
 	var cart = new Cart(req.session.cart ? req.session.cart : {});
-	Product.findById(productId, function(err, product) {
+	Product.findById(productId, function (err, product) {
 		if (err) {
 			// replace with err handling
 			return res.redirect('/');
@@ -902,7 +902,7 @@ router.get('/reduce-qty/:id/', function(req, res, next) {
 	});
 });
 
-router.get('/shopping-cart', isLoggedIn, function(req, res, next) {
+router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
 
 	if (res.locals.needsAddress || req.user.addr1 === 'undefined' || req.user.addr1 == null) {
 		req.flash('error', 'Please complete your profile with your address information');
@@ -926,54 +926,54 @@ router.get('/shopping-cart', isLoggedIn, function(req, res, next) {
 	var grandTotal = parseFloat(Number(cart.grandTotal).toFixed(2));
 	var products = cart.generateArray();
 
-	recommendations.GetRecommendations(cart, function(err, recommendations) {
-			if (err) {
-				errorMsg = req.flash('error', err.message);
-			}
-			if (!recommendations && res.locals.showRecommendations) {
-				recommendations = [{
-					code: 'cam1000',
-					title: 'Gorgeous Fresh Hat Camera',
-					description: 'Error ea velit et explicabo.',
-					price: 973,
-					imagePath: '/images/lumix-camera.jpg'
-				}, {
-					code: 'cam1001',
-					title: 'Tasty Metal Chicken Camera',
-					description: 'Lumix Incredible orchid Tasty Metal Chicken Camera',
-					price: 360,
-					imagePath: '/images/sony-camera.jpg'
-				}]
-			}
-			console.log("error: " + errorMsg);
-			res.render('shop/shopping-cart', {
-				layout: 'eshop/blank',
-				products: cart.generateArray(),
-				items: cart.generateObject(),
-				allcats: req.session.allcats,
-				totalTax: totalTax,
-				viewDocuments: viewDocuments,
-				totalPrice: totalPrice,
-				cartJSON: cartJSON,
-				totalShipping: totalShipping,
-				grandTotal: cart.grandTotal,
-				recommendations: recommendations,
-				user: req.user,
-				localUser: (req.user.state == taxConfig.ourStateCode),
-				errorMsg: errorMsg,
-				noErrorMsg: !errorMsg,
-				successMsg: successMsg,
-				noMessage: !successMsg
-			});
-		})
-		//    Category.find({}, function(err,allcats) {
-		//  if (err) {
-		//      req.flash.error('error','Error retrieiving categories');
-		//      res.redirect('/');
-		//  }
-		//  if (!allcats) {
-		//      req.flash.error('error','Error retrieving categories.');
-		//      res.redirect('/');
+	recommendations.GetRecommendations(cart, function (err, recommendations) {
+		if (err) {
+			errorMsg = req.flash('error', err.message);
+		}
+		if (!recommendations && res.locals.showRecommendations) {
+			recommendations = [{
+				code: 'cam1000',
+				title: 'Gorgeous Fresh Hat Camera',
+				description: 'Error ea velit et explicabo.',
+				price: 973,
+				imagePath: '/images/lumix-camera.jpg'
+			}, {
+				code: 'cam1001',
+				title: 'Tasty Metal Chicken Camera',
+				description: 'Lumix Incredible orchid Tasty Metal Chicken Camera',
+				price: 360,
+				imagePath: '/images/sony-camera.jpg'
+			}]
+		}
+		console.log("error: " + errorMsg);
+		res.render('shop/shopping-cart', {
+			layout: 'eshop/blank',
+			products: cart.generateArray(),
+			items: cart.generateObject(),
+			allcats: req.session.allcats,
+			totalTax: totalTax,
+			viewDocuments: viewDocuments,
+			totalPrice: totalPrice,
+			cartJSON: cartJSON,
+			totalShipping: totalShipping,
+			grandTotal: cart.grandTotal,
+			recommendations: recommendations,
+			user: req.user,
+			localUser: (req.user.state == taxConfig.ourStateCode),
+			errorMsg: errorMsg,
+			noErrorMsg: !errorMsg,
+			successMsg: successMsg,
+			noMessage: !successMsg
+		});
+	})
+	//    Category.find({}, function(err,allcats) {
+	//  if (err) {
+	//      req.flash.error('error','Error retrieiving categories');
+	//      res.redirect('/');
+	//  }
+	//  if (!allcats) {
+	//      req.flash.error('error','Error retrieving categories.');
+	//      res.redirect('/');
 
 	//  }
 	//  req.session.allcats = allcats
@@ -981,7 +981,7 @@ router.get('/shopping-cart', isLoggedIn, function(req, res, next) {
 
 })
 
-router.post('/update_shipping', isLoggedIn, function(req, res, next) {
+router.post('/update_shipping', isLoggedIn, function (req, res, next) {
 	if (!req.session.cart) {
 		return res.redirect('/shopping-cart');
 	}
@@ -1002,7 +1002,7 @@ router.post('/update_shipping', isLoggedIn, function(req, res, next) {
 	});
 });
 
-router.get('/checkout', isLoggedIn, function(req, res, next) {
+router.get('/checkout', isLoggedIn, function (req, res, next) {
 
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -1030,7 +1030,7 @@ router.get('/checkout', isLoggedIn, function(req, res, next) {
 	});
 });
 
-router.post('/checkout', function(req, res, next) {
+router.post('/checkout', function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	var email = req.body.email;
@@ -1077,29 +1077,29 @@ router.post('/checkout', function(req, res, next) {
 			User.findOneAndUpdate({
 				_id: req.user._id
 			}, {
-				$set: {
-					telephone: telephone
-				}
-			}, function(err, user) {
-				if (err) {
-					console.log("unable to update user telephone");
-				}
-				req.user.telephone = telephone;
-			});
+					$set: {
+						telephone: telephone
+					}
+				}, function (err, user) {
+					if (err) {
+						console.log("unable to update user telephone");
+					}
+					req.user.telephone = telephone;
+				});
 		}
 		if (!req.user.email && email) {
 			User.findOneAndUpdate({
 				_id: req.user._id
 			}, {
-				$set: {
-					email: email
-				}
-			}, function(err, user) {
-				if (err) {
-					console.log("unable to update user telephone");
-				}
-				req.user.email = email;
-			});
+					$set: {
+						email: email
+					}
+				}, function (err, user) {
+					if (err) {
+						console.log("unable to update user telephone");
+					}
+					req.user.email = email;
+				});
 		}
 	}
 	taxDesc = "";
@@ -1108,7 +1108,7 @@ router.post('/checkout', function(req, res, next) {
 	errorMsg = req.flash('error')[0];
 	successMsg = req.flash('success')[0];
 	products = cart.generateArray();
-	shippingCalc.calculateShipping(products, function(err, result) {
+	shippingCalc.calculateShipping(products, function (err, result) {
 		if (err) {
 			console.log("Unable to calculate shipping " + err);
 			errorMsg = req.flash('error', err.message);
@@ -1122,7 +1122,7 @@ router.post('/checkout', function(req, res, next) {
 		if ((shipping_state == taxConfig.ourStateCode) && process.env.enableTax == true) {
 			taxDesc = "PA and Philadelphia Sales Tax Applies";
 			products = cart.generateArray();
-			taxCalc.calculateTaxAll(products, req.user._id, function(err, results) {
+			taxCalc.calculateTaxAll(products, req.user._id, function (err, results) {
 				if (err) {
 					console.log(err);
 					res.redirect('/');
@@ -1184,20 +1184,19 @@ router.post('/checkout', function(req, res, next) {
 	});
 });
 
-router.post('/create', function(req, res, next) {
+router.post('/create', function (req, res, next) {
 	// reference: https://github.com/paypal/PayPal-node-SDK/search?p=2&q=tax&utf8=%E2%9C%93
 	var method = req.body.method;
 	var telephone = req.body.telephone;
 	var email = req.body.email;
-
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	var first_name = req.body.first_name;
 	var last_name = req.body.last_name;
-	var amount = parseFloat(req.body.amount/100);
-	var shippingtotal = parseFloat(req.body.shippingtotal/100);
-	var subtotal = parseFloat(req.body.subtotal/100);
-	var taxAmount = parseFloat(req.body.totalTax/100);
+	var amount = parseFloat(req.body.amount / 100);
+	var shippingtotal = parseFloat(req.body.shippingtotal / 100);
+	var subtotal = parseFloat(req.body.subtotal / 100);
+	var taxAmount = parseFloat(req.body.totalTax / 100);
 	req.check("email", "Enter a valid email address.");
 	req.check("telephone", "Enter a valid telephone number.");
 	var errors = req.validationErrors();
@@ -1220,7 +1219,7 @@ router.post('/create', function(req, res, next) {
 	var create_payment = {
 		"intent": "sale",
 		"payer": {
-			"payment_method": "paypal"
+			"payment_method": "instamojo"
 		},
 		"transactions": [{
 			"amount": {
@@ -1244,7 +1243,7 @@ router.post('/create', function(req, res, next) {
 	var item_list = [];
 	var orders = [];
 	for (var i = 0, len = products.length; i < len; i++) {
-		var extprice = parseFloat(products[i].price/100);
+		var extprice = parseFloat(products[i].price / 100);
 		extprice = String((extprice).toFixed(2));
 		intprice = String(parseFloat(products[i].price));
 		qty = Number(products[i].qty);
@@ -1259,24 +1258,25 @@ router.post('/create', function(req, res, next) {
 			"option": option
 		};
 		item = {
-				"name": products[i].item.title,
-				"price": extprice,
-				"quantity": qty,
-				"currency": "USD",
-				"sku": products[i].item.code
-			}
-			// if (products[i].item.Product_Group=="TICKET") {
-			//     item.ticket_name = ticket_name;
-			//     item.ticket_email = ticket_email;
-			//     console.log("TICKET_NAME: " + item.ticket_name);
-			// }
+			"name": products[i].item.title,
+			"price": extprice,
+			"quantity": qty,
+			"currency": "USD",
+			"sku": products[i].item.code
+		}
+		
+		// if (products[i].item.Product_Group=="TICKET") {
+		//     item.ticket_name = ticket_name;
+		//     item.ticket_email = ticket_email;
+		//     console.log("TICKET_NAME: " + item.ticket_name);
+		// }
 		create_payment.transactions[0].item_list.items.push(item)
 		order = {
 			productId: products[i].item._id,
 			product_name: products[i].item.title,
 			Product_Group: products[i].item.Product_Group,
 			product_price: intprice,
-			product_price_double: parseFloat(products[i].price/100),
+			product_price_double: parseFloat(products[i].price / 100),
 			product_qty: qty,
 			paidBy: 'Paypal',
 			ticket_name: ticket_name,
@@ -1318,39 +1318,83 @@ router.post('/create', function(req, res, next) {
 	//
 
 	// STORE THE ORDER DATA TO DB
-		// Create Order Record with a pending status.
-		var order = new Order({
-			user: {
-				id: req.user._id,
-				first_name: req.user.first_name,
-				last_name: req.user.last_name,
-				email: req.user.email,
-				telephone: req.user.telephone
-			},
-			cart: orders,
-			shipping_address: req.body.shipping_addr1,
-			shipping_city: req.body.shipping_city,
-			shipping_state: req.body.shipping_state,
-			shipping_zipcode: req.body.shipping_zipcode,
-			billing_address: req.body.shipping_addr1,
-			billing_city: req.body.shipping_city,
-			billing_state: req.body.shipping_state,
-			billing_zipcode: req.body.shipping_zipcode,
-			paymentId: 1234, // Adding Dummmy payment id
-			status: 'pending',
-			total: parseFloat(cart.grandTotal)
-		});
-		order.save(function(err) {
-			if (err) {
-				console.log("Error: " + err.message)
-				req.flash('error', 'Unable to save order... ' + err.message);
-				res.redirect('/');
-			}
-			
-			req.flash('success', "Order Successful!");
-            return res.redirect('/');
-		})
-	
+	// Create Order Record with a pending status.
+	var order = new Order({
+		user: {
+			id: req.user._id,
+			first_name: req.user.first_name,
+			last_name: req.user.last_name,
+			email: req.user.email,
+			telephone: req.user.telephone
+		},
+		cart: orders,
+		shipping_address: req.body.shipping_addr1,
+		shipping_city: req.body.shipping_city,
+		shipping_state: req.body.shipping_state,
+		shipping_zipcode: req.body.shipping_zipcode,
+		billing_address: req.body.shipping_addr1,
+		billing_city: req.body.shipping_city,
+		billing_state: req.body.shipping_state,
+		billing_zipcode: req.body.shipping_zipcode,
+		paymentId: 1234, // Adding Dummmy payment id
+		status: 'pending',
+		total: parseFloat(cart.grandTotal)
+	});
+	order.save(function (err) {
+		if (err) {
+			console.log("Error: " + err.message)
+			req.flash('error', 'Unable to save order... ' + err.message);
+			res.redirect('/');
+		}
+
+		req.flash('success', "Order Successful!");
+		return res.redirect('/');
+	})
+	const output = `
+    <p>You have a new contact request</p>
+    <h3>Contact Details</h3>
+    <ul>  
+      <li>Name: ${req.user.first_name}</li>
+      <li>address: ${req.body.shipping_addr1}</li>
+      <li>Email: ${req.user.email}</li>
+      <li>Phone: ${req.user.telephone}</li>
+    </ul>
+  `;
+  let transporter = nodemailer.createTransport({
+	host: 'mail.zo-online.com',
+	port: 587,
+	secure: false, // true for 465, false for other ports
+	auth: {
+		user: 'admin@zo-online.com', // generated ethereal user
+		pass: '22watch22@DS'  // generated ethereal password
+	},
+	tls:{
+	  rejectUnauthorized:false
+	}
+  });
+
+  // setup email data with unicode symbols
+  let mailOptions = {
+	  from: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
+	  to: 'sdsameer24@gmail.com', // list of receivers
+	  subject: 'Node Contact Request', // Subject line
+	  text: 'Hello world?', // plain text body
+	  html: output // html body
+  };
+
+  // send mail with defined transport object
+  transporter.sendMail(mailOptions, (error, info) => {
+	  if (error) {
+		  return console.log(error);
+	  }
+	  console.log('Message sent: %s', info.messageId);   
+	  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+	  res.render('contact', {msg:'Email has been sent'});
+  });
+
+  // create reusable transporter object using the default SMTP transport
+ 
 
 
 	// paypal.payment.create(create_payment, function(err, payment) {
@@ -1417,46 +1461,46 @@ router.post('/create', function(req, res, next) {
 	// });
 });
 
-router.get('/like/:id', isLoggedIn, function(req, res, next) {
+router.get('/like/:id', isLoggedIn, function (req, res, next) {
 	var theId = new ObjectId(req.params.id);
 	Product.findOneAndUpdate({
 		_id: theId
 	}, {
-		$addToSet: {
-			"likes": req.user._id
-		}
-	}, {
-		safe: true,
-		upsert: false
-	}, function(err, product) {
-		event = new Event({
-			namespace: 'products',
-			person: {
-				id: req.user._id,
-				first_name: req.user.first_name,
-				last_name: req.user.last_name,
-				email: req.user.email,
-			},
-			action: 'like',
-			thing: {
-				type: "product",
-				id: product._id,
-				name: product.name,
-				category: product.category,
-				Product_Group: product.Product_Group
+			$addToSet: {
+				"likes": req.user._id
 			}
+		}, {
+			safe: true,
+			upsert: false
+		}, function (err, product) {
+			event = new Event({
+				namespace: 'products',
+				person: {
+					id: req.user._id,
+					first_name: req.user.first_name,
+					last_name: req.user.last_name,
+					email: req.user.email,
+				},
+				action: 'like',
+				thing: {
+					type: "product",
+					id: product._id,
+					name: product.name,
+					category: product.category,
+					Product_Group: product.Product_Group
+				}
+			});
+			event.save(function (err, eventId) {
+				if (err) {
+					console.log("Error: " + err.message);
+					return -1;
+				}
+			})
 		});
-		event.save(function(err, eventId) {
-			if (err) {
-				console.log("Error: " + err.message);
-				return -1;
-			}
-		})
-	});
 	res.redirect('/');
 });
 
-router.get('/execute', function(req, res, next) {
+router.get('/execute', function (req, res, next) {
 	console.log("Completing Order: " + res.locals.fromEmail);
 	var paymentId = req.query.paymentId;
 	var token = req.query.token;
@@ -1467,7 +1511,7 @@ router.get('/execute', function(req, res, next) {
 	};
 	var cart = new Cart(req.session.cart);
 	products = cart.generateArray();
-	var payment = paypal.payment.execute(paymentId, details, function(error, payment) {
+	var payment = paypal.payment.execute(paymentId, details, function (error, payment) {
 		if (error) {
 			console.log(error);
 			res.render('error', {
@@ -1478,7 +1522,7 @@ router.get('/execute', function(req, res, next) {
 			// Update payment record with new state - should be approved.
 			Payment.find({
 				id: paymentId
-			}, function(err, paymentDocument) {
+			}, function (err, paymentDocument) {
 				if (err) {
 					res.render('error', {
 						'error': error
@@ -1487,140 +1531,134 @@ router.get('/execute', function(req, res, next) {
 				Payment.update({
 					id: paymentId
 				}, {
-					state: payment.state
-				}, function(err, numAffected) {
-					if (err) {
-						res.render('error', {
-							'error': err
-						});
-						exit();
-					}
-					Order.findOneAndUpdate({
-						paymentId: payment.id
-					}, {
-						status: payment.state
-					}, {
-						new: true,
-						safe: true,
-						upsert: true
-					}, function(err, newOrder) {
+						state: payment.state
+					}, function (err, numAffected) {
 						if (err) {
-							req.flash('error', 'Unable to save order.');
-							return res.redirect('/');
+							res.render('error', {
+								'error': err
+							});
+							exit();
 						}
-						/* Update Users Bought Array */
-						async.each(products, function(product, next) {
-							event = new Event({
-								namespace: 'products',
-								person: {
-									id: req.user._id,
-									first_name: req.user.first_name,
-									last_name: req.user.last_name,
-									email: req.user.email,
-									telephone: req.user.telephone
-								},
-								action: 'purchase',
-								thing: {
-									type: "product",
-									id: product.item._id,
-									name: product.item.name,
-									category: product.category,
-									Product_Group: product.Product_Group
-								}
-							});
-							event.save(function(err, eventId) {
-								if (err) {
-									console.log("Error: " + err.message);
-									return -1;
-								}
-							});
-							Product.findOneAndUpdate({
-								_id: product.item._id
-							}, {
-								"$push": {
-									usersBought: req.user._id
-								}
-							}, function(err, newprod){
-								if (err) {
-									console.log("Error updating product with users bought: " + JSON.stringify(err));
-								}
-							})
-							User.findOneAndUpdate({
-								_id: req.user._id
-							}, {
-								$push: {
-									"orders": {
-										paymentId: payment.id,
-										status: payment.state,
-										productId: product.item._id,
-										sku: product.sku,
-										code: product.code,
-										name: product.item.name,
-										price: product.item.price,
-										category: product.category,
-										Product_Group: product.Product_Group
-									}
-								}
+						Order.findOneAndUpdate({
+							paymentId: payment.id
+						}, {
+								status: payment.state
 							}, {
 								new: true,
 								safe: true,
-								upsert: false
-							}, function(err, newUser) {
+								upsert: true
+							}, function (err, newOrder) {
 								if (err) {
-									console.log("Unable to update user - " + err.message);
-									return -1;
+									req.flash('error', 'Unable to save order.');
+									return res.redirect('/');
 								}
-								Product.findOneAndUpdate({
-									_id: product.item._id,
-									"inventory.disableAtZero": true
-								},{
-									'$inc': {'inventory.onHand': -1},
-								}, function(err,product) {
-									if (err) {
-										console.log("Problem decrementing inventory.");
-									}
-								});
-								var mailOptions = {
-										to: res.locals.fromEmail,
-										from: req.user.email,
-										subject: "User Completed Purchase: " + req.user.first_name + ' ' + req.user.last_name,
-										text: req.user.first_name + ' ' + req.user.last_name + '\n' + req.user.email + '\n' + req.user.addr1 + '\n' + req.user.city + ', ' + req.user.state + ' ' + req.user.zipcode + '\n' + req.user.telephone + '\n\n' + newUser
-									};
-									transporter.sendMail(mailOptions, function(err) {
-										if (err) {
-											console.log(err.message);
+								/* Update Users Bought Array */
+								async.each(products, function (product, next) {
+									event = new Event({
+										namespace: 'products',
+										person: {
+											id: req.user._id,
+											first_name: req.user.first_name,
+											last_name: req.user.last_name,
+											email: req.user.email,
+											telephone: req.user.telephone
+										},
+										action: 'purchase',
+										thing: {
+											type: "product",
+											id: product.item._id,
+											name: product.item.name,
+											category: product.category,
+											Product_Group: product.Product_Group
 										}
 									});
-								if (res.locals.fromEmail) {
-									var mailOptions = {
-										to: newUser.email,
-										from: process.env.fromEmail,
-										subject: process.env.mailSubject,
-										text: 'We successfully processed an order with this email address.  If you have recieved this in error, please contact the SEPIA office at info@sepennaa.org.  Thank you for your order.\n\n' +
-											'To review your purchase, please visit http://' + req.headers.host + '/user/profile/\n\n' + JSON.stringify(newOrder)
-									};
-									meanlogger.log('dollar', 'Completed Purchase', req.user);
-									transporter.sendMail(mailOptions, function(err) {
+									event.save(function (err, eventId) {
 										if (err) {
-											console.log(err.message);
+											console.log("Error: " + err.message);
+											return -1;
 										}
 									});
-								} else {
-									console.log("fromEmail not set - no email verification will be sent.");
-								}
+									Product.findOneAndUpdate({
+										_id: product.item._id
+									}, {
+											"$push": {
+												usersBought: req.user._id
+											}
+										}, function (err, newprod) {
+											if (err) {
+												console.log("Error updating product with users bought: " + JSON.stringify(err));
+											}
+										})
+									User.findOneAndUpdate({
+										_id: req.user._id
+									}, {
+											$push: {
+												"orders": {
+													paymentId: payment.id,
+													status: payment.state,
+													productId: product.item._id,
+													sku: product.sku,
+													code: product.code,
+													name: product.item.name,
+													price: product.item.price,
+													category: product.category,
+													Product_Group: product.Product_Group
+												}
+											}
+										}, {
+											new: true,
+											safe: true,
+											upsert: false
+										}, function (err, newUser) {
+											if (err) {
+												console.log("Unable to update user - " + err.message);
+												return -1;
+											}
+											Product.findOneAndUpdate({
+												_id: product.item._id,
+												"inventory.disableAtZero": true
+											}, {
+													'$inc': { 'inventory.onHand': -1 },
+												}, function (err, product) {
+													if (err) {
+														console.log("Problem decrementing inventory.");
+													}
+												});
+											var mailOptions = {
+												to: res.locals.fromEmail,
+												from: req.user.email,
+												subject: "User Completed Purchase: " + req.user.first_name + ' ' + req.user.last_name,
+												text: req.user.first_name + ' ' + req.user.last_name + '\n' + req.user.email + '\n' + req.user.addr1 + '\n' + req.user.city + ', ' + req.user.state + ' ' + req.user.zipcode + '\n' + req.user.telephone + '\n\n' + newUser
+											};
+											transporter.sendMail(mailOptions, function (err) {
+												if (err) {
+													console.log(err.message);
+												}
+											});
+											if (res.locals.fromEmail) {
+												var mailOptions = {
+													to: newUser.email,
+													from: process.env.fromEmail,
+													subject: process.env.mailSubject,
+													text: 'We successfully processed an order with this email address.  If you have recieved this in error, please contact the SEPIA office at info@sepennaa.org.  Thank you for your order.\n\n' +
+														'To review your purchase, please visit http://' + req.headers.host + '/user/profile/\n\n' + JSON.stringify(newOrder)
+												};
+												meanlogger.log('dollar', 'Completed Purchase', req.user);
+												transporter.sendMail(mailOptions, function (err) {
+													if (err) {
+														console.log(err.message);
+													}
+												});
+											} else {
+												console.log("fromEmail not set - no email verification will be sent.");
+											}
+										});
+								})
+								req.flash('success', "Successfully processed payment!");
+								
+								res.redirect('/');
 							});
-						})
-						req.flash('success', "Successfully processed payment!");
-						var transporter = nodemailer.createTransport(smtpConfig.connectString);
-						var cart = new Cart(req.session.cart);
-						products = cart.generateArray();
-						tickets = cart.ticketSale(products, req.user);
-						req.cart = null;
-						var cart = new Cart({});
-						req.session.cart = cart;
-						res.redirect('/');
 					});
-				});
 
 			});
 
@@ -1628,14 +1666,14 @@ router.get('/execute', function(req, res, next) {
 	});
 });
 
-router.get('/complete', function(req, res, next) {
+router.get('/complete', function (req, res, next) {
 	var messages = req.flash('error');
 	res.render('shop/paypal-test', {
 		error: req.flash('error')[0]
 	});
 });
 
-router.get('/cancel', function(req, res) {
+router.get('/cancel', function (req, res) {
 	var paymentId = req.query.paymentId;
 	var token = req.query.token;
 	var PayerID = req.query.PayerID
@@ -1645,20 +1683,20 @@ router.get('/cancel', function(req, res) {
 	Payment.update({
 		id: paymentId
 	}, {
-		state: payment.state
-	}, function(err, numAffected) {
-		if (err) {
-			res.render('error', {
-				'error': err
-			});
-			exit();
-		}
-		successMsg = req.flash('success', 'Purchase Cancell');
-		return res.render('/');
-	});
+			state: payment.state
+		}, function (err, numAffected) {
+			if (err) {
+				res.render('error', {
+					'error': err
+				});
+				exit();
+			}
+			successMsg = req.flash('success', 'Purchase Cancell');
+			return res.render('/');
+		});
 });
 
-router.post('/search', function(req, res, next) {
+router.post('/search', function (req, res, next) {
 	var q = req.body.q;
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -1670,7 +1708,7 @@ router.post('/search', function(req, res, next) {
 		}
 	}, {
 		$sortByCount: "$category"
-	}], function(err, navcats) {
+	}], function (err, navcats) {
 		if (err) {
 			req.flash('error', 'An error has occurred - ' + err.message);
 			return res.redirect('/');
@@ -1688,7 +1726,7 @@ router.post('/search', function(req, res, next) {
 					_id: 1
 				}
 			}],
-			function(err, Product_Group) {
+			function (err, Product_Group) {
 				Product.aggregate([{
 					$match: {
 						$text: {
@@ -1697,7 +1735,7 @@ router.post('/search', function(req, res, next) {
 					}
 				}, {
 					$sortByCount: "$Product_Group"
-				}], function(err, Product_Group) {
+				}], function (err, Product_Group) {
 					if (err) {
 						console.log("Error fetching categories");
 						res.send(1000, 'Error');
@@ -1710,10 +1748,10 @@ router.post('/search', function(req, res, next) {
 						categCondition = {};
 					}
 					Product.find({
-							$text: {
-								$search: q
-							}
-						}, {
+						$text: {
+							$search: q
+						}
+					}, {
 							score: {
 								$meta: "textScore"
 							}
@@ -1723,7 +1761,7 @@ router.post('/search', function(req, res, next) {
 								$meta: 'textScore'
 							}
 						})
-						.exec(function(err, results) {
+						.exec(function (err, results) {
 							// count of all matching objects
 							if (err) {
 								req.flash('error', "An error has occurred - " + err.message);
@@ -1778,19 +1816,19 @@ router.post('/search', function(req, res, next) {
 	});
 });
 
-router.get('/product/:slug/', function(req, res, next) {
+router.get('/product/:slug/', function (req, res, next) {
 	var slug = req.params.slug;
 	// if we have a cart, pass it - otherwise, pass an empty object
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-	Product.find( { slug: slug }, function(err,product) {
+	Product.find({ slug: slug }, function (err, product) {
 		if (err) {
 			// replace with err handling
 			console.log("Error: " + JSON.stringify(err));
 			return res.redirect('/');
 		}
 		if (!product) {
-			req.flash('error','Product is not found.');
+			req.flash('error', 'Product is not found.');
 			res.redirect('/');
 		}
 		if (!req.user || req.user === 'undefined' || req.user == null) {
@@ -1814,12 +1852,12 @@ router.get('/product/:slug/', function(req, res, next) {
 				Product_Group: product.Product_Group
 			}
 		});
-		event.save(function(err, eventId) {
+		event.save(function (err, eventId) {
 			if (err) {
 				console.log("Error: " + err.message);
 				return -1;
 			}
-			recommendations.GetRecommendations(product, function(err, recommendations) {
+			recommendations.GetRecommendations(product, function (err, recommendations) {
 				if (err) {
 					console.log("error: " + err);
 					req.flash('error', "An error has occurred - " + err.message);
@@ -1837,18 +1875,18 @@ router.get('/product/:slug/', function(req, res, next) {
 	});
 });
 
-router.get('/privacy', function(req,res,next) {
+router.get('/privacy', function (req, res, next) {
 	res.render('privacy', {
 		layout: 'eshop/blank'
 	});
 });
 
-router.get('/tos', function(req,res,next) {
+router.get('/tos', function (req, res, next) {
 	res.render('tos', {
 		layout: 'eshop/blank'
 	});
 });
-router.get('/overview', function(req, res, next) {
+router.get('/overview', function (req, res, next) {
 	categoryrecord = {
 		"_id": "ObjectId('58485813edf44d95fb117223')",
 		"name": "Television",
@@ -1953,7 +1991,7 @@ router.get('/overview', function(req, res, next) {
 		"likes": ['5829d84b9304197fdc58a918', '6829d84b4309197fdc58a3jk'],
 		"created": 'Mon Nov 14 2016 10:28:37 GMT-0500 (EST)'
 	};
-	Product.findOne({}, function(err, doc) {
+	Product.findOne({}, function (err, doc) {
 		if (err) {
 			console.log("Problem fetching one random record.");
 		}
@@ -1966,7 +2004,7 @@ router.get('/overview', function(req, res, next) {
 	});
 })
 
-router.init = function(c) {
+router.init = function (c) {
 	config = c;
 	paypal.configure(c.api);
 }
@@ -1974,8 +2012,8 @@ router.init = function(c) {
 module.exports = router;
 
 function catExists(cat) {
-	Category.findOne({"name": cat}, function(err,categorydoc) {
-		if (err||!categorydoc) {
+	Category.findOne({ "name": cat }, function (err, categorydoc) {
+		if (err || !categorydoc) {
 			return false;
 		}
 	})

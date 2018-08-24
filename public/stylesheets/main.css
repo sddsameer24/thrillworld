@@ -9,13 +9,20 @@
 body {
   font-family: 'Roboto', sans-serif;
   background:rgb(174, 174, 192);
-  background-image: url("/images/bannermain.png");
+  background-image: url("/images/fin.png");
   background-repeat: no-repeat;
   background-size:cover;
   position: relative;
   font-weight:400px;
 }
 
+/* .bannermain{
+  background-image: url("/images/mainscr.png");
+  background-repeat: no-repeat;
+  background-size:cover;
+  position: relative;
+  padding-top: 250px;
+}  */
 ul li {
   list-style: none;
 }
@@ -64,11 +71,7 @@ a#scrollUp {
   -webkit-animation: bounce 2s ease infinite;
   animation: bounce 2s ease infinite;
 }
-.bannermain{
-  height:100px;
-  width:100%;
-  background-image: url('images/bannermain.png');
-}
+
 .video-container {
   position: relative;
   padding-bottom: 56.25%; /*16:9*/ 
@@ -376,13 +379,13 @@ ul.sub-menu {
 *******Footer CSS******
 **************************/
 
-#footer {
+/* #footer {
   background: #F0F0E9;
-}
+} */
 
 
 .footer-top .container {
-  border-bottom: 1px solid #E0E0DA;
+  /* border-bottom: 1px solid #E0E0DA; */
   padding-bottom: 20px;
 }
 

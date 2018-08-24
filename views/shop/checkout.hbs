@@ -2,8 +2,12 @@
 	<div class="row">
 		<div class="col-md-12">
 			<ol class="breadcrumb">
-				<li><a href="/">Home</a></li>
-				<li><a href="shopping-cart">Shopping Cart</a></li>
+				<li>
+					<a href="/">Home</a>
+				</li>
+				<li>
+					<a href="shopping-cart">Shopping Cart</a>
+				</li>
 				<li class="active">Checkout</li>
 			</ol>
 			<div id="charge-error" class="alert alert-danger {{#if noErrorMsg}}hidden{{/if}}">
@@ -19,17 +23,21 @@
 					<h1>Provide Purchaser Details</h1>
 					<div class="panel-body">
 						<div class="table-responsive">
-							 <form action='/create' METHOD='post' encType="multipart/form-data">
+							<form action='/create' METHOD='post' encType="multipart/form-data">
 								<div class="panel-body">
 									<div class="form-group">
 										<label class="control-label">First Name</label>
 										<label class="control-label">Last Name</label>
 										<div class="inputGroupContainer">
 											<div class="input-group">
-												<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-												<input  name="first_name" placeholder="First Name" class="form-control"  value="{{user.first_name}}" type="text">
-												<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-												<input name="last_name" placeholder="Last Name" class="form-control" value="{{user.last_name}}"  type="text">
+												<span class="input-group-addon">
+													<i class="glyphicon glyphicon-user"></i>
+												</span>
+												<input name="first_name" placeholder="First Name" class="form-control" value="{{user.first_name}}" type="text">
+												<span class="input-group-addon">
+													<i class="glyphicon glyphicon-user"></i>
+												</span>
+												<input name="last_name" placeholder="Last Name" class="form-control" value="{{user.last_name}}" type="text">
 											</div>
 										</div>
 									</div>
@@ -37,14 +45,14 @@
 										<label class="control-label">E-Mail</label>
 										<div class="inputGroupContainer">
 											<div class="input-group">
-												<input name="email"  value="{{user.email}}" type="hidden">
+												<input name="email" value="{{user.email}}" type="hidden">
 
-												<span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+												<span class="input-group-addon">
+													<i class="glyphicon glyphicon-envelope"></i>
+												</span>
 												{{#if user.email}}
-												<input disabled name="email" placeholder="E-Mail Address" class="form-control"  value="{{user.email}}" type="text">
-												{{else }}
-												<input name="email" placeholder="E-Mail Address" class="form-control"  value="{{user.email}}" type="text" required>
-												{{/if}}
+												<input disabled name="email" placeholder="E-Mail Address" class="form-control" value="{{user.email}}" type="text"> {{else }}
+												<input name="email" placeholder="E-Mail Address" class="form-control" value="{{user.email}}" type="text" required> {{/if}}
 											</div>
 										</div>
 									</div>
@@ -53,34 +61,39 @@
 										<label class="control-label">Phone #</label>
 										<div class="inputGroupContainer">
 											<div class="input-group">
-												<span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span>
+												<span class="input-group-addon">
+													<i class="glyphicon glyphicon-earphone"></i>
+												</span>
 												{{#if user.telephone}}
-												<input name="telephone" placeholder="(845) 555-1212" class="form-control"  value="{{user.telephone}}" type="text" >
-												{{else}}
-												<input name="telephone" placeholder="(845) 555-1212" class="form-control"  value="{{user.telephone}}" type="text" required>
-												{{/if}}
+												<input name="telephone" placeholder="(845) 555-1212" class="form-control" value="{{user.telephone}}" type="text"> {{else}}
+												<input name="telephone" placeholder="(845) 555-1212" class="form-control" value="{{user.telephone}}" type="text" required> {{/if}}
 											</div>
 										</div>
 									</div>
 									{{#if ../enableShipping}}
-										<div class="form-group">
-											<li class="list-group-item">
-												<label for='shipping_flag'>Ship Items?</label>
-												<div class="material-switch pull-right">
-													No <input id="shipping_flag" name="shipping_flag" {{#if shipping_flag }} checked="checked" {{/if}} type="checkbox"/>
-													<label for="shipping_flag" class="label-success"></label> Yes
-												</div>
-											</li>
-										</div>
-										<div class="form-group">
-											<span class="col-md-12 help-block" ng-show="shipping_name.$invalid || shipping_city.$invalid"> Shipping details are required.</span>
+									<div class="form-group">
+										<li class="list-group-item">
+											<label for='shipping_flag'>Ship Items?</label>
+											<div class="material-switch pull-right">
+												No
+												<input id="shipping_flag" name="shipping_flag" {{#if shipping_flag }} checked="checked" {{/if}} type="checkbox"
+												/>
+												<label for="shipping_flag" class="label-success"></label> Yes
+											</div>
+										</li>
+									</div>
+									<div class="form-group">
+										<span class="col-md-12 help-block" ng-show="shipping_name.$invalid || shipping_city.$invalid"> Shipping details are required.</span>
 										<h3>Shipping Address</h3>
 										<div class="form-group">
 											<label class="control-label">Address</label>
 											<div class="inputGroupContainer">
 												<div class="input-group">
-													<span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
-													<input ng-model="shipping_addr1" name="shipping_addr1" placeholder="Address1" class="form-control" value="{{shipping_addr1}}" type="text" required>
+													<span class="input-group-addon">
+														<i class="glyphicon glyphicon-home"></i>
+													</span>
+													<input ng-model="shipping_addr1" name="shipping_addr1" placeholder="Address1" class="form-control" value="{{shipping_addr1}}"
+													 type="text" required>
 												</div>
 											</div>
 										</div>
@@ -89,8 +102,11 @@
 											<label class="control-label">City</label>
 											<div class="inputGroupContainer">
 												<div class="input-group">
-													<span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
-													<input ng-model="shipping_city" name="shipping_city" placeholder="city" class="form-control" value="{{shipping_city}}"  type="text" required>
+													<span class="input-group-addon">
+														<i class="glyphicon glyphicon-home"></i>
+													</span>
+													<input ng-model="shipping_city" name="shipping_city" placeholder="city" class="form-control" value="{{shipping_city}}" type="text"
+													 required>
 												</div>
 											</div>
 										</div>
@@ -99,19 +115,25 @@
 											<label class="control-label">State</label>
 											<div class="inputGroupContainer">
 												<div class="input-group">
-													<span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
-													<input ng-model="shipping_state" name="shipping_state" placeholder="PA" class="form-control" value="{{shipping_state}}" type="text" required>
+													<span class="input-group-addon">
+														<i class="glyphicon glyphicon-home"></i>
+													</span>
+													<input ng-model="shipping_state" name="shipping_state" placeholder="PA" class="form-control" value="{{shipping_state}}" type="text"
+													 required>
 												</div>
 											</div>
 											<label class="control-label">Zip</label>
 											<div class="inputGroupContainer">
 												<div class="input-group">
-													<span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
-													<input ng-model="shipping_zip" name="shipping_zip" placeholder="xxxxxx" class="form-control" value="{{shipping_zip}}" type="text" required>
+													<span class="input-group-addon">
+														<i class="glyphicon glyphicon-home"></i>
+													</span>
+													<input ng-model="shipping_zip" name="shipping_zip" placeholder="xxxxxx" class="form-control" value="{{shipping_zip}}" type="text"
+													 required>
 												</div>
 											</div>
 										</div>
-									{{/if}}
+										{{/if}}
 									</div>
 									<input type="hidden" name="cmd" value="_cart">
 									<input type="hidden" name="business" value="assistant@sepennaa.org">
@@ -120,24 +142,34 @@
 									<input type="hidden" name="cancel_return" value="http://yourhost.com/cancel">
 									<input type="hidden" name="cn" value="2017 SEPIA ROUNDUP">
 									<input type="hidden" name="no_shipping" value="1">
-									<input type="hidden" name="rm" value="2"> <!-- the buyer's browser is redirected to the return url using POST -->
+									<input type="hidden" name="rm" value="2">
+									<!-- the buyer's browser is redirected to the return url using POST -->
 									<!-- Text input-->
 
 								</div>
 								<table class="table table-condensed">
 									<thead>
 										<tr>
-											<td><strong>ITEM</strong></td>
-											<td><strong>QTY</STRONG></td>
-											<td><strong>PRICE</strong></td>
-											<td><strong>TAXABLE</strong></td>
-											<td><strong>TOTAL</strong></td>
+											<td>
+												<strong>ITEM</strong>
+											</td>
+											<td>
+												<strong>QTY</STRONG>
+											</td>
+											<td>
+												<strong>PRICE</strong>
+											</td>
+											<td>
+												<strong>TAXABLE</strong>
+											</td>
+											<td>
+												<strong>TOTAL</strong>
+											</td>
 											<td>&nbsp;</td>
 										</tr>
 									</thead>
 									<tbody>
-										<input type="hidden" name="upload" value="1">
-										{{# each products }}
+										<input type="hidden" name="upload" value="1"> {{# each products }}
 										<input type="hidden" name="item_name_{{inc @index }}" value="{{this.item.title}}">
 										<input type="hidden" name="item_number_{{inc @index }}" value="{{this.item._id}}">
 										<input type="hidden" name="amount_{{inc @index }}" value="{{this.price}}">
@@ -162,72 +194,82 @@
 											<td class="text-right" text-align="right">${{money this.itemTotal}}</td>
 											<td>
 												<div class="btn-group pull-right">
-													<button class="btn btn-primary btn-xs dropdown-toggle pull-right" type="button" data-toggle="dropdown">Action <span class="caret"></span></button>
+													<button class="btn btn-primary btn-xs dropdown-toggle pull-right" type="button" data-toggle="dropdown">Action
+														<span class="caret"></span>
+													</button>
 													<ul class="dropdown-menu">
-														<li><a href="/reduce-qty/{{this.item._id}}">Reduce by 1</a></li>
-														<li><a href="/empty-cart">Remove all {{this.item.name}}</a></li>
-														{{!-- <li><a href="/empty-cart">Remove All</a></li> --}}
+														<li>
+															<a href="/reduce-qty/{{this.item._id}}">Reduce by 1</a>
+														</li>
+														<li>
+															<a href="/empty-cart">Remove all {{this.item.name}}</a>
+														</li>
+														{{!--
+														<li>
+															<a href="/empty-cart">Remove All</a>
+														</li> --}}
 													</ul>
 												</div>
 											</td>
 										</tr>
 										{{/each}}
-									</tr>
-									<tr>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>Total: </td>
-										<td class="text-right" text-align="right">Rs{{money subtotal}}</td>
-										<td>&nbsp;</td>
-									</tr>
-									<tr>
-										<td colspan=3>{{taxDesc}}</td>
-										<td>Tax: </td>
-										<td class='text-right' text-align="right">
-										Rs{{money totalTax}}
-										</td>
-										<td>&nbsp;</td>
-									</tr>
-									<tr>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>Shipping: </td>
-										<td class='text-right' text-align="right">{{money shippingtotal}}</td>
-										<td>&nbsp;</td>
-									</tr>
-									<tr>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>Total: </td>
-										<td class='text-right' text-align="right">{{money grandtotal}}</td>
-										<td>&nbsp;</td>
-									</tr>
-								</tbody>
-							</table>
-							<li class="list-group-item">
-							<div class="text-right">
-								<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">pay by card</button>
-								<p></p>
-								<p></p>
-								<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">pay on arrival</button>
-								<div class="text-left">
-								{{#if ../enableShipping}}
-									<input id='update' name='update' type='submit' value='Update Shipping' class='btn btn-warning text-right'>
-								{{/if}}
-							</div>
-							</div>
-							<input type="hidden" name="amount" value="{{grandtotal}}">
-							<input type="hidden" name="subtotal" value="{{subtotal}}">
-							<input type="hidden" name="totalTax" value="{{totalTax}}">
-							<input type="hidden" name="shippingtotal" value="{{shippingtotal}}">
-							<input type="hidden" name="method" value="paypal">
-							</li>
-						</form>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>Total: </td>
+											<td class="text-right" text-align="right">Rs{{money subtotal}}</td>
+											<td>&nbsp;</td>
+										</tr>
+										<tr>
+											<td colspan=3>{{taxDesc}}</td>
+											<td>Tax: </td>
+											<td class='text-right' text-align="right">
+												Rs{{money totalTax}}
+											</td>
+											<td>&nbsp;</td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>Shipping: </td>
+											<td class='text-right' text-align="right">{{money shippingtotal}}</td>
+											<td>&nbsp;</td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>Total: </td>
+											<td class='text-right' text-align="right">{{money grandtotal}}</td>
+											<td>&nbsp;</td>
+										</tr>
+									</tbody>
+								</table>
+								<li class="list-group-item">
+									<a href="https://instamojo.com/@sdsameer24" rel="im-checkout" data-behaviour="remote" data-style="light" data-text="Checkout"></a>
+									<script src="https://d2xwmjc4uy2hr5.cloudfront.net/im-embed/im-embed.min.js"></script>
+									<div class="text-right">
+										<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">pay by card</button>
+										<p></p>
+										<p></p>
+										<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">pay on arrival</button>
+										<div class="text-left">
+											{{#if ../enableShipping}}
+											<input id='update' name='update' type='submit' value='Update Shipping' class='btn btn-warning text-right'> {{/if}}
+										</div>
+									</div>
+									<input type="hidden" name="amount" value="{{grandtotal}}">
+									<input type="hidden" name="subtotal" value="{{subtotal}}">
+									<input type="hidden" name="totalTax" value="{{totalTax}}">
+									<input type="hidden" name="shippingtotal" value="{{shippingtotal}}">
+									<input type="hidden" name="method" value="paypal">
+								</li>
+							</form>
+						</div>
 					</div>
-				</div>
 				</div>
 
 				{{else}}
@@ -236,11 +278,8 @@
 						<h2>No items in Cart</h2>
 					</div>
 				</div>
-				{{/if}}
-				{{#if ../enableShipping}}
-				{{>shipping}}
-				{{/if}}
-<script type="javascript">
+				{{/if}} {{#if ../enableShipping}} {{>shipping}} {{/if}}
+				<script type="javascript">
   $("input[name='update']").hide();
   $("input[name='shipping_flag']").click(function() {
   		$("update").data('value')='UPDATE SHIPPING INFO';

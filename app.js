@@ -53,7 +53,7 @@ var logger = new (winston.Logger)({
 var fs = require('fs');
 
 require('./config/pp-config');
-
+require('./config/insta-config');
 var categoryrecord = {
   "_id": "ObjectId('58485813edf44d95fb117223')",
   "name": "Television",
