@@ -24,6 +24,8 @@ var Config = require('../config/config.js');
 const dotenv = require('dotenv');
 const async = require('async');
 const chalk = require('chalk');
+const Nexmo = require('nexmo');
+const socketio = require('socket.io');
 var meanlogger = require('../local_modules/meanlogger');
 var MongoClient = require('mongodb').MongoClient
 var url = 'mongodb://localhost:27017/hackathon';
@@ -1214,7 +1216,6 @@ router.post('/create', function (req, res, next) {
 	}
 	var cart = new Cart(req.session.cart);
 	products = cart.generateArray();
-	//11-17-2016
 	tax = taxCalc.calculateTaxReturn(products, req.user._id);
 	var create_payment = {
 		"intent": "sale",
@@ -1278,7 +1279,7 @@ router.post('/create', function (req, res, next) {
 			product_price: intprice,
 			product_price_double: parseFloat(products[i].price / 100),
 			product_qty: qty,
-			paidBy: 'Paypal',
+			paidBy: 'instamojo',
 			ticket_name: ticket_name,
 			ticket_email: ticket_email,
 			option: option,
@@ -1350,50 +1351,9 @@ router.post('/create', function (req, res, next) {
 		req.flash('success', "Order Successful!");
 		return res.redirect('/');
 	})
-	const output = `
-    <p>You have a new contact request</p>
-    <h3>Contact Details</h3>
-    <ul>  
-      <li>Name: ${req.user.first_name}</li>
-      <li>address: ${req.body.shipping_addr1}</li>
-      <li>Email: ${req.user.email}</li>
-      <li>Phone: ${req.user.telephone}</li>
-    </ul>
-  `;
-  let transporter = nodemailer.createTransport({
-	host: 'mail.zo-online.com',
-	port: 587,
-	secure: false, // true for 465, false for other ports
-	auth: {
-		user: 'admin@zo-online.com', // generated ethereal user
-		pass: '22watch22@DS'  // generated ethereal password
-	},
-	tls:{
-	  rejectUnauthorized:false
-	}
-  });
+	
 
-  // setup email data with unicode symbols
-  let mailOptions = {
-	  from: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
-	  to: 'sdsameer24@gmail.com', // list of receivers
-	  subject: 'Node Contact Request', // Subject line
-	  text: 'Hello world?', // plain text body
-	  html: output // html body
-  };
-
-  // send mail with defined transport object
-  transporter.sendMail(mailOptions, (error, info) => {
-	  if (error) {
-		  return console.log(error);
-	  }
-	  console.log('Message sent: %s', info.messageId);   
-	  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-
-	  res.render('contact', {msg:'Email has been sent'});
-  });
-
-  // create reusable transporter object using the default SMTP transport
+// create reusable transporter object using the default SMTP transport
  
 
 
@@ -1624,34 +1584,100 @@ router.get('/execute', function (req, res, next) {
 														console.log("Problem decrementing inventory.");
 													}
 												});
-											var mailOptions = {
-												to: res.locals.fromEmail,
-												from: req.user.email,
-												subject: "User Completed Purchase: " + req.user.first_name + ' ' + req.user.last_name,
-												text: req.user.first_name + ' ' + req.user.last_name + '\n' + req.user.email + '\n' + req.user.addr1 + '\n' + req.user.city + ', ' + req.user.state + ' ' + req.user.zipcode + '\n' + req.user.telephone + '\n\n' + newUser
-											};
-											transporter.sendMail(mailOptions, function (err) {
-												if (err) {
-													console.log(err.message);
-												}
-											});
-											if (res.locals.fromEmail) {
-												var mailOptions = {
-													to: newUser.email,
-													from: process.env.fromEmail,
-													subject: process.env.mailSubject,
-													text: 'We successfully processed an order with this email address.  If you have recieved this in error, please contact the SEPIA office at info@sepennaa.org.  Thank you for your order.\n\n' +
-														'To review your purchase, please visit http://' + req.headers.host + '/user/profile/\n\n' + JSON.stringify(newOrder)
-												};
-												meanlogger.log('dollar', 'Completed Purchase', req.user);
-												transporter.sendMail(mailOptions, function (err) {
-													if (err) {
-														console.log(err.message);
-													}
-												});
-											} else {
-												console.log("fromEmail not set - no email verification will be sent.");
-											}
+											// var mailOptions = {
+											// 	to: res.locals.fromEmail,
+											// 	from: req.user.email,
+											// 	subject: "User Completed Purchase: " + req.user.first_name + ' ' + req.user.last_name,
+											// 	text: req.user.first_name + ' ' + req.user.last_name + '\n' + req.user.email + '\n' + req.user.addr1 + '\n' + req.user.city + ', ' + req.user.state + ' ' + req.user.zipcode + '\n' + req.user.telephone + '\n\n' + newUser
+											// };
+											// transporter.sendMail(mailOptions, function (err) {
+											// 	if (err) {
+											// 		console.log(err.message);
+											// 	}
+											// });
+											// if (res.locals.fromEmail) {
+											// 	var mailOptions = {
+											// 		to: newUser.email,
+											// 		from: process.env.fromEmail,
+											// 		subject: process.env.mailSubject,
+											// 		text: 'We successfully processed an order with this email address.  If you have recieved this in error, please contact the SEPIA office at info@sepennaa.org.  Thank you for your order.\n\n' +
+											// 			'To review your purchase, please visit http://' + req.headers.host + '/user/profile/\n\n' + JSON.stringify(newOrder)
+											// 	};
+											// 	meanlogger.log('dollar', 'Completed Purchase', req.user);
+											// 	transporter.sendMail(mailOptions, function (err) {
+											// 		if (err) {
+											// 			console.log(err.message);
+											// 		}
+											// 	});
+											// } else {
+											// 	console.log("fromEmail not set - no email verification will be sent.");
+											// }
+											// order comnfirmation mail sending  ..........................................
+	const output = `
+    <p>You have a new contact request</p>
+    <h3>Contact Details</h3>
+    <ul>  
+      <li>Name: ${req.user.first_name}</li>
+      <li>address: ${req.body.shipping_addr1}</li>
+      <li>Email: ${res.locals.fromEmail}</li>
+      <li>Phone: ${req.user.telephone}</li>
+    </ul>
+  `;
+  let transporter = nodemailer.createTransport({
+	host: 'mail.zo-online.com',
+	port: 587,
+	secure: false, // true for 465, false for other ports
+	auth: {
+		user: 'admin@zo-online.com', // generated ethereal user
+		pass: '22watch22@DS'  // generated ethereal password
+	},
+	tls:{
+	  rejectUnauthorized:false
+	}
+  });
+
+  // setup email data with unicode symbols
+  let mailOptions = {
+	  from: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
+	  to: 'res.locals.fromEmail', // list of receivers
+	  subject: 'Node Contact Request', // Subject line
+	  text: 'Hello world?', // plain text body
+	  html: output // html body
+  };
+
+  // send mail with defined transport object
+  transporter.sendMail(mailOptions, (error, info) => {
+	  if (error) {
+		  return console.log(error);
+	  }
+	  console.log('Message sent: %s', info.messageId);   
+	  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+	  res.render('contact', {msg:'Email has been sent'});
+  });
+// end of order comnfirmation mail sending  ..........................................
+// order comnfirmation sms sending  ..........................................
+const number = req.user.telephone;
+  const text = req.body.text;
+nexmo.message.sendSms(
+    '917795565771', number, text, { type: 'unicode' },
+    (err, responseData) => {
+      if(err) {
+        console.log(err);
+      } else {
+        console.dir(responseData);
+        // Get data from response
+        const data = {
+          id: responseData.messages[0]['message-id'],
+          number: responseData.messages[0]['to']
+        }
+
+        // Emit to the client
+        io.emit('smsStatus', data);
+      }
+    }
+  );
+// end of order comnfirmation sms sending  ..........................................
 										});
 								})
 								req.flash('success', "Successfully processed payment!");
