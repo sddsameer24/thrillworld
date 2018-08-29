@@ -118,10 +118,10 @@
                                                         <li class="list-group-item">
                                                             <label for='Product_Group'>Product Type</label>
                                                             <select class='form-control' name='Product_Group'>
-                                                                <option value="TICKET">Ticket</option>
-                                                                <option value="DONATION">Variable Amount Donation</option>
-                                                                <option value="APPAREL">Clothing or Apparel</option>
-                                                                <option value="SIMPLE">Simple Product</option>
+                                                                {{!-- <option value="TICKET">Ticket</option>
+                                                                <option value="DONATION">Variable Amount Donation</option> --}}
+                                                                <option value="APPAREL">Non Featured</option>
+                                                                <option value="SIMPLE">Featured</option>
                                                             </select>
                                                         </li>
                                                     </ul>
@@ -193,7 +193,7 @@
                                             <td>{{this.title}}</td>
                                             <td>{{this.description}}</td>
                                             <td>{{this.category}}</td>
-                                            <td class="text-right">${{this.price}}</td>
+                                            <td class="text-right">Rs{{this.price}}</td>
                                             <td width=5%>
                                                 <form action="/admin/edit-product" method="POST">
                                                     <p data-placement="top" data-toggle="tooltip" title="Edit">
@@ -268,10 +268,10 @@
                                                                             <li class="list-group-item">
                                                                                 <label for='Product_Group'>Product Type</label>
                                                                                 <select class='form-control' name='Product_Group'>
-                                                                                    <option value="TICKET" {{#if this.isTicket}}selected{{/if}}>Ticket</option>
-                                                                                    <option value="DONATION" {{#if this.isDonation}}selected{{/if}}>Variable Amount Donation</option>
-                                                                                    <option value="APPAREL" {{#if this.isApparel}}selected{{/if}}>Clothing or Apparel</option>
-                                                                                    <option value="SIMPLE">Simple Product</option>
+                                                                                    {{!-- <option value="TICKET" {{#if this.isTicket}}selected{{/if}}>Ticket</option>
+                                                                                    <option value="DONATION" {{#if this.isDonation}}selected{{/if}}>Variable Amount Donation</option> --}}
+                                                                                    <option value="APPAREL" {{#if this.isApparel}}selected{{/if}}>Featured</option>
+                                                                                    <option value="SIMPLE">Non Featured</option>
                                                                                 </select>
                                                                             </li>
                                                                         </ul>

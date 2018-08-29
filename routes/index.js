@@ -185,7 +185,7 @@ router.get('/', function (req, res, next) {
 
 					productChunks = [];
 					productJSON = [];
-					chunkSize = 4;
+					chunkSize = 1;
 					for (var i = (4 - chunkSize); i < docs.length; i += chunkSize) {
 						productChunks.push(docs.slice(i, i + chunkSize));
 					}
@@ -294,7 +294,7 @@ router.get('/sale', function (req, res, next) {
 
 /* GET home page. */
 router.get('/group/:slug?', function (req, res, next) {
-	var group_slug = req.params.slug;
+	var group_slug = "SIMPLE";
 	req.session.group = req.params.slug; // Save Group for later
 	var q = req.query.q;
 	var successMsg = req.flash('success')[0];

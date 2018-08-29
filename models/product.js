@@ -227,7 +227,6 @@ schema.plugin(random);
 schema.index({name: 'text',title:'text',description:'text',category:'text', code: 'text'});
 
 module.exports = mongoose.model('Product',schema);
-// Getter
 // schema.path('price').get(function(num) {
 //   return (num / 100).toFixed(2);
 // });
