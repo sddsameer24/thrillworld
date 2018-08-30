@@ -27,7 +27,7 @@
 </head>
 
 <body>
-    {{>eshop/header}} {{>eshop/slider}}
+    {{>eshop/header}} {{>eshop/enquiry}}
     <section>
         <div>
 
@@ -58,16 +58,11 @@
                     {{/if}}
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-3">
-                    {{>eshop/left-sidebar}}
-                </div>
-               <div class="col-md-9">
-                    {{>eshop/featured-items}}
-                </div>
-                
-            </div>
-            {{>eshop/Display}}
+
+           <div class="container fetuitm">
+               {{>eshop/Display}}
+           </div>
+            
             <div>
                 {{>eshop/service}}
             </div>

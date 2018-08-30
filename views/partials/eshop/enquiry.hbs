@@ -1,0 +1,16 @@
+<aside class="cottage-book">
+	<form action="/search" method="post" target="cottage-book-iframe">
+    Enquiry form<br>
+    <input type="hidden" name="page" value="EN_sol_sidebook">
+		<i class="fa fa-calendar fa-fw"></i><input type="text" name="arrival" title="Check-in" placeholder="Check-in" onfocus="(this.type='date')">
+		<i class="fa fa-calendar fa-fw"></i><input type="text" name="departure" title="Check-out" placeholder="Check-out" onfocus="(this.type='date')">
+    <br><br>
+		<i class="fa fa-male fa-fw"></i><select class="half_input" title="Adults"><option value="" disabled selected>Adults</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
+		<i class="inside fa fa-child fa-fw"></i><select class="half_input" title="Children"><option value="" disabled selected>Children</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+		<br><br>
+		
+		<br><br>
+		<input name="submit" type="submit" value="Send">
+  </form>
+	<iframe id="cottage-book-iframe" src=""></iframe>
+</aside>

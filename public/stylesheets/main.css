@@ -254,19 +254,117 @@ font-family: 'Poppins', sans-serif;
   top: 0px;
   right: 9%;
 }
+/* .........................enquiry form................................... */
+
+.cottage-book{
+	width: 230px;
+	margin: 0 20px 20px 0;
+	position: relative;
+	padding: 15px;
+}
+
+
+.cottage-book input, .cottage-book textarea, .cottage-book select{
+  border: solid 2px #ccc;
+	background-color: transparent;
+	transition: 0.5s;
+	margin: 3px 0;
+	padding: 5px 10px 5px 30px;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	border-radius: 3px;
+}
+	
+
+.cottage-book input[type="submit"]{
+	padding: 5px 10px;
+}
+
+
+.cottage-book select{
+  -webkit-appearance: none;
+}
+	
+
+.cottage-book input:focus, .cottage-book textarea:focus, .cottage-book select:focus{
+  border: solid 2px #aaa;
+}
+	
+
+.cottage-book input, .cottage-book select{
+  height: 30px;
+}
+	
+
+.cottage-book i{
+	position: absolute;
+	color: gray;
+}
+
+
+.cottage-book 
+  select:invalid{
+    color: gray;
+  }
+	
+
+.half_input{
+  max-width: calc(50% - 2px);
+}
+	
+#cottage-book-iframe{
+  width: 100%;
+	height: 100%;
+	background-color: rgba(255,50,50,0.1);
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: -1;
+}
+	
+/* .........................enquiry form................................... */
 .cartglip{
   margin-right: 91px;
 }
+.realtives{
+  position:relative;
+}
+  #owl-demo .item{
+      margin: 3px;
+      color: #FFF;
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      border-radius: 3px;
+      text-align: center;
+  }
+#owl-demo .item img{
+  width:100%;
+  height:100px;
+}
+  .customNavigation{
+    text-align: right;
+  margin-top:10px;
+  margin-bottom:3px;
+  padding-bottom:3px;
+  border-bottom:2px solid #333;
+  }
+  .customNavigation a{
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
 .glyphicon-shopping-cart{
   font-size: 35px;
 }
 .navbar {
   margin-bottom: 0;
 };
-.nav > li > a {
-}
-.navbar-nav > li > a {
-}
+
 .navbar-nav > li {
   float: left;
   margin-right:0.6em;

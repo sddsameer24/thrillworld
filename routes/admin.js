@@ -191,7 +191,7 @@ router.post('/order', function (req, res, next) {
         if (err) {
             res.send(500, 'Error deleting order.');
         }
-      
+
         return res.redirect('/admin/orders');
     })
 })
@@ -576,155 +576,155 @@ router.get('/import', isAdmin, function (req, res, next) {
 var request = require('request');
 
 var HOSTS = {
-  'production' : "https://www.instamojo.com/api/1.1/",
-  'test'       : "https://test.instamojo.com/api/1.1/"
+    'production': "https://www.instamojo.com/api/1.1/",
+    'test': "https://test.instamojo.com/api/1.1/"
 };
 
 var API = {
-  'createPayment' : 'payment-requests/',
-  'links'         : 'links/',
-  'paymentStatus' : 'payment-requests/',
-  'refunds'       : 'refunds/'
+    'createPayment': 'payment-requests/',
+    'links': 'links/',
+    'paymentStatus': 'payment-requests/',
+    'refunds': 'refunds/'
 };
 
 module.exports = {
-  HEADERS: {
-    'X-Api-Key'    : "2bdd03b508f7f88c1abc9aed27de5aa9",
-    'X-Auth-Token' : "8eca226c24353bce2feb84db3aaa732c"
-  },
+    HEADERS: {
+        'X-Api-Key': "2bdd03b508f7f88c1abc9aed27de5aa9",
+        'X-Auth-Token': "8eca226c24353bce2feb84db3aaa732c"
+    },
 
-  CURRENT_HOST : 'production',
+    CURRENT_HOST: 'production',
 
-  isSandboxMode : function(isSandbox) {
-    if (isSandbox) {
-      this.CURRENT_HOST = 'test';
-    } else {
-      this.CURRENT_HOST = 'production';
+    isSandboxMode: function (isSandbox) {
+        if (isSandbox) {
+            this.CURRENT_HOST = 'test';
+        } else {
+            this.CURRENT_HOST = 'production';
+        }
+    },
+
+    setKeys: function (apiKey, authKey) {
+        this.HEADERS['X-Api-Key'] = apiKey;
+        this.HEADERS['X-Auth-Token'] = authKey;
+    },
+
+    createPayment: function (data, callback) {
+        request.post({
+            headers: this.HEADERS,
+            url: HOSTS[this.CURRENT_HOST] + API.createPayment,
+            form: data
+        }, function (error, response, body) {
+            var result = body;
+            callback(error, result);
+        });
+    },
+
+    seeAllLinks: function (callback) {
+        request.get({
+            headers: this.HEADERS,
+            url: HOSTS[this.CURRENT_HOST] + API.links
+        }, function (error, response, body) {
+            var result = JSON.parse(body);
+            callback(error, result);
+        });
+    },
+
+    getAllPaymentRequests: function (callback) {
+        request.get({
+            headers: this.HEADERS,
+            url: HOSTS[this.CURRENT_HOST] + API.paymentStatus
+        }, function (error, response, body) {
+            var result = JSON.parse(body);
+            callback(error, result);
+        });
+    },
+
+    getPaymentRequestStatus: function (id, callback) {
+        request.get({
+            headers: this.HEADERS,
+            url: HOSTS[this.CURRENT_HOST] + API.paymentStatus + id + '/'
+        }, function (error, response, body) {
+            var result = JSON.parse(body);
+            callback(error, result);
+        });
+    },
+
+    getPaymentDetails: function (payment_request_id, payment_id, callback) {
+        request.get({
+            headers: this.HEADERS,
+            url: HOSTS[this.CURRENT_HOST] + API.paymentStatus + payment_request_id + '/' + payment_id + '/'
+        }, function (error, response, body) {
+            var result = JSON.parse(body);
+            callback(error, result);
+        });
+    },
+
+    createRefund: function (refundRequest, callback) {
+        request.post({
+            headers: this.HEADERS,
+            url: HOSTS[this.CURRENT_HOST] + API.refunds + '/',
+            form: refundRequest
+        }, function (error, response, body) {
+            var result = JSON.parse(body);
+            callback(error, result);
+        });
+    },
+
+    getAllRefunds: function (callback) {
+        request.get({
+            headers: this.HEADERS,
+            url: HOSTS[this.CURRENT_HOST] + API.refunds
+        }, function (error, response, body) {
+            var result = JSON.parse(body);
+            callback(error, result);
+        });
+    },
+
+    getRefundDetails: function (id, callback) {
+        request.get({
+            headers: this.HEADERS,
+            url: HOSTS[this.CURRENT_HOST] + API.refunds + id + '/'
+        }, function (error, response, body) {
+            var result = JSON.parse(body);
+            callback(error, result);
+        });
+    },
+
+    PaymentData: function () {
+        return ({
+            'purpose': '', // required
+            'amount': 0,  // required
+            'currency': 'INR',
+            'buyer_name': '',
+            'email': '',
+            'phone': null,
+            'send_email': '',
+            'send_sms': '',
+            'allow_repeated_payments': '',
+            'webhook': '',
+            'redirect_url': '',
+
+            setWebhook: function (hook) {
+                this.webhook = hook;
+            },
+
+            setRedirectUrl: function (redirectUrl) {
+                this.redirect_url = redirectUrl;
+            }
+        });
+    },
+
+    RefundRequest: function () {
+        return ({
+            'payment_id': '',
+            'type': '',  // Available : ['RFD', 'TNR', 'QFL', 'QNR', 'EWN', 'TAN', 'PTH']
+            'body': '',
+
+            setRefundAmount: function (refundAmount) {
+                this.refund_amount = refundAmount;
+            }
+        });
     }
-  },
-
-  setKeys: function(apiKey, authKey) {
-    this.HEADERS['X-Api-Key']  = apiKey;
-    this.HEADERS['X-Auth-Token'] = authKey;
-  },
-
-  createPayment: function(data, callback) {
-    request.post({
-      headers : this.HEADERS,
-      url     : HOSTS[this.CURRENT_HOST] + API.createPayment,
-      form    : data
-    }, function(error, response, body){
-      var result = body;
-      callback(error, result);
-    });
-  },
-
-  seeAllLinks: function(callback) {
-    request.get({
-      headers : this.HEADERS,
-      url     : HOSTS[this.CURRENT_HOST] + API.links
-    }, function(error, response, body){
-      var result = JSON.parse(body);
-      callback(error, result);
-    });
-  },
-
-  getAllPaymentRequests: function(callback) {
-    request.get({
-      headers : this.HEADERS,
-      url     : HOSTS[this.CURRENT_HOST] + API.paymentStatus
-    }, function(error, response, body){
-      var result = JSON.parse(body);
-      callback(error, result);
-    });
-  },
-
-  getPaymentRequestStatus: function(id, callback) {
-    request.get({
-      headers : this.HEADERS,
-      url     : HOSTS[this.CURRENT_HOST] + API.paymentStatus + id + '/'
-    }, function(error, response, body){
-      var result = JSON.parse(body);
-      callback(error, result);
-    });
-  },
-
-  getPaymentDetails: function(payment_request_id, payment_id, callback) {
-    request.get({
-      headers : this.HEADERS,
-      url     : HOSTS[this.CURRENT_HOST] + API.paymentStatus + payment_request_id + '/' + payment_id + '/'
-    }, function(error, response, body){
-      var result = JSON.parse(body);
-      callback(error, result);
-    });
-  },
-
-  createRefund: function(refundRequest, callback) {
-    request.post({
-      headers : this.HEADERS,
-      url     : HOSTS[this.CURRENT_HOST] + API.refunds + '/',
-      form    : refundRequest
-    }, function(error, response, body){
-      var result = JSON.parse(body);
-      callback(error, result);
-    });
-  },
-
-  getAllRefunds: function(callback) {
-    request.get({
-      headers: this.HEADERS,
-      url: HOSTS[this.CURRENT_HOST] + API.refunds
-    }, function(error, response, body){
-      var result = JSON.parse(body);
-      callback(error, result);
-    });
-  },
-
-  getRefundDetails: function(id, callback) {
-    request.get({
-      headers: this.HEADERS,
-      url: HOSTS[this.CURRENT_HOST] + API.refunds + id + '/'
-    }, function(error, response, body){
-      var result = JSON.parse(body);
-      callback(error, result);
-    });
-  },
-
-  PaymentData: function() {
-    return ({
-      'purpose'                 : '', // required
-      'amount'                  : 0,  // required
-      'currency'                : 'INR',
-      'buyer_name'              : '',
-      'email'                   : '',
-      'phone'                   : null,
-      'send_email'              : '',
-      'send_sms'                : '',
-      'allow_repeated_payments' : '',
-      'webhook'                 : '',
-      'redirect_url'            : '',
-
-      setWebhook: function(hook) {
-        this.webhook = hook;
-      },
-
-      setRedirectUrl: function(redirectUrl) {
-        this.redirect_url = redirectUrl;
-      }
-    });
-  },
-
-  RefundRequest: function() {
-    return ({
-      'payment_id'    : '',
-      'type'          : '',  // Available : ['RFD', 'TNR', 'QFL', 'QNR', 'EWN', 'TAN', 'PTH']
-      'body'          : '',
-
-      setRefundAmount: function(refundAmount) {
-        this.refund_amount = refundAmount;
-      }
-    });
-  }
 };
 
 /* Recieve posted CSV */
@@ -868,7 +868,7 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
     }
     if (req.files) {
         imageFile = req.files.imageFile;
-        imageFile.mv('public/images/'+ req.body.name + '.png', function (err) {
+        imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
             if (err) {
                 res.status(500).send(err);
             }
@@ -898,13 +898,8 @@ router.post('/add-product', isAdmin, function (req, res, next) {
         res.send('No files were uploaded.');
         return;
     }
-
     imageFile = req.files.imageFile;
-//     console.log(process.env.imagePath);
-//     console.log(req.files);
-//    // console.log(req.files);
-//     console.log(__dirname +`\public`);
-    imageFile.mv('public/images/'+ req.body.name + '.png', function (err) {
+    imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
         if (err) {
             res.status(500).send(err);
         }
@@ -936,21 +931,35 @@ router.post('/add-category', isAdmin, function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
     var imageFile;
-
-    category = new Category({
-        description: req.body.description,
-        name: req.body.name,
-        slug: req.body.slug,
-        layout: req.body.layout
-
-    })
-    category.save(function (err) {
+    if (!req.files) {
+        res.send('No files were uploaded.');
+        return;
+    }
+    imageFile = req.files.imageFile;
+    //     console.log(process.env.imagePath);
+    //     console.log(req.files);
+    //    // console.log(req.files);
+    //     console.log(__dirname +`\public`);
+    imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
         if (err) {
-            req.flash('error', 'Error: ' + err.message);
-            return res.redirect('/admin/categories');
+            res.status(500).send(err);
         }
-        console.log("category: " + category);
-        return res.redirect('/admin/categories');
+
+        category = new Category({
+            description: req.body.description,
+            name: req.body.name,
+            slug: req.body.slug,
+            layout: req.body.layout,
+            imagePath: '/images/' + req.body.name + '.png'
+        })
+        category.save(function (err) {
+            if (err) {
+                req.flash('error', 'Error: ' + err.message);
+                return res.redirect('/admin/categories');
+            }
+            console.log("category: " + category);
+            return res.redirect('/admin/categories');
+        });
     });
 });
 
@@ -1002,37 +1011,33 @@ router.get('/categories:filter?', isAdmin, function (req, res, next) {
 router.post('/edit-category', isAdmin, function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
-    category = {};
-    Category.findById(req.body.id, function (err, category) {
+    var imageFile;
+    var updated = {
+        description: req.body.description,
+        name: req.body.name,
+        slug: req.body.slug,
+    }
+    if (req.files) {
+        imageFile = req.files.imageFile;
+        imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
+            if (err) {
+                res.status(500).send(err);
+            }
+        })
+        updated.imagePath = '/images/' + req.body.name + '.png'
+
+    }
+
+    Category.findOneAndUpdate({_id: req.body._id }, { $set: updated }, function (err, category) {
 
         if (err) {
-            console.log("ERROR: " + err.message);
-        } else {
-            if (!category) {
-                category = new Category({
-                    description: req.body.description,
-                    name: req.body.name,
-                    slug: req.body.slug,
-                    layout: req.body.layout
-                });
-            } else {
-                category.description = req.body.description || '';
-                category.name = req.body.name || '';
-                category.slug = req.body.slug || '';
-                category.layout = req.body.layout || '';
-                category.updated = Date.now();
-            }
-        }
-        console.log("Found: " + JSON.stringify(category));
-
-        category.save(function (err) {
-            if (!err) {
-                console.log("updated");
-            } else {
-                console.log(err);
-            }
-            res.redirect('/admin/categories');
-        })
+            console.log("Unable to update category - " + err.message);
+            req.flash('error', "Unable to update category - " + err.message);
+            return res.redirect('/admin/categories');
+        }; 
+        console.log("Category " + req.body.name + " Updated");
+        req.flash('success', 'Product ' + req.body.name + ' Updated!');
+        return res.redirect('/admin/products');
     });
 
 });
@@ -1041,22 +1046,22 @@ router.post('/delete-category', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
 
-    Category.findOne({ _id: req.body.id }, function (err, category) {
+    Category.remove({ _id: req.body.id }, function (err, category) {
         if (err) {
             res.send(500, 'Error deleting category.');
         }
         category.status = 'deleted';
-        category.save(function (err) {
-            if (!err) {
-                console.log("updated");
-                req.flash('success', 'Category deleted.');
+        // category.save(function (err) {
+        //     if (!err) {
+        //         console.log("updated");
+        //         req.flash('success', 'Category deleted.');
 
-            } else {
-                console.log(err);
-                req.flash('error', 'Unable to delete category');
-            }
+        //     } else {
+        //         console.log(err);
+        //         req.flash('error', 'Unable to delete category');
+        //     }
             return res.redirect('/admin/categories');
-        });
+        
     })
 })
 

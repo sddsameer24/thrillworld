@@ -16,8 +16,9 @@ var schema = new Schema({
 		type: String,
 		required: false
 	},
-	layout: {
-		type: String
+	imagePath: {
+		type: String,
+		required: true
 	},
 	ancestors: [{
 		id: {type: Schema.Types.ObjectId, ref: 'Category', required: false},
