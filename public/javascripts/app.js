@@ -31,6 +31,7 @@ app.factory("services", ['$http', function($http) {
 }]);
 
 app.controller('listCtrl', function ($scope, services) {
+    console.log("hello");
     services.getProducts().then(function(data){
         $scope.products = data.data;
     });

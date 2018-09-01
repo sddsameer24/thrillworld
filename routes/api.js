@@ -176,30 +176,30 @@ router.delete('/categories/:id', function(req, res, next) {
  */
 router.get('/facet/:category', function(req, res, next) {
 
-// db.products.aggregate([{
-//     $match: {
-//         "Product_Group": "Television"
-//     }
-// }, {
-//     $unwind: "$Attributes"
-// }, {
-//     $match: {
-//         "Attributes.Name": "Price"
-//     }
-// },{
-//     $bucket: {
-//         groupBy: "$Attributes.Value",
-//         boundaries: [0, 200, 300, 500, Infinity],
-//         output: {
-//             count: {
-//                 $sum: 1
-//             },
-//             matches: {
-//                 $push: "$Attribute.Value"
-//             }
-//         }
-//     }
-// }])
+db.products.aggregate([{
+    $match: {
+        "Product_Group": "Television"
+    }
+}, {
+    $unwind: "$Attributes"
+}, {
+    $match: {
+        "Attributes.Name": "Price"
+    }
+},{
+    $bucket: {
+        groupBy: "$Attributes.Value",
+        boundaries: [0, 200, 300, 500, Infinity],
+        output: {
+            count: {
+                $sum: 1
+            },
+            matches: {
+                $push: "$Attribute.Value"
+            }
+        }
+    }
+}])
 
 
 
@@ -246,15 +246,7 @@ router.get('/facet/:category', function(req, res, next) {
 	})
 });
 
-/**
- * GET product.
- * @constructor
- */
-router.get('/product/:id', function(req, res, next) {
-	Product.findById(req.params.id,function(err,product) {
-		res.json(product);
-	})
-});
+
 
 /* GET product. */
 router.get('/products/:id', function(req, res, next) {
@@ -335,6 +327,7 @@ router.delete('/users/:id', function(req, res, next) {
 
 /* get product facets */
 router.get('/facets/:id', function(req, res, next) {
+	
 	Product.findById(req.params.id, function(req, res, next) {
 		res.json
 	})

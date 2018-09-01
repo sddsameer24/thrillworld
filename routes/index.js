@@ -78,10 +78,10 @@ router.get('/listing', function (req, res, next) {
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-	
-	
+
+
 	if (req.session.group) {
-		console.log(req);
+		//console.log(req);
 		return res.redirect('/group/SIMPLE?q=');
 	}
 	var successMsg = req.flash('success')[0];
@@ -229,7 +229,7 @@ router.get('/sale', function (req, res, next) {
 	var navcats = req.app.get('navcats');
 	var navgroups = req.app.get('navgroups');
 
-	// console.log("Local navcats " + res.locals.navcats);
+	// //console.log("Local navcats " + res.locals.navcats);
 
 	var tutorial = req.params.tutorial;
 	if (tutorial == 1) {
@@ -314,12 +314,12 @@ router.get('/group/:slug?', function (req, res, next) {
 		group_search,
 		function (err, products) {
 			if (err) {
-				console.log("Error finding group " + group_slug);
+				//console.log("Error finding group " + group_slug);
 				req.flash('error', 'Cannot find group');
 				return res.redirect('/');
 			}
 			if (!products) {
-				console.log("Error finding group " + group_slug);
+				//console.log("Error finding group " + group_slug);
 				req.flash('error', 'Cannot find group');
 				return res.redirect('/');
 			}
@@ -466,8 +466,8 @@ router.get('/category/Television', function (req, res, next) {
 			}
 		}
 		], function (err, results) {
-			console.log("Product-unwound: " + JSON.stringify(results));
-			console.log("Err-unwound: " + JSON.stringify(err));
+			//console.log("Product-unwound: " + JSON.stringify(results));
+			//console.log("Err-unwound: " + JSON.stringify(err));
 			Product.aggregate([{
 				$sortByCount: "$category"
 			}], function (err, allcats) {
@@ -486,12 +486,12 @@ router.get('/category/Television', function (req, res, next) {
 
 					}, function (err, category) {
 						if (err) {
-							console.log("Error finding category " + category_slug);
+							//console.log("Error finding category " + category_slug);
 							req.flash('error', 'Cannot find category');
 							return res.redirect('/');
 						}
 						if (!category) {
-							console.log("Error finding category " + category_slug);
+							//console.log("Error finding category " + category_slug);
 							req.flash('error', 'Cannot find category');
 							return res.redirect('/');
 						}
@@ -560,7 +560,7 @@ router.get('/category/Television', function (req, res, next) {
 							}
 							Product.find({ category: "Television" }, function (err, products) {
 								if (err || !products || products === 'undefined') {
-									console.log("Error: " + err.message);
+									//console.log("Error: " + err.message);
 									req.flash('error', 'Problem finding products');
 									res.redirect('/');
 								}
@@ -641,12 +641,12 @@ router.get('/category/:slug', function (req, res, next) {
 
 			}, function (err, category) {
 				if (err) {
-					console.log("Error finding category " + category_slug);
+					//console.log("Error finding category " + category_slug);
 					req.flash('error', 'Cannot find category');
 					return res.redirect('/');
 				}
 				if (!category) {
-					console.log("Error finding category " + category_slug);
+					//console.log("Error finding category " + category_slug);
 					req.flash('error', 'Cannot find category');
 					return res.redirect('/');
 				}
@@ -728,7 +728,7 @@ router.get('/category/:slug', function (req, res, next) {
 						// 	categCondition
 						// ], function(err, products) {
 						if (err || !products || products === 'undefined') {
-							console.log("Error: " + err.message);
+							//console.log("Error: " + err.message);
 							req.flash('error', 'Problem finding products');
 							res.redirect('/');
 						}
@@ -810,7 +810,7 @@ router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 			return res.redirect('/');
 		}
 		if (product.Product_Group == 'DONATION') {
-			console.log("PRICE: " + parseFloat(price * 100));
+			//console.log("PRICE: " + parseFloat(price * 100));
 			theprice = parseFloat(price * 100);
 		} else {
 			theprice = product.price;
@@ -951,7 +951,7 @@ router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
 				imagePath: '/images/sony-camera.jpg'
 			}]
 		}
-		console.log("error: " + errorMsg);
+		//console.log("error: " + errorMsg);
 		res.render('shop/shopping-cart', {
 			layout: 'eshop/blank',
 			products: cart.generateArray(),
@@ -1088,7 +1088,7 @@ router.post('/checkout', function (req, res, next) {
 					}
 				}, function (err, user) {
 					if (err) {
-						console.log("unable to update user telephone");
+						//console.log("unable to update user telephone");
 					}
 					req.user.telephone = telephone;
 				});
@@ -1102,7 +1102,7 @@ router.post('/checkout', function (req, res, next) {
 					}
 				}, function (err, user) {
 					if (err) {
-						console.log("unable to update user telephone");
+						//console.log("unable to update user telephone");
 					}
 					req.user.email = email;
 				});
@@ -1116,7 +1116,7 @@ router.post('/checkout', function (req, res, next) {
 	products = cart.generateArray();
 	shippingCalc.calculateShipping(products, function (err, result) {
 		if (err) {
-			console.log("Unable to calculate shipping " + err);
+			//console.log("Unable to calculate shipping " + err);
 			errorMsg = req.flash('error', err.message);
 			return res.redirect('/');
 		}
@@ -1130,7 +1130,7 @@ router.post('/checkout', function (req, res, next) {
 			products = cart.generateArray();
 			taxCalc.calculateTaxAll(products, req.user._id, function (err, results) {
 				if (err) {
-					console.log(err);
+					//console.log(err);
 					res.redirect('/');
 				}
 				if (!req.session.cart) {
@@ -1269,11 +1269,11 @@ router.post('/create', function (req, res, next) {
 			"currency": "USD",
 			"sku": products[i].item.code
 		}
-		
+
 		// if (products[i].item.Product_Group=="TICKET") {
 		//     item.ticket_name = ticket_name;
 		//     item.ticket_email = ticket_email;
-		//     console.log("TICKET_NAME: " + item.ticket_name);
+		//     //console.log("TICKET_NAME: " + item.ticket_name);
 		// }
 		create_payment.transactions[0].item_list.items.push(item)
 		order = {
@@ -1315,8 +1315,8 @@ router.post('/create', function (req, res, next) {
 		create_payment.custom = custom;
 		create_payment.payer.funding_instruments = funding_instruments;
 	}
-		// order comnfirmation mail sending  ..........................................
-		const output = `
+	// order comnfirmation mail sending  ..........................................
+	const output = `
 		<p>You have a new contact request</p>
 		<h3>Contact Details</h3>
 		<ul>  
@@ -1326,7 +1326,7 @@ router.post('/create', function (req, res, next) {
 		  <li>Phone: ${req.user.telephone}</li>
 		</ul>
 	  `;
-	  let transporter = nodemailer.createTransport({
+	let transporter = nodemailer.createTransport({
 		host: 'mail.zo-online.com',
 		port: 587,
 		secure: false, // true for 465, false for other ports
@@ -1334,52 +1334,52 @@ router.post('/create', function (req, res, next) {
 			user: 'admin@zo-online.com', // generated ethereal user
 			pass: '22watch22@DS'  // generated ethereal password
 		},
-		tls:{
-		  rejectUnauthorized:false
+		tls: {
+			rejectUnauthorized: false
 		}
-	  });
-	
-	  // setup email data with unicode symbols
-	  let mailOptions = {
-		  from: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
-		  to: 'res.locals.fromEmail', // list of receivers
-		  subject: 'Node Contact Request', // Subject line
-		  text: 'Hello world?', // plain text body
-		  html: output // html body
-	  };
-	
-	  // send mail with defined transport object
-	  transporter.sendMail(mailOptions, (error, info) => {
-		  if (error) {
-			  return console.log(error);
-		  }
-		  console.log('Message sent: %s', info.messageId);   
-		  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-	
-		  res.render('contact', {msg:'Email has been sent'});
-	  });
+	});
+
+	// setup email data with unicode symbols
+	let mailOptions = {
+		from: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
+		to: 'res.locals.fromEmail', // list of receivers
+		subject: 'Node Contact Request', // Subject line
+		text: 'Hello world?', // plain text body
+		html: output // html body
+	};
+
+	// send mail with defined transport object
+	transporter.sendMail(mailOptions, (error, info) => {
+		if (error) {
+			return //console.log(error);
+		}
+		//console.log('Message sent: %s', info.messageId);
+		//console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+		res.render('contact', { msg: 'Email has been sent' });
+	});
 	// end of order comnfirmation mail sending  ..........................................
 	// order comnfirmation sms sending  ..........................................
 	const number = req.user.telephone;
-	  const text = req.body.text;
+	const text = req.body.text;
 	Nexmo.message.sendSms(
 		'917795565771', number, text, { type: 'unicode' },
 		(err, responseData) => {
-		  if(err) {
-			console.log(err);
-		  } else {
-			console.dir(responseData);
-			// Get data from response
-			const data = {
-			  id: responseData.messages[0]['message-id'],
-			  number: responseData.messages[0]['to']
+			if (err) {
+				//console.log(err);
+			} else {
+				console.dir(responseData);
+				// Get data from response
+				const data = {
+					id: responseData.messages[0]['message-id'],
+					number: responseData.messages[0]['to']
+				}
+
+				// Emit to the client
+				io.emit('smsStatus', data);
 			}
-	
-			// Emit to the client
-			io.emit('smsStatus', data);
-		  }
 		}
-	  );
+	);
 	// end of order comnfirmation sms sending  ..........................................
 	//
 	// Send the payment request to paypal
@@ -1413,7 +1413,7 @@ router.post('/create', function (req, res, next) {
 	});
 	order.save(function (err) {
 		if (err) {
-			console.log("Error: " + err.message)
+			//console.log("Error: " + err.message)
 			req.flash('error', 'Unable to save order... ' + err.message);
 			res.redirect('/');
 		}
@@ -1423,13 +1423,13 @@ router.post('/create', function (req, res, next) {
 	})
 
 
-// create reusable transporter object using the default SMTP transport
- 
+	// create reusable transporter object using the default SMTP transport
+
 
 
 	// paypal.payment.create(create_payment, function(err, payment) {
 	// 	if (err) {
-	// 		console.log("ERROR HIT");
+	// 		//console.log("ERROR HIT");
 	// 		errorMsg = req.flash('error', err.message);
 	// 		res.redirect('/')
 	// 	} else {
@@ -1440,7 +1440,7 @@ router.post('/create', function (req, res, next) {
 	// 		newPayment.save(function(err, newpayment) {
 	// 			if (err) {
 	// 				errorMsg = req.flash('error', err.message);
-	// 				console.log('error: ' + err.message);
+	// 				//console.log('error: ' + err.message);
 	// 				return res.redirect('/shopping-cart');
 	// 			}
 	// 			// Create Order Record with a pending status.
@@ -1467,7 +1467,7 @@ router.post('/create', function (req, res, next) {
 	// 			});
 	// 			order.save(function(err) {
 	// 				if (err) {
-	// 					console.log("Error: " + err.message)
+	// 					//console.log("Error: " + err.message)
 	// 					req.flash('error', 'Unable to save order... ' + err.message);
 	// 					res.redirect('/');
 	// 				}
@@ -1522,7 +1522,7 @@ router.get('/like/:id', isLoggedIn, function (req, res, next) {
 			});
 			event.save(function (err, eventId) {
 				if (err) {
-					console.log("Error: " + err.message);
+					//console.log("Error: " + err.message);
 					return -1;
 				}
 			})
@@ -1531,7 +1531,7 @@ router.get('/like/:id', isLoggedIn, function (req, res, next) {
 });
 
 router.get('/execute', function (req, res, next) {
-	console.log("Completing Order: " + res.locals.fromEmail);
+	//console.log("Completing Order: " + res.locals.fromEmail);
 	var paymentId = req.query.paymentId;
 	var token = req.query.token;
 	var PayerID = req.query.PayerID
@@ -1543,7 +1543,7 @@ router.get('/execute', function (req, res, next) {
 	products = cart.generateArray();
 	var payment = paypal.payment.execute(paymentId, details, function (error, payment) {
 		if (error) {
-			console.log(error);
+			//console.log(error);
 			res.render('error', {
 				'error': error
 			});
@@ -1604,7 +1604,7 @@ router.get('/execute', function (req, res, next) {
 									});
 									event.save(function (err, eventId) {
 										if (err) {
-											console.log("Error: " + err.message);
+											//console.log("Error: " + err.message);
 											return -1;
 										}
 									});
@@ -1616,7 +1616,7 @@ router.get('/execute', function (req, res, next) {
 											}
 										}, function (err, newprod) {
 											if (err) {
-												console.log("Error updating product with users bought: " + JSON.stringify(err));
+												//console.log("Error updating product with users bought: " + JSON.stringify(err));
 											}
 										})
 									User.findOneAndUpdate({
@@ -1641,7 +1641,7 @@ router.get('/execute', function (req, res, next) {
 											upsert: false
 										}, function (err, newUser) {
 											if (err) {
-												console.log("Unable to update user - " + err.message);
+												//console.log("Unable to update user - " + err.message);
 												return -1;
 											}
 											Product.findOneAndUpdate({
@@ -1651,7 +1651,7 @@ router.get('/execute', function (req, res, next) {
 													'$inc': { 'inventory.onHand': -1 },
 												}, function (err, product) {
 													if (err) {
-														console.log("Problem decrementing inventory.");
+														//console.log("Problem decrementing inventory.");
 													}
 												});
 											// var mailOptions = {
@@ -1662,7 +1662,7 @@ router.get('/execute', function (req, res, next) {
 											// };
 											// transporter.sendMail(mailOptions, function (err) {
 											// 	if (err) {
-											// 		console.log(err.message);
+											// 		//console.log(err.message);
 											// 	}
 											// });
 											// if (res.locals.fromEmail) {
@@ -1676,17 +1676,17 @@ router.get('/execute', function (req, res, next) {
 											// 	meanlogger.log('dollar', 'Completed Purchase', req.user);
 											// 	transporter.sendMail(mailOptions, function (err) {
 											// 		if (err) {
-											// 			console.log(err.message);
+											// 			//console.log(err.message);
 											// 		}
 											// 	});
 											// } else {
-											// 	console.log("fromEmail not set - no email verification will be sent.");
+											// 	//console.log("fromEmail not set - no email verification will be sent.");
 											// }
-											
+
 										});
 								})
 								req.flash('success', "Successfully processed payment!");
-								
+
 								res.redirect('/');
 							});
 					});
@@ -1768,7 +1768,7 @@ router.post('/search', function (req, res, next) {
 					$sortByCount: "$Product_Group"
 				}], function (err, Product_Group) {
 					if (err) {
-						console.log("Error fetching categories");
+						//console.log("Error fetching categories");
 						res.send(1000, 'Error');
 					}
 					if (frontPageCategory) {
@@ -1847,25 +1847,41 @@ router.post('/search', function (req, res, next) {
 	});
 });
 
-router.get('/product/:slug/', function (req, res, next) {
-	var slug = req.params.slug;
+router.get('/product/:slug3', function (req, res, next) {
+	// var baseUrl = (window.location).href; // You can also use document.URL
+	// var koopId = baseUrl.substring(baseUrl.lastIndexOf('=') + 1);
+	// // alert(koopId)
+	var slug3 = req.params.slug3;
+	console.log("called"+slug3);
+	console.log(req.params);
+	
+
+	qryFilter = {"_id": slug3};
+
 	// if we have a cart, pass it - otherwise, pass an empty object
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-	Product.find({ slug: slug }, function (err, product) {
-		if (err) {
+	
+	Product.find(qryFilter , function (err, product) {
+		console.log("Product: " + JSON.stringify(product));
+		if (err || product === 'undefined' || product == null) {
 			// replace with err handling
-			console.log("Error: " + JSON.stringify(err));
+			var errorMsg = req.flash('error', 'unable to find product');
 			return res.redirect('/');
 		}
+	// Product.find({ slug: slug }, function (err, product) {
+	// 	//console.log("Product: " + JSON.stringify(product));
+	// 	if (err) {
+	// 		// replace with err handling
+			
+	// 		//console.log("Error: " + JSON.stringify(err));
+	// 		return res.redirect('/');
+	// 	}
 		if (!product) {
 			req.flash('error', 'Product is not found.');
 			res.redirect('/');
 		}
-		if (!req.user || req.user === 'undefined' || req.user == null) {
-			req.user = {};
-		}
-		console.log("Product: " + JSON.stringify(product));
+		
 		event = new Event({
 			namespace: 'products',
 			person: {
@@ -1885,12 +1901,12 @@ router.get('/product/:slug/', function (req, res, next) {
 		});
 		event.save(function (err, eventId) {
 			if (err) {
-				console.log("Error: " + err.message);
+				//console.log("Error: " + err.message);
 				return -1;
 			}
 			recommendations.GetRecommendations(product, function (err, recommendations) {
 				if (err) {
-					console.log("error: " + err);
+					//console.log("error: " + err);
 					req.flash('error', "An error has occurred - " + err.message);
 					return res.redirect('/');
 				}
@@ -2024,7 +2040,7 @@ router.get('/overview', function (req, res, next) {
 	};
 	Product.findOne({}, function (err, doc) {
 		if (err) {
-			console.log("Problem fetching one random record.");
+			//console.log("Problem fetching one random record.");
 		}
 		res.render('overview', {
 			layout: 'eshop/blank',
