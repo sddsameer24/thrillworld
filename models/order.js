@@ -116,7 +116,7 @@ orderSchema.post('save', function(doc) {
 
 	MongoClient.connect(dbHost, function(err, db) {
 		if (err) {
-			console.log("Error: " + errror.message);
+			//console.log("Error: " + errror.message);
 		}
 		var dateObj = new Date();
 		var month = dateObj.getUTCMonth(); //months from 1-12
@@ -134,7 +134,7 @@ orderSchema.post('save', function(doc) {
 		incupdate.$inc['ytd'] = doc.cart.total;
 		db.collection('sales', function(err, collection) {
 			if (err) {
-				console.log('error ' + error.message);
+				//console.log('error ' + error.message);
 			}
 			collection.update({
 					year: year
@@ -144,9 +144,9 @@ orderSchema.post('save', function(doc) {
 				},
 				function(err, result) {
 					if (err) {
-						console.log("Error " + err.message);
+						//console.log("Error " + err.message);
 					}
-					console.log("RESULT: " + JSON.stringify(result));
+					//console.log("RESULT: " + JSON.stringify(result));
 				});
 		})
 
@@ -160,7 +160,7 @@ this.createPurchase = function(product, othersArray, cb) {
 	});
 	purchase.save(function(err) {
 		if (err) {
-			console.log('error: ' + err.message);
+			//console.log('error: ' + err.message);
 		}
 	})
 	return cb();

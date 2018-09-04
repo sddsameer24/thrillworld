@@ -28,7 +28,7 @@ module.exports = {
         // Use connect method to connect to the server
         Order.find({}, function(err, orders) {
             if (err) {
-                console.log("error " + err.message);
+                //console.log("error " + err.message);
             }
             async.each(orders, function(order, next) {
             // for (var i = 0; i < orders.length; i++) {
@@ -36,7 +36,7 @@ module.exports = {
                     order.total = 0;
                     // orders[i].total = 0;
                 }
-                console.log("ORDER: " + JSON.stringify(order))
+                //console.log("ORDER: " + JSON.stringify(order))
                 stats.totalAmountReceived = (parseFloat(stats.totalAmountReceived) + parseFloat(order.total/100));
 
                 var items = order.cart;
@@ -62,8 +62,8 @@ module.exports = {
                 // for(var j = 0; j < items.length; j++) {
                 // 	item = orders[i].cart.items[j];
                 // 	stats.itemCount += 1;
-                // 	console.log("ITEMS: " + JSON.stringify(item._id));
-                // 	console.log("---");
+                // 	//console.log("ITEMS: " + JSON.stringify(item._id));
+                // 	//console.log("---");
                 // }
                 if (order.status == 'approved') {
                     stats.totalApprovedOrders += 1;

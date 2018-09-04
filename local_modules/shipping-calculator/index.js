@@ -31,7 +31,7 @@ module.exports = {
 		var totalShipping = 0;
 		var totalShipablePrice = 0;
 		for (var i=0;i<products.length;i++) {
-			//console.log("Product " + i + ": " + JSON.stringify(products[i]));
+			////console.log("Product " + i + ": " + JSON.stringify(products[i]));
 			if (products[i].shipable=='Yes' || products[i].shipable==true) {
 				totalShipablePrice += products[i].price;
 			}

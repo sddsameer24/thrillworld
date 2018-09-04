@@ -2,7 +2,7 @@
 
 // Flot Line Chart with Tooltips
 $(document).ready(function() {
-    console.log("document ready");
+    //console.log("document ready");
     var offset = 0;
     plot();
 
@@ -1087,7 +1087,7 @@ $(function() {
                 xDateFormat: "%y-%0m-%0d",
 
                 onHover: function(flotItem, $tooltipEl) {
-                    // console.log(flotItem, $tooltipEl);
+                    // //console.log(flotItem, $tooltipEl);
                 }
             }
 

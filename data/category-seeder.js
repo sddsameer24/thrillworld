@@ -14,17 +14,17 @@ Category.remove({});
 
 Product.find().distinct('category', function(err,categories) {
 	if (err) {
-		console.log("error " + err.message);
+		//console.log("error " + err.message);
 		exit();
 	}
 	var done = 0;
 	for (var i = 0; i < categories.length; i++) {
 		if (!categories[i]) {
-			console.log('products not defined');
+			//console.log('products not defined');
 			exit();
 		}
 		var cname = categories[i];
-		console.log('cname ' + cname);
+		//console.log('cname ' + cname);
 		var cslug = slug(cname)
 		category = new Category({
 			name: cname,

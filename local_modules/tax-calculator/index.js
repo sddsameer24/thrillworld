@@ -10,7 +10,7 @@ module.exports = {
 	calculateTaxReturn: function(products,userId,callback) {
 
 		this.calculateTaxAll(products,userId,function(err,results) {
-			console.log("Results before shipping " + JSON.stringify(results));
+			//console.log("Results before shipping " + JSON.stringify(results));
 			return results.taxAmount;
 		})
 	},
@@ -95,9 +95,9 @@ module.exports = {
 					return;
 				}
 				cartTaxTotal += parseFloat(results.taxAmount);
-				console.log("Cart Tax Total " + cartTaxTotal);
+				//console.log("Cart Tax Total " + cartTaxTotal);
 				done++;
-				console.log("d = " + done);
+				//console.log("d = " + done);
 				if (done >= products.length) {
 					finishit();
 				}

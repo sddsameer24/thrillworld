@@ -24,7 +24,7 @@ dotenv.load({
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
-  console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+  //console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   logger.log('error','%s MongoDB connection error. Please make sure MongoDB is running.');
   process.exit();
 });
@@ -43,7 +43,7 @@ async.times(100, function(i, next) {
 	var numUsers = Math.floor(Math.random() * (10 - 2 + 1)) + 2;
 	User.aggregate([{ $sample: { size: numUsers }},{$project: { _id: 1 }}], function(err,usersArray) {
 		if (err) {
-			console.log(err);
+			//console.log(err);
 		}
 		var items = []
 		for(user in usersArray) {
@@ -64,8 +64,8 @@ async.times(100, function(i, next) {
 		name = name.toUpperCase();
 		price = Math.floor((Math.random() * 100000 - 1) + 1);
 		cost = Math.floor((Math.random() * price) + (price / 2));
-		// console.log("Price: " + price);
-		// console.log("Cost: " + cost);
+		// //console.log("Price: " + price);
+		// //console.log("Cost: " + cost);
 		pgroup = Math.floor((Math.random() * product_groups.length - 1) + 1);
 	    product_group = product_groups[pgroup];
 		title = faker.commerce.productAdjective() + ' ' + color + ' ' + name
@@ -122,7 +122,7 @@ async.times(100, function(i, next) {
 		});
 		product.save(function(err,productId) {
 			if (err) {
-				console.log('error: ',err.message);
+				//console.log('error: ',err.message);
 			}
 			for(user in usersArray) {
 				items.push(usersArray[user]._id);

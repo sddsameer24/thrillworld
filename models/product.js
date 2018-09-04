@@ -25,6 +25,18 @@ var schema = new Schema({
 		type: String,
 		required: false
 	},
+	imagePathg1: {
+		type: String,
+		required: false
+	},
+	imagePathg2: {
+		type: String,
+		required: false
+	},
+	imagePathg3: {
+		type: String,
+		required: false
+	},
 	name: {
 		type: String,
 		required: true
@@ -32,6 +44,19 @@ var schema = new Schema({
 	title: {
 		type: String,
 		required: false
+	},
+
+	Wifi: {
+		type: Boolean
+	},
+	campfire: {
+		type: Boolean
+	},
+	Pool: {
+		type: Boolean
+	},
+	parking: {
+		type: Boolean
 	},
 	slug: {
 		type: String,
@@ -54,6 +79,11 @@ var schema = new Schema({
         required: false
 	},
 	likes: [String],
+	Product_Group: {
+		type: String,
+		required: false
+	},
+	reviews: [String],
 	Product_Group: {
 		type: String,
 		required: false

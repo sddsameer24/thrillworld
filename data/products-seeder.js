@@ -9,7 +9,7 @@ dotenv.load({
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
-  console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+  //console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   logger.log('error','%s MongoDB connection error. Please make sure MongoDB is running.');
   process.exit();
 });

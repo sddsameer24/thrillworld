@@ -109,7 +109,7 @@ router.post('/search',function(req, res, next) {
             }
         ],function(err,results) {
             if (err) {
-                console.log("error: ", err.message);
+                //console.log("error: ", err.message);
             }
 
             res.render('shop/facet', {
@@ -235,12 +235,12 @@ router.post('/add-to-cart', function(req, res, next) {
 				taxAmount=0;
 			} else {
 				taxAmount = response.taxAmount;
-				console.log('tax amount: ' + taxAmount);
+				//console.log('tax amount: ' + taxAmount);
 			}
 		    cart.oldadd(product, product.id, product.price, taxAmount, size, ticket_name, ticket_email, product.type,product.taxable,product.shipable,req.user._id);
-	        console.log('---------');
-	        console.log(cart);
-	        console.log('---------');
+	        //console.log('---------');
+	        //console.log(cart);
+	        //console.log('---------');
 	        req.session.cart = cart; // store cart in session
 	        req.flash('success', 'Item successfully added to cart.');
 	        res.redirect(shopUrl);
@@ -269,13 +269,13 @@ router.get('/add-to-cart/:id/', function(req, res, next) {
 				taxAmount=0;
 			} else {
 				taxAmount = taxInfo.taxAmount;
-				console.log('tax amount: ' + taxAmount);
+				//console.log('tax amount: ' + taxAmount);
 			}
 		    cart.oldadd(product, product.id, product.price, taxAmount, size, ticket_name, ticket_email, product.type,product.taxable,product.shipable,req.user._id);
 	    	req.session.cart = cart; // store cart in session
-	        console.log('---------');
-	        console.log(cart);
-	        console.log('---------');        
+	        //console.log('---------');
+	        //console.log(cart);
+	        //console.log('---------');        
 	        req.flash('success','Item Successfully added to cart.');
 	    	res.redirect('/');
 	    });
@@ -296,7 +296,7 @@ router.get('/reduce-qty/:id/', function(req, res, next) {
     var productId = req.params.id;
     // if we have a cart, pass it - otherwise, pass an empty object
     var cart = new Cart(req.session.cart ? req.session.cart : {});
-    console.log("reduce qty - product: " + productId);
+    //console.log("reduce qty - product: " + productId);
     Product.findById(productId, function(err, product) {
         if (err) {
             // replace with err handling
@@ -464,19 +464,19 @@ router.post('/create', function(req, res, next) {
     paypal.payment.create(create_payment, function(err, payment) {
         if (err) {
             errorMsg = req.flash('error', "Error sending payment to paypal.");
-            console.log('Payment not sent to paypal.' + err.message);
+            //console.log('Payment not sent to paypal.' + err.message);
             res.redirect('/')
         } else {
             req.session.paymentId = payment.id;
-            console.log(payment.id)
+            //console.log(payment.id)
             var ourPayment = payment;
             ourPayment.user = req.user._id;
             var newPayment = new Payment(ourPayment);
-            console.log(newPayment);
+            //console.log(newPayment);
             newPayment.save(function(err, newpayment) {
                 if (err) {
                     errorMsg = req.flash('error', err.message);
-                    console.log('error: ' + err.message);
+                    //console.log('error: ' + err.message);
                     return res.redirect('/shopping-cart');
                 }
                 // Create Order Record with a pending status.
@@ -496,7 +496,7 @@ router.post('/create', function(req, res, next) {
                         res.redirect('/');
                     }
                 })
-                console.log('Payment ' + newPayment._id + ' successfully created.');
+                //console.log('Payment ' + newPayment._id + ' successfully created.');
                 var redirectUrl;
                 if (payment.payer.payment_method === 'paypal') {
                     var done = 0;
@@ -526,7 +526,7 @@ router.get('/execute', function(req, res, next) {
     };
     var payment = paypal.payment.execute(paymentId, details, function(error, payment) {
         if (error) {
-            console.log(error);
+            //console.log(error);
             res.render('error', {
                 'error': error
             });
@@ -551,7 +551,7 @@ router.get('/execute', function(req, res, next) {
                         });
                         exit();
                     }
-                    console.log("Payment Record Updated with Payment State " + payment.state);
+                    //console.log("Payment Record Updated with Payment State " + payment.state);
                     Order.findOneAndUpdate({
                         paymentId: payment.id
                     }, {
@@ -587,7 +587,7 @@ router.get('/execute', function(req, res, next) {
                             };
                             transporter.sendMail(mailOptions, function(err) {});
 
-                            console.log('User recorded updated');
+                            //console.log('User recorded updated');
                         });
                     });
                 });
@@ -618,7 +618,7 @@ router.get('/cancel', function(req, res) {
     var paymentId = req.query.paymentId;
     var token = req.query.token;
     var PayerID = req.query.PayerID
-    console.log(req.user);
+    //console.log(req.user);
     var details = {
         "payer_id": PayerID
     };

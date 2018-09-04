@@ -1,16 +1,56 @@
-<aside class="cottage-book">
-	<form action="/search" method="post" target="cottage-book-iframe">
-    Enquiry form<br>
-    <input type="hidden" name="page" value="EN_sol_sidebook">
-		<i class="fa fa-calendar fa-fw"></i><input type="text" name="arrival" title="Check-in" placeholder="Check-in" onfocus="(this.type='date')">
-		<i class="fa fa-calendar fa-fw"></i><input type="text" name="departure" title="Check-out" placeholder="Check-out" onfocus="(this.type='date')">
-    <br><br>
-		<i class="fa fa-male fa-fw"></i><select class="half_input" title="Adults"><option value="" disabled selected>Adults</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
-		<i class="inside fa fa-child fa-fw"></i><select class="half_input" title="Children"><option value="" disabled selected>Children</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
-		<br><br>
-		
-		<br><br>
-		<input name="submit" type="submit" value="Send">
-  </form>
-	<iframe id="cottage-book-iframe" src=""></iframe>
-</aside>
+<div class="row mb-5">
+        <div class="col-md-12">
+
+          <div class="block-32">
+            <form action="#">
+              <div class="row">
+                <div class="col-md-6 mb-3 mb-lg-0 col-lg-3">
+                  <label for="checkin">Check In</label>
+                  <div class="field-icon-wrap">
+                    <div class="icon"><span class="icon-calendar"></span></div>
+                    <input type="date" id="checkin_date" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3 mb-lg-0 col-lg-3">
+                  <label for="checkin">Check Out</label>
+                  <div class="field-icon-wrap">
+                    <div class="icon"><span class="icon-calendar"></span></div>
+                    <input type="date" id="checkout_date" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3 mb-md-0 col-lg-3">
+                  <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                      <label for="checkin">Adults</label>
+                      <div class="field-icon-wrap">
+                        <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                        <select name="" id="" class="form-control">
+                          <option value="">1</option>
+                          <option value="">2</option>
+                          <option value="">3</option>
+                          <option value="">4+</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3 mb-md-0">
+                      <label for="checkin">Children</label>
+                      <div class="field-icon-wrap">
+                        <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                        <select name="" id="" class="form-control">
+                          <option value="">1</option>
+                          <option value="">2</option>
+                          <option value="">3</option>
+                          <option value="">4+</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-3 align-self-end">
+                  <button class="btn btn-primary btn-block">Check Availabilty</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>

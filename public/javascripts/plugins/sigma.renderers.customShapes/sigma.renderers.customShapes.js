@@ -34,13 +34,13 @@
         image.src = url;
         image.status = 'loading';
         image.onerror = function() {
-          console.log("error loading", url);
+          //console.log("error loading", url);
           image.status = 'error';
         };
         image.onload = function(){
           // TODO see how we redraw on load
           // need to provide the siginst as a parameter to the library
-          console.log("redraw on image load", url);
+          //console.log("redraw on image load", url);
           image.status = 'ok';
           sigInst.refresh();
         };

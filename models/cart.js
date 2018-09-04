@@ -19,17 +19,17 @@ module.exports = function Cart(oldCart) {
 	this.grandTotal = Number(oldCart.totalPrice) || 0; // Grandtotal
 	this.totalPriceWithTax = Number(oldCart.totalPriceWithTax) || 0; // Total with shipping/tax
 
-	console.log("old cart: " + JSON.stringify(oldCart));
+	//console.log("old cart: " + JSON.stringify(oldCart));
 
 	/* TODO: Figure out how to change the value of this in the cart.add method from within the necessary method calls calculateShipping and calculateTax
 	/* add item to cart */
 	/* TODO: How do I make a call to calculateTax from my cart.js module without losing "this" */
 
 	this.cartShippingTotal = function() {
-		// console.log("Cart Total: " + JSON.stringify(this.items));
+		// //console.log("Cart Total: " + JSON.stringify(this.items));
 		shippingCalc.calculateShippingAll(this.items,function(err,results) {
 			if (err) {
-				console.log('error :' + err.message);
+				//console.log('error :' + err.message);
 			}
 
 		})
@@ -40,10 +40,10 @@ module.exports = function Cart(oldCart) {
 		// look up common pairings for each product in
 	}
 	this.cartTaxTotal = function(userId) {
-		// console.log("Cart Total: " + JSON.stringify(this.items));
+		// //console.log("Cart Total: " + JSON.stringify(this.items));
 		taxCalc.calculateTaxAll(this.items,userId,function(err,results) {
 			if (err) {
-				console.log('error :' + err.message);
+				//console.log('error :' + err.message);
 			}
 		})
 		this.totalTax = results.taxAmount;
@@ -56,7 +56,7 @@ module.exports = function Cart(oldCart) {
 		for(var itemid in oldCart.items) {
 	    	if (id==itemid) {
 	    		if (oldCart.items[itemid].item.Product_Group=='DONATION') {
-	    			console.log("DUPLICATE");
+	    			//console.log("DUPLICATE");
 	    			error = {
 	    				message: 'Unable to add duplicate donations.  Please clear previous donation before adding another.'
 	    			}
@@ -72,7 +72,7 @@ module.exports = function Cart(oldCart) {
 		storedItem.price = parseFloat(price);
 		// storedItem.itemTotal = Number(price * storedItem.qty).toFixed(2);
 		storedItem.itemTotal = Number((price*100) * storedItem.qty);
-		console.log("Stored Item Item Total: " + JSON.stringify(storedItem));
+		//console.log("Stored Item Item Total: " + JSON.stringify(storedItem));
 // this.totalShipping = result.totalShipping;
         // storedItem.taxAmount = result.taxAmount;
 		storedItem.type = type;
@@ -187,7 +187,7 @@ module.exports = function Cart(oldCart) {
 			var code = products[i].item.code;
 			var ticket_name = products[i].item.ticket_name;
 			var option = products[i].item.option;
-			console.log("OPTION: " + option);
+			//console.log("OPTION: " + option);
 			var dateobj = new Date();
 			if (itemgroup == 'TICKET') {
 				ticket = new Ticket({
@@ -203,25 +203,23 @@ module.exports = function Cart(oldCart) {
 				ticket.save(function(err,ticket) {
 					if (err) {
 						res.send('500','Problem saving ticket.');
-						console.log('Error Saving Ticket ' + err.message);
+						//console.log('Error Saving Ticket ' + err.message);
 					}
 				});
 				User.findById(user._id, function(err,userdoc) {
 					if (err) {
-						console.log("Unable to find user " + user._id);
+						//console.log("Unable to find user " + user._id);
 					}
 					User.update({_id:user._id},
 						{$push:
 							{purchased:
 								{code: code, purchased: dateobj}
 							}
-						},function(err, newuserdoc){
-					    	if (err) console.log("error " + error.message);
-						});
+						// },function(err, newuserdoc){
+					    // 	if (err) //console.log("error " + error.message);
+						// });
 					});
 				return ticket;
 
 			} 
-		}
-	}
-};
+				)}}}};

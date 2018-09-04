@@ -106,7 +106,8 @@ This will expose the entire product catalog collection.
     "created": "2016-12-09T17:40:58.033Z",
     "options": [],
     "Attributes": [],
-    "likes": []
+    "likes": [],
+    "reviews":[]
   },
   
 ## Notes on Installation

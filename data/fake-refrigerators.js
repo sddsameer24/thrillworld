@@ -22,7 +22,7 @@ dotenv.load({
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
-  console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+  //console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   logger.log('error','%s MongoDB connection error. Please make sure MongoDB is running.');
   process.exit();
 });
@@ -55,7 +55,7 @@ async.times(100, function(i, next) {
 	var numUsers = Math.floor(Math.random() * (10 - 2 + 1)) + 2;
 	User.aggregate([{ $sample: { size: numUsers }},{$project: { _id: 1 }}], function(err,usersArray) {
 		if (err) {
-			console.log(err);
+			//console.log(err);
 		}
 		var items = []
 		for(user in usersArray) {
@@ -126,7 +126,7 @@ async.times(100, function(i, next) {
 		});
 		product.save(function(err,productId) {
 			if (err) {
-				console.log('error: ',err.message);
+				//console.log('error: ',err.message);
 			}
 			done++;
 			/* go back and update users with this new product */

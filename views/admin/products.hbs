@@ -87,22 +87,45 @@
                                                             <label for='price'>Price</label>
                                                             <input class="form-control" name='price' type="text" placeholder="">
                                                         </li>
-                                                        <li class="list-group-item">
-                                                            <label for='shippable'>Shippable?</label>
-                                                            <div class="material-switch pull-right">
-                                                                No
-                                                                <input id="shippable" name="shippable" type="checkbox" />
-                                                                <label for="shippable" class="label-success"></label> Yes
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <li class="list-group-item">
+                                                                    <label for='parking '>parking ?</label>
+                                                                    <div class="material-switch pull-right">
+                                                                        No
+                                                                        <input id="parking " name="parking " type="checkbox" />
+                                                                        <label for="parking " class="label-success"></label> Yes
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item">
+                                                                    <label for='Pool'>Pool?</label>
+                                                                    <div class="material-switch pull-right">
+                                                                        No
+                                                                        <input id="Pool" name="Pool" type="checkbox" />
+                                                                        <label for="Pool" class="label-success"></label> Yes
+                                                                    </div>
+                                                                </li>
                                                             </div>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <label for='taxable'>Taxable?</label>
-                                                            <div class="material-switch pull-right">
-                                                                No
-                                                                <input id="taxable" name="taxable" type="checkbox" />
-                                                                <label for="taxable" class="label-success"></label> Yes
+                                                            <div class="col-md-6">
+                                                                <li class="list-group-item">
+                                                                    <label for='campfire'>campfire?</label>
+                                                                    <div class="material-switch pull-right">
+                                                                        No
+                                                                        <input id="campfire" name="campfire" type="checkbox" />
+                                                                        <label for="campfire" class="label-success"></label> Yes
+                                                                    </div>
+                                                                </li>
+                                                                <li class="list-group-item">
+                                                                    <label for='Wifi'>Wifi?</label>
+                                                                    <div class="material-switch pull-right">
+                                                                        No
+                                                                        <input id="Wifi" name="Wifi" type="checkbox" />
+                                                                        <label for="Wifi" class="label-success"></label> Yes
+                                                                    </div>
+                                                                </li>
                                                             </div>
-                                                        </li>
+
+                                                        </div>
                                                         <li class="list-group-item">
                                                             <label for='description'>Description</label>
                                                             <textarea rows="2" class="form-control" [(ngModel)]="newProduct.description" name='description' placeholder=""></textarea>
@@ -112,16 +135,18 @@
                                                             <select class='form-control' name='category'>
                                                                 {{#each allcats}}
                                                                 <option value="{{this.name}}">{{this.slug}}</option>
+
                                                                 {{/each}}
                                                             </select>
                                                         </li>
                                                         <li class="list-group-item">
                                                             <label for='Product_Group'>Product Type</label>
                                                             <select class='form-control' name='Product_Group'>
-                                                                {{!-- <option value="TICKET">Ticket</option>
+                                                                {{!--
+                                                                <option value="TICKET">Ticket</option>
                                                                 <option value="DONATION">Variable Amount Donation</option> --}}
-                                                                <option value="APPAREL">Non Featured</option>
-                                                                <option value="SIMPLE">Featured</option>
+                                                                <option value="APPAREL">Featured</option>
+                                                                <option value="SIMPLE">Non Featured</option>
                                                             </select>
                                                         </li>
                                                     </ul>
@@ -129,8 +154,35 @@
                                                 <div class="form-group">
                                                     <ul class="list-group">
                                                         <li class="list-group-item">
-                                                            <label for='imageFile'>Image</label>
+                                                            <label for='imageFile'>Display Image</label>
                                                             <input type='file' name='imageFile' class='form-control'>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="form-group">
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item">
+                                                            <label for='imageFile1'>Gallery1</label>
+                                                            <input type='file' name='imageFile1' class='form-control'>
+                                                            
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="form-group">
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item">
+                                                            <label for='imageFile2'>Gallery2</label>
+                                                            <input type='file' name='imageFile2' class='form-control'>
+                                                            
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="form-group">
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item">
+                                                            <label for='imageFile3'>Gallery3</label>
+                                                            <input type='file' name='imageFile3' class='form-control'>
+                                                            
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -268,7 +320,8 @@
                                                                             <li class="list-group-item">
                                                                                 <label for='Product_Group'>Product Type</label>
                                                                                 <select class='form-control' name='Product_Group'>
-                                                                                    {{!-- <option value="TICKET" {{#if this.isTicket}}selected{{/if}}>Ticket</option>
+                                                                                    {{!--
+                                                                                    <option value="TICKET" {{#if this.isTicket}}selected{{/if}}>Ticket</option>
                                                                                     <option value="DONATION" {{#if this.isDonation}}selected{{/if}}>Variable Amount Donation</option> --}}
                                                                                     <option value="APPAREL" {{#if this.isApparel}}selected{{/if}}>Featured</option>
                                                                                     <option value="SIMPLE">Non Featured</option>

@@ -35,7 +35,7 @@ router.post('/update-profile', csrfProtection, function (req, res, next) {
 			res.redirect('/user/profile');
 		})
 		.catch(function (err) {
-			console.log("Error: " + JSON.stringify(err));
+			//console.log("Error: " + JSON.stringify(err));
 			req.flash('error', 'Problem updating user profile.');
 			res.redirect('/user/profile');
 			res.status(400).send(err);
@@ -57,7 +57,7 @@ router.get('/profile', isLoggedIn, csrfProtection, function (req, res, next) {
 });
 router.get('/orders', isLoggedIn, function (req, res, next) {
 
-	// console.log(payments);
+	// //console.log(payments);
 	// res.render('user/profile', {layout:'fullpage.hbs',user: req.user, payments: payments,hasPayments:0});
 
 	Order.find({
@@ -77,11 +77,11 @@ router.get('/orders', isLoggedIn, function (req, res, next) {
 		// var arr = [];
 		// var total = 0;
 		// for (var order in orders) {
-		//     console.log("Cart Item: " + orders[order]);
-		//     console.log("------------");
+		//     //console.log("Cart Item: " + orders[order]);
+		//     //console.log("------------");
 		//     for (var item in orders[order].cart.items) {
-		//         console.log("Item " + item);
-		//         console.log(orders[order].cart.items[item].item.name);
+		//         //console.log("Item " + item);
+		//         //console.log(orders[order].cart.items[item].item.name);
 		//         total = parseFloat(orders[order].cart.items[item].item.)
 		//     }
 		// }
@@ -105,7 +105,7 @@ router.get('/logout-and-delete', isLoggedIn, function (req, res, next) {
 	meanlogger.log("auth", "logged out and deleted account", req.user);
 	User.findByIdAndRemove(req.user._id, function (err, result) {
 		if (err) {
-			console.log("Problem removing user record.");
+			//console.log("Problem removing user record.");
 			req.flash('error', 'Unable to delete user record.');
 			res.redirect('/');
 		}
@@ -145,7 +145,7 @@ router.post('/forgot', function (req, res, next) {
 			}, function (err, user) {
 				if (!user) {
 					req.flash('error', 'No account with that email address exists.');
-					console.log('no account with that email.');
+					//console.log('no account with that email.');
 					return res.redirect('/user/forgot');
 				}
 				user.resetPasswordToken = token;
@@ -155,7 +155,7 @@ router.post('/forgot', function (req, res, next) {
 					if (err) {
 						req.flash('error', 'An error occurred.');
 					}
-					console.log("Saved User: " + JSON.stringify(user));
+					//console.log("Saved User: " + JSON.stringify(user));
 					done(err, token, user);
 				});
 			});
@@ -220,7 +220,7 @@ router.get('/reset/:token', function (req, res) {
 			errorMsg = req.flash('error', 'Password reset token is invalid or has expired.');
 			return res.redirect('/user/forgot');
 		}
-		console.log("Found User: " + JSON.stringify(user));
+		//console.log("Found User: " + JSON.stringify(user));
 		res.render('user/reset', {
 			user: req.user,
 			token: req.params.token,
@@ -252,9 +252,9 @@ router.post('/reset/:token', function (req, res) {
 				}
 			}, function (err, user) {
 				if (err) {
-					console.log("Error: " + err.message);
+					//console.log("Error: " + err.message);
 				}
-				console.log("User: " + JSON.stringify(user));
+				//console.log("User: " + JSON.stringify(user));
 				// if (!user) {
 				// 	errorMsg = req.flash('error', 'Password reset token is invalid or has expired.');
 				// 	return res.redirect('back');
@@ -339,7 +339,7 @@ router.post('/signup', passport.authenticate('local.signup', {
 router.get('/signin', csrfProtection, function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-    console.log("Error: " + JSON.stringify(errorMsg));
+    //console.log("Error: " + JSON.stringify(errorMsg));
 	if (process.env.FACEBOOK_ID) {
 		var authFacebook = true
 	} else {
@@ -380,7 +380,7 @@ router.get('/signin', csrfProtection, function (req, res, next) {
 //     failureMessage: "Invalid username or password",
 //     failureFlash: true
 // }), function(req, res, next) {
-//     console.log("REQ: " + JSON.stringify(req));
+//     //console.log("REQ: " + JSON.stringify(req));
 //     meanlogger.log("auth","logged in",req.user);
 //     if (req.session.oldUrl && (req.session.oldUrl != req.url)) {
 //         var oldUrl = req.session.oldUrl
@@ -391,7 +391,7 @@ router.get('/signin', csrfProtection, function (req, res, next) {
 //             user.lastlogin=Date.now();
 //             user.save(function(err,docs) {
 //                 if (err) {
-//                     console.log("Unable to save user.");
+//                     //console.log("Unable to save user.");
 //                 }
 //             })
 //             res.render('user/profile', {
@@ -420,10 +420,10 @@ router.post('/signin', function (req, res, next) {
 			session: true
 		},
 		function (err, user, info) {
-            console.log("trying to log in");
+            //console.log("trying to log in");
 			if (err) {
 				req.flash('error', 'Internal Server Error');
-				console.log("Error: " + err.message);
+				//console.log("Error: " + err.message);
                                 res.redirect('/user/signin');
 
 				res.render('user/signin', {
@@ -439,7 +439,7 @@ router.post('/signin', function (req, res, next) {
 			}
 			if (!user) {
 				req.flash('error', 'Invalid credentials');
-				console.log("Error Login - invalid credentials");
+				//console.log("Error Login - invalid credentials");
                 return res.redirect('/user/signin');
 				// return res.render('user/signin', {
 				// 	layout: 'eshop/blank',
@@ -454,7 +454,7 @@ router.post('/signin', function (req, res, next) {
 			req.logIn(user, function (err) {
 				if (err) {
 					req.flash('error', 'Invalid credentials');
-					console.log("Error Login - invalid credentials");
+					//console.log("Error Login - invalid credentials");
                     return res.redirect('/user/signin');
 
 					// return res.render('user/signin', {

@@ -31,7 +31,7 @@ router.get('/buckauto', function(req, res, next) {
 			}
 		}],function(err,product) {
 			if (err) {
-				console.log("Error: " + err.message);
+				//console.log("Error: " + err.message);
 				res.send(1000, "Problem fetching products");
 			}
 			res.json(product);
@@ -46,7 +46,7 @@ router.get('/buckauto', function(req, res, next) {
 router.get('/graph/:userId', function(req, res, next) {
 	var url = 'mongodb://' + process.env.MONGO_USER + ':' + process.env.MONGO_PASS + '@localhost:27017/hackathon';
 	var url = 'mongodb://localhost:27017/hackathon';
-	console.log("URL: " + url)
+	//console.log("URL: " + url)
 	MongoClient.connect(url, (err, db) => {
 		products = db.collection('products');
 		
@@ -261,7 +261,7 @@ router.get('/products/:id', function(req, res, next) {
  */
 router.post('/api/products', function (req, res){
   var product;
-  console.log(res);
+  //console.log(res);
   product = new Product({
     code: req.body.code,
     description: req.body.description,
@@ -275,9 +275,9 @@ router.post('/api/products', function (req, res){
   });
   product.save(function (err) {
     if (!err) {
-      return console.log("created");
+      return //console.log("created");
     } else {
-      return console.log(err);
+      return //console.log(err);
     }
   });
   return res.send(product);
@@ -286,7 +286,7 @@ router.post('/api/products', function (req, res){
 /* DELETE product. */
 router.delete('/products/:id', function(req, res, next) {
 	Product.remove({_id: req.params.id},function(err,product) {
-		console.log("Deleting Product " + req.params.id);
+		//console.log("Deleting Product " + req.params.id);
 		res.json(product);
 	})
 });
@@ -458,9 +458,9 @@ router.post('/order', (req, res, next) => {
 	  
 	  transporter.sendMail(mailOptions, function(error, info){
 		if (error) {
-		  console.log(error);
+		  //console.log(error);
 		} else {
-		  console.log('Email sent: ' + info.response);
+		  //console.log('Email sent: ' + info.response);
 		}
 	  });
 
@@ -507,7 +507,7 @@ router.get('/purchases-by-yearmo', function(req,res,next) {
 	    var data = [];
 
 	    if (err) {
-	        console.log("error: " + err.message);
+	        //console.log("error: " + err.message);
 	    } else {
 	        var i = 0;
 	        async.each(yearmos,function(yearmo,next) {
@@ -517,7 +517,7 @@ router.get('/purchases-by-yearmo', function(req,res,next) {
 	            })
 	        })
 	    }
-		console.log(JSON.stringify(data));
+		//console.log(JSON.stringify(data));
     res.json(data);
     });
 });

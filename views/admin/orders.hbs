@@ -396,7 +396,7 @@
             'dataType': "json",
             'success': function (data) {
                 json = data;
-                console.log(json);
+                //console.log(json);
                 $.each(data, function (i, product) {
                     $('#product').append($('<option>').text(product.name).attr('value', product.sku));
                 });

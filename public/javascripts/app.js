@@ -31,14 +31,14 @@ app.factory("services", ['$http', function($http) {
 }]);
 
 app.controller('listCtrl', function ($scope, services) {
-    console.log("hello");
+    //console.log("hello");
     services.getProducts().then(function(data){
         $scope.products = data.data;
     });
 });
 
 app.controller('editCtrl', function ($scope, $rootScope, $location, $routeParams, services, product) {
-    console.log("hello");
+    //console.log("hello");
     var productID = ($routeParams.productID) ? parseInt($routeParams.productID) : 0;
     $rootScope.title = (productID > 0) ? 'Edit Product' : 'Add Product';
     $scope.buttonText = (productID > 0) ? 'Update Product' : 'Add New Product';

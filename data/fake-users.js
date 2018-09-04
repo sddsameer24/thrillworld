@@ -23,7 +23,7 @@ dotenv.load({
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
-  console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+  //console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   logger.log('error','%s MongoDB connection error. Please make sure MongoDB is running.');
   process.exit();
 });
@@ -44,7 +44,7 @@ admin = new User({
 });
 admin.save(function(err) {
 	if (err) {
-		console.log("Error creating administrative user.  " + err.message);
+		//console.log("Error creating administrative user.  " + err.message);
 		process.abort();
 	}
 })
@@ -58,11 +58,11 @@ for (var i=0; i < maxUsers; i++) {
 	var state = faker.address.stateAbbr();
 	var zipcode = faker.address.zipCode();
 	// geocoder.geocode(addr1 + ', ' + city + ', ' + state + ' ' + zipcode, function(err, data) {
-	// 	console.log(JSON.stringify(data));
-	// 	console.log('---');
+	// 	//console.log(JSON.stringify(data));
+	// 	//console.log('---');
 	Product.findRandom(filter, fields, options, function(err,purchasedArray) {
 		if (err) {
-			console.log(err);
+			//console.log(err);
 		}
 		var items = []
 		for(item in purchasedArray) {
@@ -91,14 +91,14 @@ for (var i=0; i < maxUsers; i++) {
 
 
 			if (err) {
-				console.log('error: ' + err);
+				//console.log('error: ' + err);
 			}
 		});
 		user.save(function(err,newuser) {
 			if (err) {
-				console.log('error: ',err.message);
+				//console.log('error: ',err.message);
 			}
-			console.log("Items: " + JSON.stringify(items))
+			//console.log("Items: " + JSON.stringify(items))
 			for(item in items) {
 				Product.update(
 					{ _id: item._id},

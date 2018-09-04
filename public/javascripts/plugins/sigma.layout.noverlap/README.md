@@ -79,7 +79,7 @@ var listener = s.configNoverlap(config);
 
 // Bind all events:
 listener.bind('start stop interpolate', function(event) {
-  console.log(event.type);
+  //console.log(event.type);
 });
 
 // Start the algorithm:

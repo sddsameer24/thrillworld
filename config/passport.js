@@ -27,7 +27,7 @@ passport.use('local.signup', new LocalStrategy({
 	passReqToCallback: true
 }, function (req, email, password, done) {
 	process.nextTick(function () {
-    console.log("Here...");
+    //console.log("Here...");
 		req.checkBody('email', 'Invalid Email').notEmpty().isEmail();
 		req.checkBody('password', 'Invalid Password').notEmpty().isLength({
 			min: 4
@@ -72,7 +72,7 @@ passport.use('local.signup', new LocalStrategy({
 				return done(err);
 			}
 			if (user) {
-        console.log("User email exists.");
+        //console.log("User email exists.");
 				return done(null, false, req.flash('error', 'Email is already in use.'));
 			}
 			var newUser = new User();
@@ -92,7 +92,7 @@ passport.use('local.signup', new LocalStrategy({
 				if (err) {
 					return done(err);
 				}
-				console.log('User successfully registered');
+				//console.log('User successfully registered');
 				req.flash('success', 'User successfully registered.');
 				return done(null, newUser);
 			});
@@ -116,7 +116,7 @@ passport.use('local.signin', new LocalStrategy({
 		});
 		return done(null, false, messages);
 	}
-  console.log("In passport");
+  //console.log("In passport");
 	User.findOne({
 		'email': email
 	}, function (err, user) {
@@ -148,19 +148,19 @@ passport.use(new FacebookStrategy({
 			facebook: profile.id
 		}, (err, existingUser) => {
 			if (err) {
-				console.log("Problem fetching user.");
+				//console.log("Problem fetching user.");
 				return done(err);
 			}
 			if (existingUser) {
-				console.log("Existing User");
+				//console.log("Existing User");
 				req.flash('error', 'There is already a Facebook account that belongs to you. Sign in with that account or delete it, then link it with your current account.');
 				done(err);
 			} else {
-				console.log("Not Existing User");
+				//console.log("Not Existing User");
 
 				User.findById(req.user.id, (err, user) => {
 					if (err) {
-						console.log("Problem fetching user.");
+						//console.log("Problem fetching user.");
 						return done(err);
 					}
 					user.facebook = profile.id;
@@ -176,7 +176,7 @@ passport.use(new FacebookStrategy({
 					user.profile.picture = user.profile.picture || `https://graph.facebook.com/${profile.id}/picture?type=large`;
 					user.save((err) => {
 						if (err) {
-							console.log("Problem linking facebook to user.");
+							//console.log("Problem linking facebook to user.");
 						}
 						req.flash('success', {
 							msg: 'Facebook account has been linked.'
@@ -191,22 +191,22 @@ passport.use(new FacebookStrategy({
 			facebook: profile.id
 		}, (err, existingUser) => {
 			if (err) {
-				console.log("Problem fetching user.");
+				//console.log("Problem fetching user.");
 				return done(err);
 			}
 			if (existingUser) {
-				console.log("Existing user.");
+				//console.log("Existing user.");
 				return done(null, existingUser);
 			}
 			User.findOne({
 				email: profile._json.email
 			}, (err, existingEmailUser) => {
 				if (err) {
-					console.log("Problem fetching user.");
+					//console.log("Problem fetching user.");
 					return done(err);
 				}
 				if (existingEmailUser) {
-					console.log('There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings.');
+					//console.log('There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings.');
 					req.flash('error', 'There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings.');
 					done('There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings.');
 				} else {

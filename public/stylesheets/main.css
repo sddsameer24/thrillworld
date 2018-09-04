@@ -587,7 +587,10 @@ a#scrollUp i{
   text-decoration: none;
 }
 
-
+.productimg{
+  height:100%;
+  width:100%;
+}
 .shop-menu ul li {
 	display:inline-block;
   padding-left: 15px;
@@ -631,7 +634,21 @@ a#scrollUp i{
 .navbar-collapse.collapse{
   padding-left: 0;
 }
-
+.icon-calendar:before {
+  content: "\f073";
+}
+.icon-calendar-plus-o:before {
+  content: "\f271";
+}
+.icon-calendar-minus-o:before {
+  content: "\f272";
+}
+.icon-calendar-times-o:before {
+  content: "\f273";
+}
+.icon-calendar-check-o:before {
+  content: "\f274";
+}
 .mainmenu ul li{
   padding-right: 15px;
   padding-left: 15px;
@@ -1631,6 +1648,39 @@ h2.title {
   position: relative;
 }
 
+.block-32 {
+  margin-top: -70px;
+  z-index: 1;
+  position: relative;
+  background: #fff;
+  padding: 30px;
+  -webkit-box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1); }
+  .block-32 .field-icon-wrap {
+    position: relative; }
+    .block-32 .field-icon-wrap .form-control {
+      height: 52px !important;
+      position: relative;
+      padding-right: 40px;
+      -webkit-box-shadow: none !important;
+      box-shadow: none !important;
+      color: #a6a6a6; }
+    .block-32 .field-icon-wrap .icon {
+      position: absolute;
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+      transform: translateY(-50%);
+      right: 15px;
+      z-index: 2; }
+    .block-32 .field-icon-wrap select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 100%; }
+  .block-32 .btn {
+    height: 52px;
+    color: #fff; }
 .newarrival{
 	position:absolute;
 	top:0;

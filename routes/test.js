@@ -8,7 +8,7 @@ dotenv.load({ path: '.env.hackathon' });
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
-  console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+  //console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   process.exit();
 });
     Product.aggregate([{
@@ -34,10 +34,10 @@ mongoose.connection.on('error', () => {
             }]
         }
     }], function(err, products) {
-        console.log(JSON.stringify(products))
+        //console.log(JSON.stringify(products))
     });
-console.log("-----------------------------------")
+//console.log("-----------------------------------")
     // Product.find({}, function(err, products) {
         
-    //     console.log(JSON.stringify(products))
+    //     //console.log(JSON.stringify(products))
     // });

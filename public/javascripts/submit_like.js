@@ -28,7 +28,7 @@ $('form').submit(function(event) {
     success     : function(data) {
 
       // log data to the console so we can see
-      console.log(data);
+      //console.log(data);
 
       // if validation fails
       // add the error class to show a red input
