@@ -65,6 +65,9 @@ var schema = new Schema({
 	description: {
 		type: String,
 		required: false
+	},vendor_id: {
+		type: String,
+		required: false
 	},
 	price: {
         type: Currency,

@@ -1288,7 +1288,8 @@ router.post('/create', function (req, res, next) {
 			ticket_email: ticket_email,
 			option: option,
 			category: products[i].item.category,
-			code: products[i].item.code
+			code: products[i].item.code,
+			vendor_id: products[i].item.vendor_id
 		}
 		orders.push(order);
 	}
@@ -1654,7 +1655,8 @@ router.get('/execute', function (req, res, next) {
 													name: product.item.name,
 													price: product.item.price,
 													category: product.category,
-													Product_Group: product.Product_Group
+													Product_Group: product.Product_Group,
+													vendor_id: product.vendor_id
 												}
 											}
 										}, {
