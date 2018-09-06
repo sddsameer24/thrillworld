@@ -1316,71 +1316,71 @@ router.post('/create', function (req, res, next) {
 		create_payment.custom = custom;
 		create_payment.payer.funding_instruments = funding_instruments;
 	}
-	// order comnfirmation mail sending  ..........................................
-	const output = `
-		<p>You have a new contact request</p>
-		<h3>Contact Details</h3>
-		<ul>  
-		  <li>Name: ${req.user.first_name}</li>
-		  <li>address: ${req.body.shipping_addr1}</li>
-		  <li>Email: ${res.locals.fromEmail}</li>
-		  <li>Phone: ${req.user.telephone}</li>
-		</ul>
-	  `;
-	let transporter = nodemailer.createTransport({
-		host: 'mail.zo-online.com',
-		port: 587,
-		secure: false, // true for 465, false for other ports
-		auth: {
-			user: 'admin@zo-online.com', // generated ethereal user
-			pass: '22watch22@DS'  // generated ethereal password
-		},
-		tls: {
-			rejectUnauthorized: false
-		}
-	});
+	// // order comnfirmation mail sending  ..........................................
+	// const output = `
+	// 	<p>You have a new contact request</p>
+	// 	<h3>Contact Details</h3>
+	// 	<ul>  
+	// 	  <li>Name: ${req.user.first_name}</li>
+	// 	  <li>address: ${req.body.shipping_addr1}</li>
+	// 	  <li>Email: ${res.locals.fromEmail}</li>
+	// 	  <li>Phone: ${req.user.telephone}</li>
+	// 	</ul>
+	//   `;
+	// let transporter = nodemailer.createTransport({
+	// 	host: 'mail.zo-online.com',
+	// 	port: 587,
+	// 	secure: false, // true for 465, false for other ports
+	// 	auth: {
+	// 		user: 'admin@zo-online.com', // generated ethereal user
+	// 		pass: '22watch22@DS'  // generated ethereal password
+	// 	},
+	// 	tls: {
+	// 		rejectUnauthorized: false
+	// 	}
+	// });
 
-	// setup email data with unicode symbols
-	let mailOptions = {
-		from: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
-		to: 'res.locals.fromEmail', // list of receivers
-		subject: 'Node Contact Request', // Subject line
-		text: 'Hello world?', // plain text body
-		html: output // html body
-	};
+	// // setup email data with unicode symbols
+	// let mailOptions = {
+	// 	from: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
+	// 	to: 'res.locals.fromEmail', // list of receivers
+	// 	subject: 'Node Contact Request', // Subject line
+	// 	text: 'Hello world?', // plain text body
+	// 	html: output // html body
+	// };
 
-	// send mail with defined transport object
-	transporter.sendMail(mailOptions, (error, info) => {
-		if (error) {
-			return ////console.log(error);
-		}
-		////console.log('Message sent: %s', info.messageId);
-		////console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+	// // send mail with defined transport object
+	// transporter.sendMail(mailOptions, (error, info) => {
+	// 	if (error) {
+	// 		return ////console.log(error);
+	// 	}
+	// 	////console.log('Message sent: %s', info.messageId);
+	// 	////console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 
-		res.render('contact', { msg: 'Email has been sent' });
-	});
-	// end of order comnfirmation mail sending  ..........................................
-	// order comnfirmation sms sending  ..........................................
-	const number = req.user.telephone;
-	const text = req.body.text;
-	Nexmo.message.sendSms(
-		'917795565771', number, text, { type: 'unicode' },
-		(err, responseData) => {
-			if (err) {
-				////console.log(err);
-			} else {
-				console.dir(responseData);
-				// Get data from response
-				const data = {
-					id: responseData.messages[0]['message-id'],
-					number: responseData.messages[0]['to']
-				}
+	// 	res.render('contact', { msg: 'Email has been sent' });
+	// });
+	// // end of order comnfirmation mail sending  ..........................................
+	// // order comnfirmation sms sending  ..........................................
+	// const number = req.user.telephone;
+	// const text = req.body.text;
+	// Nexmo.message.sendSms(
+	// 	'917795565771', number, text, { type: 'unicode' },
+	// 	(err, responseData) => {
+	// 		if (err) {
+	// 			////console.log(err);
+	// 		} else {
+	// 			console.dir(responseData);
+	// 			// Get data from response
+	// 			const data = {
+	// 				id: responseData.messages[0]['message-id'],
+	// 				number: responseData.messages[0]['to']
+	// 			}
 
-				// Emit to the client
-				io.emit('smsStatus', data);
-			}
-		}
-	);
+	// 			// Emit to the client
+	// 			io.emit('smsStatus', data);
+	// 		}
+	// 	}
+	// );
 	// end of order comnfirmation sms sending  ..........................................
 	//
 	// Send the payment request to paypal

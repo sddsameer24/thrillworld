@@ -87,6 +87,28 @@
                                                             <label for='price'>Price</label>
                                                             <input class="form-control" name='price' type="text" placeholder="">
                                                         </li>
+                                                        <li class="list-group-item">
+                                                            <div class="row">
+
+                                                                <div class="col-md-5">
+                                                                    <label for='Latitude'>Latitude</label>
+                                                                    <input class="form-control" id="lati" name='Latitude' type="text" placeholder="{{y}}">
+                                                                </div>
+                                                                <div class="col-md-5">
+                                                                    <label for='Longitude'>Longitude</label>
+                                                                    <input class="form-control" id="long" name='Longitude' type="text" value="{{x}}">
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label for='Auto'>Auto</label>
+                                                                    <a type="button" onclick="getLocation()">
+                                                                        <img height="32px" src="/images/Location-Geo.png"> </a>
+
+                                                                </div>
+
+                                                            </div>
+                                                        </li>
+
+
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <li class="list-group-item">
@@ -164,7 +186,7 @@
                                                         <li class="list-group-item">
                                                             <label for='imageFile1'>Gallery1</label>
                                                             <input type='file' name='imageFile1' class='form-control'>
-                                                            
+
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -173,7 +195,7 @@
                                                         <li class="list-group-item">
                                                             <label for='imageFile2'>Gallery2</label>
                                                             <input type='file' name='imageFile2' class='form-control'>
-                                                            
+
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -182,7 +204,7 @@
                                                         <li class="list-group-item">
                                                             <label for='imageFile3'>Gallery3</label>
                                                             <input type='file' name='imageFile3' class='form-control'>
-                                                            
+
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -404,3 +426,20 @@
 </div>
 <!-- /.container-fluid -->
 </div>
+<script>
+    var x = document.getElementById("lati");
+    var y = document.getElementById("long");
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            x.innerHTML = "Geolocation is not supported by this browser.";
+        }
+    }
+
+    function showPosition(position) {
+        x = position.coords.latitude;
+        y = position.coords.longitude;
+    }
+</script>

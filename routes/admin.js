@@ -943,6 +943,8 @@ router.post('/add-product', isAdmin, function (req, res, next) {
                         shippable: req.body.shippable,
                         taxable: req.body.taxable,
                         category: req.body.category,
+                        Longitude:req.body.Longitude,                       
+                        Latitude:req.body.Latitude,                     
                         imagePath: '/images/' + req.body.name + '.png',
                         imagePathg1: '/images/' + req.body.name + 'g1' + '.png',
                         imagePathg2: '/images/' + req.body.name + 'g2' + '.png',
@@ -959,7 +961,6 @@ router.post('/add-product', isAdmin, function (req, res, next) {
               
     });
 });
-
 router.post('/add-category', isAdmin, function (req, res, next) {
     ////console.log(req.files);
     errorMsg = req.flash('error')[0];

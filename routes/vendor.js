@@ -719,47 +719,72 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
 });
 
 router.post('/add-product', isAdmin, function (req, res, next) {
-    console.log(req.files);
+    ////console.log(req.files);
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
-    var imageFile;
+    var imageFile,imageFile1,imageFile2,imageFile3;
 
     if (!req.files) {
         res.send('No files were uploaded.');
         return;
     }
-    //console.log(req.user._id);
-
     imageFile = req.files.imageFile;
-//     console.log(process.env.imagePath);
-//     console.log(req.files);
-//    // console.log(req.files);
-//     console.log(__dirname +`\public`);
-    imageFile.mv('public/images/'+ req.body.name + '.png', function (err) {
+    imageFile1 = req.files.imageFile1;
+    imageFile2 = req.files.imageFile2;
+    imageFile3 = req.files.imageFile3;
+    imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
         if (err) {
             res.status(500).send(err);
         }
-        product = new Product({
-            name: req.body.name,
-            code: req.body.code,
-            title: req.body.title,
-            Product_Group: req.body.Product_Group,
-            price: parseFloat((req.body.price * 100).toFixed(2)),
-            description: req.body.description,
-            shippable: req.body.shippable,
-            taxable: req.body.taxable,
-            category: req.body.category,
-            imagePath: '/images/' + req.body.name + '.png',
-            vendor_id: req.user._id
-        })
-        product.save(function (err) {
+    });
+
+        imageFile1.mv('public/images/' + req.body.name + 'g1' + '.png', function (err) {
             if (err) {
-                req.flash('error', 'Error: ' + err.message);
-                return res.redirect('/vendor/products');
+                res.status(500).send(err);
             }
-            console.log("product: " + product);
-            return res.redirect('/vendor/products');
         });
+  
+            imageFile2.mv('public/images/' + req.body.name + 'g2' + '.png', function (err) {
+                if (err) {
+                    res.status(500).send(err);
+                }
+            });
+        
+                imageFile3.mv('public/images/' + req.body.name + 'g3' + '.png', function (err) {
+                    if (err) {
+                        res.status(500).send(err);
+                    }
+                }); 
+                    product = new Product({
+                        name: req.body.name,
+                        code: req.body.code,
+                        Wifi: req.body.Wifi,
+                        campfire: req.body.campfire,
+                        Pool: req.body.Pool,
+                        parking: req.body.parking,
+                        title: req.body.title,
+                        Product_Group: req.body.Product_Group,
+                        price: parseFloat((req.body.price * 100).toFixed(2)),
+                        description: req.body.description,
+                        shippable: req.body.shippable,
+                        taxable: req.body.taxable,
+                        category: req.body.category,
+                        Longitude:req.body.Longitude,                       
+                        Latitude:req.body.Latitude,                     
+                        imagePath: '/images/' + req.body.name + '.png',
+                        imagePathg1: '/images/' + req.body.name + 'g1' + '.png',
+                        imagePathg2: '/images/' + req.body.name + 'g2' + '.png',
+                        imagePathg3: '/images/' + req.body.name + 'g3' + '.png',
+
+                    })
+                    product.save(function (err) {
+                        if (err) {
+                            req.flash('error', 'Error: ' + err.message);
+                            return res.redirect('/admin/products');
+                        }
+                        console.log("product: " + product);
+                        return res.redirect('/admin/products');
+              
     });
 });
 
