@@ -119,6 +119,12 @@ var schema = new Schema({
 		type: Date,
 		default: Date.now()
 	},
+	Latitude: {
+		type: String
+	},
+	Longitude: {
+		type: String
+	},
 	update: {
 		type: Date,
 		default: Date.now()
