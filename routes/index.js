@@ -73,7 +73,30 @@ router.get('/whypaypal', function (req, res, next) {
 });
 /* host main Info Page */
 router.get('/listing', function (req, res, next) {
-	res.render('shop/listing');
+	res.render('shop/listing'),{
+		layout: 'eshop/blank'
+	}
+	
+});
+router.get('/signup', function (req, res, next) {
+	var messages = req.flash('error');
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	res.render('user/signup', {
+		layout: 'eshop/blank',
+		//csrfToken: req.csrfToken(),
+		"successMsg": successMsg,
+		"noMessage": !successMsg,
+		"message": messages,
+		"errorMsg": messages[0],
+		"noErrorMsg": !messages,
+	});
+});
+
+router.get('/shop', function (req, res, next) {
+	res.render('shop/shop',{
+		layout: 'eshop/blank'
+	});
 });
 
 /* GET home page. */
