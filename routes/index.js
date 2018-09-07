@@ -24,7 +24,7 @@ var Config = require('../config/config.js');
 const dotenv = require('dotenv');
 const async = require('async');
 const chalk = require('chalk');
-const Nexmo = require('Nexmo');
+const Nexmo = require('nexmo');
 const socketio = require('socket.io');
 var meanlogger = require('../local_modules/meanlogger');
 var MongoClient = require('mongodb').MongoClient
@@ -1339,71 +1339,91 @@ router.post('/create', function (req, res, next) {
 		create_payment.custom = custom;
 		create_payment.payer.funding_instruments = funding_instruments;
 	}
-	// // order comnfirmation mail sending  ..........................................
-	// const output = `
-	// 	<p>You have a new contact request</p>
-	// 	<h3>Contact Details</h3>
-	// 	<ul>  
-	// 	  <li>Name: ${req.user.first_name}</li>
-	// 	  <li>address: ${req.body.shipping_addr1}</li>
-	// 	  <li>Email: ${res.locals.fromEmail}</li>
-	// 	  <li>Phone: ${req.user.telephone}</li>
-	// 	</ul>
-	//   `;
-	// let transporter = nodemailer.createTransport({
-	// 	host: 'mail.zo-online.com',
-	// 	port: 587,
-	// 	secure: false, // true for 465, false for other ports
-	// 	auth: {
-	// 		user: 'admin@zo-online.com', // generated ethereal user
-	// 		pass: '22watch22@DS'  // generated ethereal password
-	// 	},
-	// 	tls: {
-	// 		rejectUnauthorized: false
-	// 	}
-	// });
+	// order comnfirmation mail sending  ..........................................
+	const output = `
+		<p>You have a new contact request</p>
+		<h3>Contact Details</h3>
+		<ul>  
+		  <li>Name: ${req.user.first_name}</li>
+		  <li>address: ${req.body.shipping_addr1}</li>
+		  <li>Email: ${res.locals.fromEmail}</li>
+		  <li>Phone: ${req.user.telephone}</li>
+		</ul>
+	  `;
+	let transporter = nodemailer.createTransport({
+		host: 'mail.zo-online.com',
+		port: 587,
+		secure: false, // true for 465, false for other ports
+		auth: {
+			user: 'admin@zo-online.com', // generated ethereal user
+			pass: '22watch22@DS'  // generated ethereal password
+		},
+		tls: {
+			rejectUnauthorized: false
+		}
+	});
 
-	// // setup email data with unicode symbols
-	// let mailOptions = {
-	// 	from: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
-	// 	to: 'res.locals.fromEmail', // list of receivers
-	// 	subject: 'Node Contact Request', // Subject line
-	// 	text: 'Hello world?', // plain text body
-	// 	html: output // html body
-	// };
+	// setup email data with unicode symbols
+	let mailOptions = {
+		from: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
+		replyTo: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
+		to: req.user.email, // list of receivers
+		subject: 'Node Contact Request', // Subject line
+		text: 'Hello world?', // plain text body
+		html: output // html body
+	};
 
-	// // send mail with defined transport object
-	// transporter.sendMail(mailOptions, (error, info) => {
-	// 	if (error) {
-	// 		return ////console.log(error);
-	// 	}
-	// 	////console.log('Message sent: %s', info.messageId);
-	// 	////console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-
-	// 	res.render('contact', { msg: 'Email has been sent' });
-	// });
-	// // end of order comnfirmation mail sending  ..........................................
-	// // order comnfirmation sms sending  ..........................................
-	// const number = req.user.telephone;
+	// send mail with defined transport object
+	transporter.sendMail(mailOptions, (error, info) => {
+		if (error) {
+			
+			console.log("ERROR"+error);
+			return ////console.log(error);
+		}
+		console.log("INFo"+info);
+		console.log('Message sent: %s', info.messageId);
+		console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+		req.flash('success', "SENT MAIL, KINDLY CHECK!");
+	//	res.render('contact', { msg: 'Email has been sent' });
+	});
+	// end of order comnfirmation mail sending  ..........................................
+	// order comnfirmation sms sending  ..........................................
+	var number = req.user.telephone;
 	// const text = req.body.text;
-	// Nexmo.message.sendSms(
-	// 	'917795565771', number, text, { type: 'unicode' },
-	// 	(err, responseData) => {
-	// 		if (err) {
-	// 			////console.log(err);
-	// 		} else {
-	// 			console.dir(responseData);
-	// 			// Get data from response
-	// 			const data = {
-	// 				id: responseData.messages[0]['message-id'],
-	// 				number: responseData.messages[0]['to']
-	// 			}
+	const text = "Order successfull Thank You, Thrillworld";
+	console.log("NUMBRER"+number);
+	console.log("NUMBRER"+number[0]+number[1]);
+	console.log("TEXT"+text);
 
-	// 			// Emit to the client
-	// 			io.emit('smsStatus', data);
-	// 		}
-	// 	}
-	// );
+	if(number.length<=10){
+		 number="91"+number;
+		console.log("NEW"+ number);
+	}
+
+	// Init Nexmo
+const nexmo = new Nexmo({
+	apiKey: '38d2edbc',
+	apiSecret: 'grzR4xHCJDGhDqi2'
+	}, {debug: true})
+
+	nexmo.message.sendSms(
+		'917795565771', number, text, { type: 'unicode' },
+		(err, responseData) => {
+			if (err) {
+				console.log("SMS"+err);
+			} else {
+				console.dir(responseData);
+				// Get data from response
+				const data = {
+					id: responseData.messages[0]['message-id'],
+					number: responseData.messages[0]['to']
+				}
+
+				// Emit to the client
+			//	io.emit('smsStatus', data);
+			}
+		}
+	);
 	// end of order comnfirmation sms sending  ..........................................
 	//
 	// Send the payment request to paypal
