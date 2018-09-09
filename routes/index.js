@@ -31,7 +31,10 @@ var MongoClient = require('mongodb').MongoClient
 var url = 'mongodb://localhost:27017/hackathon';
 // Use connect method to connect to the Server
 
-
+// Instamojo Setup
+var Insta = require('instamojo-nodejs');
+Insta.setKeys("test_a3c5ddaf80ebda935933f83e311", "test_6d44edf82ee5b6627d0e938218d");
+Insta.isSandboxMode(true);
 
 // dotenv.load({
 // 	path: '.env.hackathon'
@@ -101,9 +104,42 @@ router.get('/shop', function (req, res, next) {
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
+	var orderid = req.param('orderid');
+	var payment_id = req.param('payment_id');
+	var payment_request_id = req.param('payment_request_id');
+
+	console.log(orderid + "    " +payment_id+ "    "+payment_request_id);
+
+	
+
+	if(payment_id && payment_request_id){
+		console.log("TRUE PAYMENT NEED TO GET DATA");
+
+		Insta.getPaymentDetails(payment_request_id, payment_id, function(error, response) {
+			if (error) {
+			  // Some error
+			} else {
+			  console.log(response);
+			 // response = JSON.parse(response);
+			  console.log(response.payment_request.status);
+
+			  if(response.payment_request.status=="Completed"){
+				console.log("STORE SUCESS");
+				Order.update({_id:orderid}, 
+					{ "status": "Paid", "paymentId": payment_id}, function (e) {
+						if (e) {
+							error(e);
+							return;
+						}
+				
+					});
+			  }
+			}
+		  });
 
 
-	if (req.session.group) {
+	
+	}else if(req.session.group) {
 		////console.log(req);
 		return res.redirect('/group/SIMPLE?q=');
 	}
@@ -1241,6 +1277,8 @@ router.post('/create', function (req, res, next) {
 	if (!req.session.cart) {
 		return res.redirect('/shopping-cart');
 	}
+	
+
 	var cart = new Cart(req.session.cart);
 	products = cart.generateArray();
 	tax = taxCalc.calculateTaxReturn(products, req.user._id);
@@ -1380,6 +1418,8 @@ router.post('/create', function (req, res, next) {
 			console.log("ERROR"+error);
 			return ////console.log(error);
 		}
+		
+		
 		console.log("INFo"+info);
 		console.log('Message sent: %s', info.messageId);
 		console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
@@ -1406,24 +1446,24 @@ const nexmo = new Nexmo({
 	apiSecret: 'grzR4xHCJDGhDqi2'
 	}, {debug: true})
 
-	nexmo.message.sendSms(
-		'917795565771', number, text, { type: 'unicode' },
-		(err, responseData) => {
-			if (err) {
-				console.log("SMS"+err);
-			} else {
-				console.dir(responseData);
-				// Get data from response
-				const data = {
-					id: responseData.messages[0]['message-id'],
-					number: responseData.messages[0]['to']
-				}
+	// nexmo.message.sendSms(
+	// 	'917795565771', number, text, { type: 'unicode' },
+	// 	(err, responseData) => {
+	// 		if (err) {
+	// 			console.log("SMS"+err);
+	// 		} else {
+	// 			console.dir(responseData);
+	// 			// Get data from response
+	// 			const data = {
+	// 				id: responseData.messages[0]['message-id'],
+	// 				number: responseData.messages[0]['to']
+	// 			}
 
-				// Emit to the client
-			//	io.emit('smsStatus', data);
-			}
-		}
-	);
+	// 			// Emit to the client
+	// 		//	io.emit('smsStatus', data);
+	// 		}
+	// 	}
+	// );
 	// end of order comnfirmation sms sending  ..........................................
 	//
 	// Send the payment request to paypal
@@ -1455,7 +1495,7 @@ const nexmo = new Nexmo({
 		status: 'pending',
 		total: parseFloat(cart.grandTotal)
 	});
-	order.save(function (err) {
+	order.save(function (err,orderdata) {
 		if (err) {
 			////console.log("Error: " + err.message)
 			req.flash('error', 'Unable to save order... ' + err.message);
@@ -1463,7 +1503,41 @@ const nexmo = new Nexmo({
 		}
 
 		req.flash('success', "Order Successful!");
-		return res.redirect('/');
+		console.log("HERE REDIRECT");
+
+		var data = new Insta.PaymentData();
+
+	data.purpose = "Test";            // REQUIRED
+	data.amount = parseFloat(cart.grandTotal);                  // REQUIRED
+	data.currency                = 'INR';
+	data.buyer_name              = req.user.first_name;
+	data.email                   = req.user.email;
+	data.phone                   = req.user.telephone;
+	data.send_sms                = 'True';
+	data.send_email              = 'True';
+	data.allow_repeated_payments = 'False';
+	data.setRedirectUrl("http://localhost:3000/?orderid="+orderdata.id+"&");
+
+	Insta.createPayment(data, function(error, response) {
+  	if (error) {
+	// some error
+	console.log("instamojo ERROR"+error);
+ 	 } else {
+    // Payment redirection link at response.payment_request.longurl
+		
+		response = JSON.parse(response);
+		
+		//console.log(response.success);
+		console.log("instamojo SUCESS"+response);
+		console.log(response.payment_request.longurl);
+		//console.log("REQUIRED URL"+JSON.stringify(response));
+	//	console.log(response['payment_request']);
+	//	console.log(JSON.parse(response['payment_request']));
+		return res.redirect(response.payment_request.longurl);
+		
+ 	 }
+	});
+		// return res.redirect('/');
 	})
 
 
@@ -1533,6 +1607,9 @@ const nexmo = new Nexmo({
 	// 		});
 	// 	}
 	// });
+
+
+	
 });
 
 router.get('/like/:id', isLoggedIn, function (req, res, next) {
