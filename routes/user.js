@@ -22,7 +22,7 @@ var csrfProtection = csrf({
 	cookie: true
 })
 
-var smtpConfig = require('../config/smtp-config.js');
+
 
 router.post('/update-profile', csrfProtection, function (req, res, next) {
 
@@ -161,6 +161,18 @@ router.post('/forgot', function (req, res, next) {
 			});
 		},
 		function (token, user, done) {
+			let transporter = nodemailer.createTransport({
+				host: 'mail.zo-online.com',
+				port: 587,
+				secure: false, // true for 465, false for other ports
+				auth: {
+					user: 'admin@zo-online.com', // generated ethereal user
+					pass: '22watch22@DS'  // generated ethereal password
+				},
+				tls: {
+					rejectUnauthorized: false
+				}
+			});
 			// // var smtpTransport = nodemailer.createTransport('SMTP', {
 			//   service: 'SendGrid',
 			//   auth: {
@@ -178,11 +190,21 @@ router.post('/forgot', function (req, res, next) {
 			//         pass: 'yourpassword!'
 			//     }
 			// };
-			var transporter = nodemailer.createTransport(smtpConfig.connectString);
+			// var transporter = nodemailer.createTransport(smtpConfig.connectString);
+		    // let mailOptions = {
+			// 	from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+			// 	replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+			// 	to: req.user.email, // list of receivers
+			// 	subject: 'Node Contact Request', // Subject line
+			// 	text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+			//  		'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+			//  		'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
+			//  		'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+			//  };
 			var mailOptions = {
 				to: user.email,
-				from: 'techadmin@sepennaa.org',
-				subject: 'SEPIA Roundup Password Reset',
+				from: 'sdsameer24@gmail.com',
+				subject: 'Password Reset',
 				text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
 					'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
 					'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
@@ -271,7 +293,18 @@ router.post('/reset/:token', function (req, res) {
 			});
 		},
 		function (user, done) {
-			var transporter = nodemailer.createTransport(smtpConfig.connectString);
+			var transporter = nodemailer.createTransport({
+				host: 'mail.zo-online.com',
+		port: 587,
+		secure: false, // true for 465, false for other ports
+		auth: {
+			user: 'admin@zo-online.com', // generated ethereal user
+			pass: '22watch22@DS'  // generated ethereal password
+		},
+		tls: {
+			rejectUnauthorized: false
+		}
+	});
 
 			var mailOptions = {
 				to: user.email,

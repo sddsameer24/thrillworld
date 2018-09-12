@@ -61,7 +61,7 @@ var userSchema = new Schema({
 	role: {
 		type: String,
 		required: false,
-		enum: ['visitor','admin']
+		enum: ['visitor','vendor','admin']
 	},
 	acceptedTOS: {
 		type: Date

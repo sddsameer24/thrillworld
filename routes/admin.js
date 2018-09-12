@@ -891,12 +891,47 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
         return res.redirect('/admin/products');
     });
 });
+//...............................testimonials.......................
+router.post('/add-test', isAdmin, function (req, res, next) {
+    ////console.log(req.files);
+    errorMsg = req.flash('error')[0];
+    successMsg = req.flash('success')[0];
+    var imageFile;
 
+    if (!req.files) {
+        res.send('No files were uploaded.');
+        return;
+    }
+    imageFile = req.files.imageFile;
+
+    imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
+        if (err) {
+            res.status(500).send(err);
+        }
+    });
+
+
+    test = new test({
+        name: req.body.name,
+        comment: req.body.comment,
+        imagePath: '/images/' + req.body.name + '.png',
+    })
+    test.save(function (err) {
+        if (err) {
+            req.flash('error', 'Error: ' + err.message);
+            return res.redirect('/admin/test');
+        }
+        console.log("test: " + product);
+        return res.redirect('/admin/test');
+
+    });
+});
+//...............................testimonials.......................
 router.post('/add-product', isAdmin, function (req, res, next) {
     ////console.log(req.files);
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
-    var imageFile,imageFile1,imageFile2,imageFile3;
+    var imageFile, imageFile1, imageFile2, imageFile3;
 
     if (!req.files) {
         res.send('No files were uploaded.');
@@ -912,53 +947,53 @@ router.post('/add-product', isAdmin, function (req, res, next) {
         }
     });
 
-        imageFile1.mv('public/images/' + req.body.name + 'g1' + '.png', function (err) {
-            if (err) {
-                res.status(500).send(err);
-            }
-        });
-  
-            imageFile2.mv('public/images/' + req.body.name + 'g2' + '.png', function (err) {
-                if (err) {
-                    res.status(500).send(err);
-                }
-            });
-        
-                imageFile3.mv('public/images/' + req.body.name + 'g3' + '.png', function (err) {
-                    if (err) {
-                        res.status(500).send(err);
-                    }
-                }); 
-                    product = new Product({
-                        name: req.body.name,
-                        code: req.body.code,
-                        Wifi: req.body.Wifi,
-                        campfire: req.body.campfire,
-                        Pool: req.body.Pool,
-                        parking: req.body.parking,
-                        title: req.body.title,
-                        Product_Group: req.body.Product_Group,
-                        price: parseFloat((req.body.price * 100).toFixed(2)),
-                        description: req.body.description,
-                        shippable: req.body.shippable,
-                        taxable: req.body.taxable,
-                        category: req.body.category,
-                        Longitude:req.body.Longitude,                       
-                        Latitude:req.body.Latitude,                     
-                        imagePath: '/images/' + req.body.name + '.png',
-                        imagePathg1: '/images/' + req.body.name + 'g1' + '.png',
-                        imagePathg2: '/images/' + req.body.name + 'g2' + '.png',
-                        imagePathg3: '/images/' + req.body.name + 'g3' + '.png',
+    imageFile1.mv('public/images/' + req.body.name + 'g1' + '.png', function (err) {
+        if (err) {
+            res.status(500).send(err);
+        }
+    });
 
-                    })
-                    product.save(function (err) {
-                        if (err) {
-                            req.flash('error', 'Error: ' + err.message);
-                            return res.redirect('/admin/products');
-                        }
-                        console.log("product: " + product);
-                        return res.redirect('/admin/products');
-              
+    imageFile2.mv('public/images/' + req.body.name + 'g2' + '.png', function (err) {
+        if (err) {
+            res.status(500).send(err);
+        }
+    });
+
+    imageFile3.mv('public/images/' + req.body.name + 'g3' + '.png', function (err) {
+        if (err) {
+            res.status(500).send(err);
+        }
+    });
+    product = new Product({
+        name: req.body.name,
+        code: req.body.code,
+        Wifi: req.body.Wifi,
+        campfire: req.body.campfire,
+        Pool: req.body.Pool,
+        parking: req.body.parking,
+        title: req.body.title,
+        Product_Group: req.body.Product_Group,
+        price: parseFloat((req.body.price * 100).toFixed(2)),
+        description: req.body.description,
+        shippable: req.body.shippable,
+        taxable: req.body.taxable,
+        category: req.body.category,
+        Longitude: req.body.Longitude,
+        Latitude: req.body.Latitude,
+        imagePath: '/images/' + req.body.name + '.png',
+        imagePathg1: '/images/' + req.body.name + 'g1' + '.png',
+        imagePathg2: '/images/' + req.body.name + 'g2' + '.png',
+        imagePathg3: '/images/' + req.body.name + 'g3' + '.png',
+
+    })
+    product.save(function (err) {
+        if (err) {
+            req.flash('error', 'Error: ' + err.message);
+            return res.redirect('/admin/products');
+        }
+        console.log("product: " + product);
+        return res.redirect('/admin/products');
+
     });
 });
 router.post('/add-category', isAdmin, function (req, res, next) {

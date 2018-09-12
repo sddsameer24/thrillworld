@@ -1354,8 +1354,8 @@ router.post('/create', function (req, res, next) {
 		}
 		orders.push(order);
 	}
-	if (method === 'paypal') {
-		create_payment.payer.payment_method = 'paypal';
+	if (method === 'instamojo') {
+		create_payment.payer.payment_method = 'instamojo';
 		return_url = "http://" + req.headers.host + "/execute";
 		cancel_url = "http://" + req.headers.host + "/cancel";
 		create_payment.redirect_urls = {
@@ -1379,14 +1379,15 @@ router.post('/create', function (req, res, next) {
 	}
 	// order comnfirmation mail sending  ..........................................
 	const output = `
-		<p>You have a new contact request</p>
-		<h3>Contact Details</h3>
+		<p>Booking Confirmation</p>
+		<h3>Details</h3>
 		<ul>  
 		  <li>Name: ${req.user.first_name}</li>
 		  <li>address: ${req.body.shipping_addr1}</li>
 		  <li>Email: ${res.locals.fromEmail}</li>
 		  <li>Phone: ${req.user.telephone}</li>
 		</ul>
+		<p>Our executive will get in touch with you</p>
 	  `;
 	let transporter = nodemailer.createTransport({
 		host: 'mail.zo-online.com',
@@ -1403,8 +1404,8 @@ router.post('/create', function (req, res, next) {
 
 	// setup email data with unicode symbols
 	let mailOptions = {
-		from: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
-		replyTo: '"Nodemailer Contact" <admin@zo-online.com>', // sender address
+		from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+		replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
 		to: req.user.email, // list of receivers
 		subject: 'Node Contact Request', // Subject line
 		text: 'Hello world?', // plain text body
@@ -1429,6 +1430,7 @@ router.post('/create', function (req, res, next) {
 	// end of order comnfirmation mail sending  ..........................................
 	// order comnfirmation sms sending  ..........................................
 	var number = req.user.telephone;
+	console.log(number);
 	// const text = req.body.text;
 	const text = "Order successfull Thank You, Thrillworld";
 	console.log("NUMBRER"+number);
@@ -1446,24 +1448,24 @@ const nexmo = new Nexmo({
 	apiSecret: 'grzR4xHCJDGhDqi2'
 	}, {debug: true})
 
-	// nexmo.message.sendSms(
-	// 	'917795565771', number, text, { type: 'unicode' },
-	// 	(err, responseData) => {
-	// 		if (err) {
-	// 			console.log("SMS"+err);
-	// 		} else {
-	// 			console.dir(responseData);
-	// 			// Get data from response
-	// 			const data = {
-	// 				id: responseData.messages[0]['message-id'],
-	// 				number: responseData.messages[0]['to']
-	// 			}
+	nexmo.message.sendSms(
+		'917795565771', number, text, { type: 'unicode' },
+		(err, responseData) => {
+			if (err) {
+				console.log("SMS"+err);
+			} else {
+				console.dir(responseData);
+				// Get data from response
+				const data = {
+					id: responseData.messages[0]['your booking successful'],
+					number: responseData.messages[0]['number']
+				}
 
-	// 			// Emit to the client
-	// 		//	io.emit('smsStatus', data);
-	// 		}
-	// 	}
-	// );
+				// Emit to the client
+			//	io.emit('smsStatus', data);
+			}
+		}
+	);
 	// end of order comnfirmation sms sending  ..........................................
 	//
 	// Send the payment request to paypal
