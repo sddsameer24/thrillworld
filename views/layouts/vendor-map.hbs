@@ -36,9 +36,9 @@
     <script> 
         
     function showStores() { 
-        $.getJSON( "http://localhost:3000/api/stores", function( data ) { 
-            var lat=39.820913027470006;
-            var lon=-97.470703125; 
+        $.getJSON( "http://localhost:3000/api/products", function( data ) { 
+            var lat=12.9253375999;
+            var lon=77.6773632; 
             var myLatlng = new google.maps.LatLng(lat, lon); 
             var mapProp = { 
                 center:myLatlng, zoom:5, mapTypeId:google.maps.MapTypeId.ROADMAP, scrollwheel: false,mapTypeControl: false 

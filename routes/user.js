@@ -4,7 +4,6 @@ var Product = require('../models/product');
 var csrf = require('csurf');
 var flash = require('connect-flash');
 var passport = require('passport');
-
 var User = require('../models/user');
 var Payment = require('../models/payment');
 var Order = require('../models/order');
@@ -21,9 +20,6 @@ const chalk = require('chalk');
 var csrfProtection = csrf({
 	cookie: true
 })
-
-
-
 router.post('/update-profile', csrfProtection, function (req, res, next) {
 
 	User.update({
@@ -41,7 +37,6 @@ router.post('/update-profile', csrfProtection, function (req, res, next) {
 			res.status(400).send(err);
 		});
 });
-
 router.get('/profile', isLoggedIn, csrfProtection, function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -249,7 +244,6 @@ router.get('/reset/:token', function (req, res) {
 			errorMsg: errorMsg,
 			noErrorMsg: !errorMsg,
 			successMsg: successMsg,
-			// csrfToken: req.csrfToken(),
 			noMessage: !successMsg,
 		});
 	});
