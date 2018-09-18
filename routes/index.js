@@ -97,10 +97,28 @@ router.get('/signup', function (req, res, next) {
 });
 
 router.get('/shop', function (req, res, next) {
-	res.render('shop/shop',{
-		layout: 'eshop/blank'
+   
+		Product.find(function (err, products) {
+            productChunks = [];
+            chunkSize = 5;
+            for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
+                productChunks.push(docs.slice(i, i + chunkSize))
+            }
+           
+            res.render('shop/shop', {
+                layout: 'eshop/blank',
+                products: productChunks,
+                errorMsg: errorMsg,
+                successMsg: successMsg,
+                noErrorMsg: !errorMsg,
+                noMessage: !successMsg,
+                totalSales: tot,
+                orders: docs,
+                noErrors: 1
+            });
+        });
 	});
-});
+
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -321,7 +339,7 @@ router.get('/sale', function (req, res, next) {
 			} else {
 				categCondition = {};
 			}
-			Product.find(categCondition, function (err, docs) {
+			Product.Product.find(categCondition, function (err, docs) {
 				productChunks = [];
 				productJSON = [];
 				chunkSize = 4;
@@ -1383,7 +1401,7 @@ router.post('/create', function (req, res, next) {
 		<h3>Details</h3>
 		<ul>  
 		  <li>Name: ${req.user.first_name}</li>
-		  <li>address: ${req.body.shipping_addr1}</li>
+		 
 		  <li>Email: ${res.locals.fromEmail}</li>
 		  <li>Phone: ${req.user.telephone}</li>
 		</ul>
@@ -1994,12 +2012,9 @@ router.post('/search', function (req, res, next) {
 });
 
 router.get('/product/:slug3', function (req, res, next) {
-	// var baseUrl = (window.location).href; // You can also use document.URL
-	// var koopId = baseUrl.substring(baseUrl.lastIndexOf('=') + 1);
-	// // alert(koopId)
+	
 	var slug3 = req.params.slug3;
-	//console.log("called"+slug3);
-	//console.log(req.params);
+
 	
 
 	qryFilter = {"_id": slug3};
@@ -2008,25 +2023,106 @@ router.get('/product/:slug3', function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	
+	
 	Product.find(qryFilter , function (err, product) {
-		//console.log("Product: " + JSON.stringify(product));
+		// console.log("Product: " + JSON.stringify(product));
+	
 		if (err || product === 'undefined' || product == null) {
 			// replace with err handling
 			var errorMsg = req.flash('error', 'unable to find product');
 			return res.redirect('/');
 		}
-	// Product.find({ slug: slug }, function (err, product) {
-	// 	////console.log("Product: " + JSON.stringify(product));
-	// 	if (err) {
-	// 		// replace with err handling
-			
-	// 		////console.log("Error: " + JSON.stringify(err));
-	// 		return res.redirect('/');
-	// 	}
+
 		if (!product) {
 			req.flash('error', 'Product is not found.');
 			res.redirect('/');
 		}
+		//................................................................
+	// var geocoder = new google.maps.Geocoder();
+	// var address = "San Diego, CA, 92111"; //Add your address here, all on one line.
+	// addresses = ["San Diego, CA 92111",
+	// 						 "Cancun, Mexico",
+	// 						 "Sydney, Australia"];
+	
+	// var latitude;
+	// var longitude;
+	// var color = "#85cad1"; //Set your tint color. Needs to be a hex value.
+	
+	// function getGeocode() {
+	// 	geocoder.geocode( { 'address': address}, function(results, status) {
+	// 		if (status == google.maps.GeocoderStatus.OK) {
+	// 			latitude = results[0].geometry.location.lat();
+	// 			longitude = results[0].geometry.location.lng(); 
+	// 			initGoogleMap();
+	// 		} 
+	// 	});
+	// }
+	
+	// function initGoogleMap() {
+	// 	var styles = [
+	// 		{
+	// 		  stylers: [
+	// 			{ saturation: -100 }
+	// 		  ]
+	// 		}
+	// 	];
+		
+	// 	var options = {
+	// 		mapTypeControlOptions: {
+	// 			mapTypeIds: ['Styled']
+	// 		},
+	// 		center: new google.maps.LatLng(latitude, longitude),
+	// 		zoom: 2,
+	// 		scrollwheel: false,
+	// 		navigationControl: false,
+	// 		mapTypeControl: false,
+	// 		zoomControl: true,
+	// 		disableDefaultUI: true,	
+	// 		mapTypeId: 'Styled'
+	// 	};
+	// 	var div = document.getElementById('googleMap');
+	// 	var map = new google.maps.Map(div, options);
+	// 	marker = new google.maps.Marker({
+	// 		map:map,
+	// 		draggable:false,
+	// 		animation: google.maps.Animation.DROP,
+	// 		position: new google.maps.LatLng(latitude,longitude)
+	// 	});
+	// 	var styledMapType = new google.maps.StyledMapType(styles, { name: 'Styled' });
+	// 	map.mapTypes.set('Styled', styledMapType);
+		
+	// 	var infowindow = new google.maps.InfoWindow({
+	// 		  content: "<div class='iwContent'>"+address+"</div>"
+	// 	});
+	// 	google.maps.event.addListener(marker, 'click', function() {
+	// 		window.location = "http://local.wordpress.dev/blog";
+	// 	});
+	// 	google.maps.event.addListener(marker, 'mouseover', function() {
+	// 		infowindow.open(map,marker);
+	// 	});
+			
+		
+	// 	bounds = new google.maps.LatLngBounds(
+	// 	  new google.maps.LatLng(-84.999999, -179.999999), 
+	// 	  new google.maps.LatLng(84.999999, 179.999999));
+	
+	// 	rect = new google.maps.Rectangle({
+	// 		bounds: bounds,
+	// 		fillColor: color,
+	// 		fillOpacity: 0.2,
+	// 		strokeWeight: 0,
+	// 		map: map
+	// 	});
+	
+	// 	var listener = google.maps.event.addListener(map, "idle", function() { 
+	// 		$('#map-banner').show();
+	// 		$("#map-header").fitText(1.2, { minFontSize: '20px', maxFontSize: '400px'});
+	// 	  google.maps.event.removeListener(listener); 
+	// 	});
+	
+	// }
+	// google.maps.event.addDomListener(window, 'load', getGeocode);
+	//................................................................
 		
 		event = new Event({
 			namespace: 'products',
