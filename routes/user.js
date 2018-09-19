@@ -23,8 +23,8 @@ var csrfProtection = csrf({
 router.post('/update-profile', csrfProtection, function (req, res, next) {
 
 	User.update({
-			_id: req.user._id
-		}, req.body)
+		_id: req.user._id
+	}, req.body)
 		.then(function (err, user) {
 			req.user = user;
 			req.flash('success', 'User Updated');
@@ -62,31 +62,31 @@ router.get('/orders', isLoggedIn, function (req, res, next) {
 			"user.email": req.user.email
 		}]
 	}, null, {
-		sort: {
-			created: -1
-		}
-	}, function (err, orders) {
-		if (err) {
-			return res.write('Error');
-		}
-		// var arr = [];
-		// var total = 0;
-		// for (var order in orders) {
-		//     //console.log("Cart Item: " + orders[order]);
-		//     //console.log("------------");
-		//     for (var item in orders[order].cart.items) {
-		//         //console.log("Item " + item);
-		//         //console.log(orders[order].cart.items[item].item.name);
-		//         total = parseFloat(orders[order].cart.items[item].item.)
-		//     }
-		// }
-		// return arr;
-		res.render('user/orders', {
-			layout: 'eshop/blank',
-			user: req.user,
-			orders: orders,
+			sort: {
+				created: -1
+			}
+		}, function (err, orders) {
+			if (err) {
+				return res.write('Error');
+			}
+			// var arr = [];
+			// var total = 0;
+			// for (var order in orders) {
+			//     //console.log("Cart Item: " + orders[order]);
+			//     //console.log("------------");
+			//     for (var item in orders[order].cart.items) {
+			//         //console.log("Item " + item);
+			//         //console.log(orders[order].cart.items[item].item.name);
+			//         total = parseFloat(orders[order].cart.items[item].item.)
+			//     }
+			// }
+			// return arr;
+			res.render('user/orders', {
+				layout: 'eshop/blank',
+				user: req.user,
+				orders: orders,
+			});
 		});
-	});
 });
 router.get('/logout', isLoggedIn, function (req, res, next) {
 	meanlogger.log("auth", "logged out", req.user);
@@ -156,6 +156,67 @@ router.post('/forgot', function (req, res, next) {
 			});
 		},
 		function (token, user, done) {
+			// let transporter = nodemailer.createTransport({
+			// 	host: 'mail.zo-online.com',
+			// 	port: 587,
+			// 	secure: false, // true for 465, false for other ports
+			// 	auth: {
+			// 		user: 'admin@zo-online.com', // generated ethereal user
+			// 		pass: '22watch22@DS'  // generated ethereal password
+			// 	},
+			// 	tls: {
+			// 		rejectUnauthorized: false
+			// 	}
+			// });
+			//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+			// var smtpTransport = nodemailer.createTransport('SMTP', {
+			//   service: 'SendGrid',
+			//   auth: {
+			//     user: 'admin@zo-online.com',
+			//     pass: '22watch22@DS'
+			//   }
+			// });
+
+			// var smtpConfig = {
+			//     host: 'mail.zo-online.com',
+			//     port: 587,
+			//     secure: true, // use SSL
+			//     auth: {
+			//         user: 'admin@zo-online.com',
+			//         pass: '22watch22@DS'
+			//     }
+			// };
+			// 	var transporter = nodemailer.createTransport(smtpConfig.connectString);
+			//     let mailOptions = {
+			// 		from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+			// 		replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+			// 		to: req.user.email, // list of receivers
+			// 		subject: 'Node Contact Request', // Subject line
+			// 		text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+			// 	 		'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+			// 	 		'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
+			// 	 		'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+			// 	 };
+			// 	var mailOptions = {
+			// 		to: user.email,
+			// 		from: 'sdsameer24@gmail.com',
+			// 		subject: 'Password Reset',
+			// 		text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+			// 			'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+			// 			'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
+			// 			'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+			// 	};
+			// 	transporter.sendMail(mailOptions, function (err) {
+			// 		if (!err) {
+			// 			req.flash('success', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+			// 			res.redirect('/');
+			// 		} else {
+			// 			req.flash('error', 'A problem has occurred while sending the email.');
+			// 			return res.redirect('/user/forgot');
+			// 		}
+			// 	});
+			
+		
 			let transporter = nodemailer.createTransport({
 				host: 'mail.zo-online.com',
 				port: 587,
@@ -168,52 +229,35 @@ router.post('/forgot', function (req, res, next) {
 					rejectUnauthorized: false
 				}
 			});
-			// // var smtpTransport = nodemailer.createTransport('SMTP', {
-			//   service: 'SendGrid',
-			//   auth: {
-			//     user: '!!! YOUR SENDGRID USERNAME !!!',
-			//     pass: '!!! YOUR SENDGRID PASSWORD !!!'
-			//   }
-			// });
-			//
-			// var smtpConfig = {
-			//     host: 'smtp.gmail.com',
-			//     port: 465,
-			//     secure: true, // use SSL
-			//     auth: {
-			//         user: 'you@yourmail.org',
-			//         pass: 'yourpassword!'
-			//     }
-			// };
-			// var transporter = nodemailer.createTransport(smtpConfig.connectString);
-		    // let mailOptions = {
-			// 	from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-			// 	replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-			// 	to: req.user.email, // list of receivers
-			// 	subject: 'Node Contact Request', // Subject line
-			// 	text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-			//  		'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-			//  		'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
-			//  		'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-			//  };
-			var mailOptions = {
-				to: user.email,
-				from: 'sdsameer24@gmail.com',
+
+			// setup email data with unicode symbols
+			let mailOptions = {
+				from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				to: user.email, // list of receivers
 				subject: 'Password Reset',
 				text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
 					'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
 					'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
 					'If you did not request this, please ignore this email and your password will remain unchanged.\n'
 			};
-			transporter.sendMail(mailOptions, function (err) {
-				if (!err) {
-					req.flash('success', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
-					res.redirect('/');
-				} else {
-					req.flash('error', 'A problem has occurred while sending the email.');
-					return res.redirect('/user/forgot');
+
+			// send mail with defined transport object
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+
+					console.log("ERROR" + error);
+					return ////console.log(error);
 				}
+
+
+				console.log("INFo" + info);
+				console.log('Message sent: %s', info.messageId);
+				console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+				req.flash('success', "SENT MAIL, KINDLY CHECK!");
+				//	res.render('contact', { msg: 'Email has been sent' });
 			});
+			// end of order comnfirmation mail sending  ..........................................
 		}
 	], function (err) {
 		if (err) {
@@ -233,11 +277,8 @@ router.get('/reset/:token', function (req, res) {
 			$gt: Date.now()
 		}
 	}, function (err, user) {
-		if (!user) {
-			errorMsg = req.flash('error', 'Password reset token is invalid or has expired.');
-			return res.redirect('/user/forgot');
-		}
-		//console.log("Found User: " + JSON.stringify(user));
+		
+		console.log("Found User: " + JSON.stringify(user));
 		res.render('user/reset', {
 			user: req.user,
 			token: req.params.token,
@@ -246,19 +287,17 @@ router.get('/reset/:token', function (req, res) {
 			successMsg: successMsg,
 			noMessage: !successMsg,
 		});
+		
+		});
 	});
-});
+
 
 router.post('/reset/:token', function (req, res) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	pass = req.body.password;
 	conf = req.body.confirmation;
-	token = req.params.token;
-	if (pass != conf) {
-		req.flash('error', 'Email and confirmation do not match.');
-		res.redirect('/user/reset/' + token);
-	}
+	token = req.params.token;	
 	async.waterfall([
 		function (done) {
 			User.findOne({
@@ -270,7 +309,7 @@ router.post('/reset/:token', function (req, res) {
 				if (err) {
 					//console.log("Error: " + err.message);
 				}
-				//console.log("User: " + JSON.stringify(user));
+				console.log("User: " + JSON.stringify(user));
 				// if (!user) {
 				// 	errorMsg = req.flash('error', 'Password reset token is invalid or has expired.');
 				// 	return res.redirect('back');
@@ -289,16 +328,16 @@ router.post('/reset/:token', function (req, res) {
 		function (user, done) {
 			var transporter = nodemailer.createTransport({
 				host: 'mail.zo-online.com',
-		port: 587,
-		secure: false, // true for 465, false for other ports
-		auth: {
-			user: 'admin@zo-online.com', // generated ethereal user
-			pass: '22watch22@DS'  // generated ethereal password
-		},
-		tls: {
-			rejectUnauthorized: false
-		}
-	});
+				port: 587,
+				secure: false, // true for 465, false for other ports
+				auth: {
+					user: 'admin@zo-online.com', // generated ethereal user
+					pass: '22watch22@DS'  // generated ethereal password
+				},
+				tls: {
+					rejectUnauthorized: false
+				}
+			});
 
 			var mailOptions = {
 				to: user.email,
@@ -366,7 +405,7 @@ router.post('/signup', passport.authenticate('local.signup', {
 router.get('/signin', csrfProtection, function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-    //console.log("Error: " + JSON.stringify(errorMsg));
+	//console.log("Error: " + JSON.stringify(errorMsg));
 	if (process.env.FACEBOOK_ID) {
 		var authFacebook = true
 	} else {
@@ -385,7 +424,7 @@ router.get('/signin', csrfProtection, function (req, res, next) {
 		authFacebook: authFacebook,
 		authGoogle: authGoogle,
 		noErrorMessage: !errorMsg,
-        errorMsg: errorMsg,
+		errorMsg: errorMsg,
 		message: messages,
 		first_name: req.session.first_name,
 		last_name: req.session.last_name,
@@ -431,7 +470,7 @@ router.get('/signin', csrfProtection, function (req, res, next) {
 router.post('/signin', function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-    if (process.env.FACEBOOK_ID) {
+	if (process.env.FACEBOOK_ID) {
 		var authFacebook = true
 	} else {
 		var authFacebook = false;
@@ -444,14 +483,14 @@ router.post('/signin', function (req, res, next) {
 	req.session.oldUrl = req.get('referer');
 	var messages = req.flash('error');
 	passport.authenticate('local.signin', {
-			session: true
-		},
+		session: true
+	},
 		function (err, user, info) {
-            //console.log("trying to log in");
+			//console.log("trying to log in");
 			if (err) {
 				req.flash('error', 'Internal Server Error');
 				//console.log("Error: " + err.message);
-                                res.redirect('/user/signin');
+				res.redirect('/user/signin');
 
 				res.render('user/signin', {
 					layout: 'eshop/blank',
@@ -467,7 +506,7 @@ router.post('/signin', function (req, res, next) {
 			if (!user) {
 				req.flash('error', 'Invalid credentials');
 				//console.log("Error Login - invalid credentials");
-                return res.redirect('/user/signin');
+				return res.redirect('/user/signin');
 				// return res.render('user/signin', {
 				// 	layout: 'eshop/blank',
 				// 	authFacebook: authFacebook,
@@ -482,7 +521,7 @@ router.post('/signin', function (req, res, next) {
 				if (err) {
 					req.flash('error', 'Invalid credentials');
 					//console.log("Error Login - invalid credentials");
-                    return res.redirect('/user/signin');
+					return res.redirect('/user/signin');
 
 					// return res.render('user/signin', {
 					// 	layout: 'eshop/blank',

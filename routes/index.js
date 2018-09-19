@@ -102,7 +102,7 @@ router.get('/shop', function (req, res, next) {
             productChunks = [];
             chunkSize = 5;
             for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
-                productChunks.push(docs.slice(i, i + chunkSize))
+                productChunks.push(products.slice(i, i + chunkSize))
             }
            
             res.render('shop/shop', {
@@ -1400,8 +1400,7 @@ router.post('/create', function (req, res, next) {
 		<p>Booking Confirmation</p>
 		<h3>Details</h3>
 		<ul>  
-		  <li>Name: ${req.user.first_name}</li>
-		 
+		  <li>Name: ${req.user.first_name}</li>		 
 		  <li>Email: ${res.locals.fromEmail}</li>
 		  <li>Phone: ${req.user.telephone}</li>
 		</ul>
@@ -1425,7 +1424,7 @@ router.post('/create', function (req, res, next) {
 		from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
 		replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
 		to: req.user.email, // list of receivers
-		subject: 'Node Contact Request', // Subject line
+		subject: 'booking', // Subject line
 		text: 'Hello world?', // plain text body
 		html: output // html body
 	};
@@ -1450,7 +1449,7 @@ router.post('/create', function (req, res, next) {
 	var number = req.user.telephone;
 	console.log(number);
 	// const text = req.body.text;
-	const text = "Order successfull Thank You, Thrillworld";
+	const text = "Booking successfull Thank You, Thrillworld";
 	console.log("NUMBRER"+number);
 	console.log("NUMBRER"+number[0]+number[1]);
 	console.log("TEXT"+text);
