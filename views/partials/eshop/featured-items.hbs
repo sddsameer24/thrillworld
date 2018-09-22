@@ -88,7 +88,7 @@
                                         </div>
                                     </form>
                                 {{else}} <!--if this.isApparel -->
-                                    {{#if this.isTicket}}
+                                    {{#if this.new}}
                                         <form action='/add-to-cart' method='POST'>
                                         <div class="form-group">
                                             <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
@@ -126,7 +126,7 @@
                                             {{/if}}
                                         </div>
                                         </form>
-                                    {{else}} <!-- if this.isTicket -->
+                                    {{else}} <!-- if this.new -->
                                         <form action='/add-to-cart' method='POST'>
                                             <div class="form-group">
                                                 <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
@@ -156,7 +156,7 @@
                                                 {{/if}}
                                             </div>
                                         </form>
-                                    {{/if}} <!-- if this.isTicket -->
+                                    {{/if}} <!-- if this.new -->
                                 {{/if}} <!-- if this.isApparel -->
                             {{/if}} <!-- if this.isVariable -->
                             <p data-placement="top" data-toggle="tooltip" title="View Document ">

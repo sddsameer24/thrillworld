@@ -65,21 +65,25 @@ var schema = new Schema({
 	description: {
 		type: String,
 		required: false
-	},vendor_id: {
+	}, vendor_id: {
 		type: String,
 		required: false
 	},
 	price: {
-        type: Currency,
-        required: true
+		type: Currency,
+		required: true
 	},
 	product_price_double: {
 		type: Number,
 		required: false
 	},
+	Duration: {
+		type: String,
+		required: true
+	},
 	cost: {
-        type: Currency,
-        required: false
+		type: Currency,
+		required: false
 	},
 	likes: [String],
 	Product_Group: {
@@ -183,69 +187,69 @@ var schema = new Schema({
 	}]
 });
 // shippable Getter
-schema.path('shippable').get(function(txt) {
-  if (txt) {
-  	return 'Yes';
-  } else {
-  	return 'No';
-  }
+schema.path('shippable').get(function (txt) {
+	if (txt) {
+		return 'Yes';
+	} else {
+		return 'No';
+	}
 });
 
 // Setter
-schema.path('shippable').set(function(txt) {
-  if (txt=='Yes') {
-  	return true;
-  } else {
-  	return false;
-  }
+schema.path('shippable').set(function (txt) {
+	if (txt == 'Yes') {
+		return true;
+	} else {
+		return false;
+	}
 });
 // Taxable Getter
-schema.path('taxable').get(function(txt) {
-  if (txt) {
-  	return 'Yes';
-  } else {
-  	return 'No';
-  }
+schema.path('taxable').get(function (txt) {
+	if (txt) {
+		return 'Yes';
+	} else {
+		return 'No';
+	}
 });
 
 // Setter
-schema.path('taxable').set(function(txt) {
-  if (txt=='Yes') {
-  	return true;
-  } else {
-  	return false;
-  }
+schema.path('taxable').set(function (txt) {
+	if (txt == 'Yes') {
+		return true;
+	} else {
+		return false;
+	}
 });
 
-schema.virtual('isDonation').get(function() {
-	if (this.price == 0||this.price=='0'||this.Product_Group=='DONATION'||this.price=='0.00'||this.price==0.00) {
+schema.virtual('isDonation').get(function () {
+	if (this.price == 0 || this.price == '0' || this.Product_Group == 'DONATION' || this.price == '0.00' || this.price == 0.00) {
 		return true;
 	}
 	return false;
 })
-schema.virtual('isVariable').get(function() {
-	if (this.Product_Group=='DONATION') {
+schema.virtual('isVariable').get(function () {
+	if (this.Product_Group == 'DONATION') {
 		return true;
 	}
 	return false;
 });
 
-schema.virtual('isTicket').get(function() {
-	if (this.Product_Group=='TICKET') {
+schema.virtual('new').get(function () {
+	if (this.Product_Group == 'TICKET') {
 		return true;
 	}
 	return false;
 });
 
-schema.virtual('hasOptions').get(function() {
+schema.virtual('hasOptions').get(function () {
 	if (this.options.length < 0) {
 		return false;
 	}
 	return true;
 });
 
-schema.virtual('isApparel').get(function() {
-	if (this.Product_Group=='APPAREL') {
+schema.virtual('isApparel').get(function () {
+	if (this.Product_Group == 'APPAREL') {
 		return true;
 	}
 	return false;
@@ -263,9 +267,9 @@ schema.virtual('isApparel').get(function() {
 // }
 schema.plugin(random);
 
-schema.index({name: 'text',title:'text',description:'text',category:'text', code: 'text'});
+schema.index({ name: 'text', title: 'text', description: 'text', category: 'text', code: 'text' });
 
-module.exports = mongoose.model('Product',schema);
+module.exports = mongoose.model('Product', schema);
 // schema.path('price').get(function(num) {
 //   return (num / 100).toFixed(2);
 // });

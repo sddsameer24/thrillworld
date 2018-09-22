@@ -972,6 +972,7 @@ router.post('/add-product', isAdmin, function (req, res, next) {
         Pool: req.body.Pool,
         parking: req.body.parking,
         title: req.body.title,
+        Duration:req.body.Duration,
         Product_Group: req.body.Product_Group,
         price: parseFloat((req.body.price * 100).toFixed(2)),
         description: req.body.description,

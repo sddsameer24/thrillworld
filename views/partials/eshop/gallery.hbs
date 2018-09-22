@@ -1,0 +1,197 @@
+<!-- gallery -->
+	<div id="gallery" class="gallery">
+			<div class="container">
+				<h3>Our Gallery</h3>   
+				<div id="jzBox" class="jzBox">
+					<div id="jzBoxNextBig"></div>
+					<div id="jzBoxPrevBig"></div>
+					<img src="#" id="jzBoxTargetImg" alt="">
+					<div id="jzBoxBottom">
+						<div id="jzBoxTitle"></div>
+						<div id="jzBoxCounter"></div>
+						<span id="jzBoxMoreItems"> 
+							<i class="glyphicon glyphicon-menu-left" id="jzBoxPrev"></i> &nbsp;
+							<i class="glyphicon glyphicon-menu-right" id="jzBoxNext"></i> &nbsp;
+						</span>
+						<i class="glyphicon glyphicon-remove-circle" id="jzBoxClose"></i>
+					</div>
+				</div>
+				<div class="w3ls-gallery-grids">
+					<div class="col-md-4 gallery-grid">
+						<div class="wpf-demo-4">  
+							<a href="../images/Dandeli.png" class="jzBoxLink item-hover" title="thrillworld.">  
+								<img src="../images/Dandeli.png" class="img-responsive" alt=" " />
+								<div class="view-caption">
+									<p>Click Here</p>
+								</div> 
+							</a>    		
+						</div>
+						<div class="wpf-demo-4">  
+							<a href="../images/Dandelig2.png" class="jzBoxLink item-hover" title="thrillworld">  
+								<img src="../images/Dandelig2.png" alt=" " class="img-responsive" />
+								<div class="view-caption">
+									<p>Click Here</p>
+								</div> 
+							</a>    			
+						</div>
+						<div class="wpf-demo-4">  
+							<a href="../images/Dandelig3.png" class="jzBoxLink item-hover" title="thrillworld.">  
+								<img src="../images/Dandelig3.png" alt=" " class="img-responsive" />
+								<div class="view-caption">
+									<p>Click Here</p>
+								</div> 
+							</a>    			
+						</div>
+						<div class="clearfix"> </div>
+					</div>
+					<div class="col-md-4 gallery-grid">
+						<div class="wpf-demo-4">  
+							<a href="../images/daytrips.png" class="jzBoxLink item-hover" title="thrillworld.">  
+								<img src="../images/daytrips.png" alt=" " class="img-responsive" />
+								<div class="view-caption">
+									<p>Click Here</p>
+								</div> 
+							</a>    			
+						</div>
+						<div class="wpf-demo-4">  
+							<a href="../images/footer.png" class="jzBoxLink item-hover" title="thrillworld.">  
+								<img src="../images/footer.png" alt=" " class="img-responsive" />
+								<div class="view-caption">
+									<p>Click Here</p>
+								</div> 
+							</a>    			
+						</div>
+						<div class="clearfix"> </div>
+					</div>
+					<div class="col-md-4 gallery-grid">
+						<div class="wpf-demo-4">  
+							<a href="../images/ticket.jpg" class="jzBoxLink item-hover" title="thrillworld.">  
+								<img src="../images/ticket.jpg" alt=" " class="img-responsive" />
+								<div class="view-caption">
+									<p>Click Here</p>
+								</div> 
+							</a>  
+						</div> 
+						<div class="wpf-demo-4">  
+							<a href="../images/g2.png" class="jzBoxLink item-hover" title="thrillworld.">  
+								<img src="../images/g2.png" alt=" " class="img-responsive" />
+								<div class="view-caption">
+									<p>Click Here</p>
+								</div> 
+							</a>    			
+						</div>
+						<div class="wpf-demo-4">  
+							<a href="../images/g3.png" class="jzBoxLink item-hover" title="thrillworld">  
+								<img src="../images/g3.png" alt=" " class="img-responsive" />
+								<div class="view-caption">
+									<p>Click Here</p>
+								</div> 
+							</a>    			
+						</div> 
+						<div class="clearfix"> </div>
+					</div>
+					<div class="clearfix"> </div>
+				</div>
+				<script src="../javascripts/jzBox.js"></script>
+			</div>
+	</div>
+    <style>
+        #jzBox {
+	top: 0;
+	left: 0;
+	z-index: 10000;
+	position: fixed;
+	background-color: rgba(30, 30, 30, 0.9);
+	margin: 0 !important;
+	text-align: center;
+	width: 100%;
+	height: 100%;
+	display: none;
+	color: #fff;
+}
+#jzBoxTargetImg {
+	margin:4% 0 1% 0;
+	max-width: 96%;
+	max-height: 73%;
+	cursor: pointer;
+}
+#jzBoxTitle {
+    font-size: 1.1em;
+    font-weight: 300;
+	margin-bottom: 1em;
+}
+#jzBoxCounter {
+	margin-bottom: 1%;
+	font-size: 12px;
+}
+
+#jzBox i:hover {
+	cursor: pointer;
+	color: #f35a5a;
+} 
+#jzBoxBottom { max-height: 22%; }
+
+#jzBoxNextBig, #jzBoxPrevBig {
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	position: fixed;
+	z-index: 10001;
+	height: 100%; 
+} 
+#jzBoxNextBig { left: 69%; }
+
+i#jzBoxPrev, i#jzBoxNext {
+    font-size: 2em;
+    padding: 0.2em;
+    border: 1px solid #fff;
+	z-index: 99999;
+	-webkit-transition:.5s all;
+	-moz-transition:.5s all; 
+	transition:.5s all;
+}
+i#jzBoxClose {
+    font-size: 3em;
+    vertical-align: bottom;
+    margin-left: 10em;
+	-webkit-transition:.5s all;
+	-moz-transition:.5s all; 
+	transition:.5s all;
+}
+/*-- //jzBox-lightbox --*/
+.w3ls-gallery-grids{
+	margin:5em 0 0 0;
+}
+.gallery-grid {
+    padding: 0; 
+}
+.wpf-demo-4{
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+img.img-responsive {
+    width: 100%;
+}
+.view-caption {
+    position: absolute;
+    top: -32%;
+    width: 100%;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.57);
+    padding: 1em;
+    -webkit-transition: .5s all;
+    -moz-transition: .5s all;
+    transition: .5s all;
+}
+.wpf-demo-4:hover .view-caption {
+	top: 0;
+}
+.view-caption p {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 400;
+    letter-spacing: 3px;
+}
+/*-- //gallery --*/
+    </style>

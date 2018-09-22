@@ -1,0 +1,15 @@
+{{#each navcats}}
+<div class="col-md-3">
+{{!-- <img class="zoomImg img-responsive" src="{{ this.imagePath }}" alt="sameer"> --}}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a href="/category/{{this._id}}?q={{../q}}">{{this._id}}
+                <span class="pull-right">({{this.count}})</span>
+            </a>
+        </h4>
+    </div>
+</div>
+</div>
+ 
+{{/each}}
