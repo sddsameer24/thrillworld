@@ -238,10 +238,10 @@
                             </div>
                             <!-- /.modal-dialog -->
                         </div>
-                        <div class="dataTable_wrapper">
-                            <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                        <div class="dataTable_wrapper ">
+                            <table class="table table-striped table-bordered table-hover table-responsive text-nowrap" id="dataTables-example">
                                 <thead>
-                                    <tr>
+                                    <tr class="card-body">
                                         <th>
                                             <h2>Product</h2>
                                         </th>
@@ -274,7 +274,7 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="card-header card bg-info text-white">
                                     {{#each products }}
                                     <tr class="odd gradeX">
                                         <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
@@ -362,7 +362,7 @@
                                                                             <label for='Product_Group'>Product Type</label>
                                                                             <select class='form-control' name='Product_Group'>
                                                                                 {{!--
-                                                                                <option value="TICKET" {{#if this.isTicket}}selected{{/if}}>Ticket</option>
+                                                                                <option value="TICKET" {{#if this.new}}selected{{/if}}>Ticket</option>
                                                                                 <option value="DONATION" {{#if this.isDonation}}selected{{/if}}>Variable Amount Donation</option> --}}
                                                                                 <option value="APPAREL" {{#if this.isApparel}}selected{{/if}}>Featured</option>
                                                                                 <option value="SIMPLE">Non Featured</option>

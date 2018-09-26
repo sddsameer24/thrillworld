@@ -15,6 +15,8 @@ var mongoose = require('mongoose');
 var ObjectId = require('mongoose').Types.ObjectId;
 var validator = require('express-validator');
 var util = require('util');
+var Distance = require('geo-distance');
+var NodeGeocoder = require('node-geocoder');
 // var smtpConfig = require('../config/smtp-config.js');
 var taxCalc = require('../local_modules/tax-calculator');
 var shippingCalc = require('../local_modules/shipping-calculator');
@@ -36,10 +38,20 @@ var Insta = require('instamojo-nodejs');
 Insta.setKeys("test_a3c5ddaf80ebda935933f83e311", "test_6d44edf82ee5b6627d0e938218d");
 Insta.isSandboxMode(true);
 
+var options = {
+	provider: 'google',
+   
+	// Optional depending on the providers
+	httpAdapter: 'https', // Default
+	apiKey: 'AIzaSyAidN5MszkfMW2VYcES7uoePsX1qQmuG7M', // for Mapquest, OpenCage, Google Premier
+	formatter: null         // 'gpx', 'string', ...
+  };
+   
+  var geocoder = NodeGeocoder(options);
 // dotenv.load({
 // 	path: '.env.hackathon'
 // });
-
+// distance.apiKey = 'AIzaSyAidN5MszkfMW2VYcES7uoePsX1qQmuG7M';
 var title = process.env.title;
 
 var fs = require('fs');
@@ -97,7 +109,7 @@ router.get('/signup', function (req, res, next) {
 });
 
 router.get('/shop', function (req, res, next) {
-   
+	
 		Product.find(function (err, products) {
             productChunks = [];
             chunkSize = 5;
@@ -108,14 +120,65 @@ router.get('/shop', function (req, res, next) {
             res.render('shop/shop', {
                 layout: 'eshop/blank',
                 products: productChunks,
-                errorMsg: errorMsg,
-                successMsg: successMsg,
-                noErrorMsg: !errorMsg,
-                noMessage: !successMsg,
-                totalSales: tot,
-                orders: docs,
-                noErrors: 1
-            });
+			});
+			// console.log(products);
+			// window.onload = function getLocation() {
+			// 	var Latitude=position.coords.latitude; 
+			// 	var Longitude=position.coords.longitude; 
+			// 	console.log(Longitude);
+			// };
+			// function getLocation() {
+			// 	if (navigator.geolocation) {
+			// 		navigator.geolocation.getCurrentPosition(showPosition);
+			// 	} else { 
+			// 		x.innerHTML = "Geolocation is not supported by this browser.";
+			// 	}
+			// }
+			// function showPosition(){
+			// 	navigator.geolocation.getCurrentPosition(function(position){
+			// 		return Latitude=position.coords.latitude;
+			// 		return Longitude=position.coords.longitude;
+				 
+			// 	});
+			// }
+
+			// var Latitude=getLocation().Latitude;
+			// var Longitude=getLocation().Longitude;
+
+			// console.log(Longitude);
+
+			for (var i = 0; i < products.length; i ++) {
+				 console.log(products[i].Latitude);
+				 var dest = {
+					lat: products[i].Latitude,
+					lon: products[i].Longitude
+				  };
+				  var userloc = {
+					lat: 12,
+					lon: 13
+				  };
+				  var destTouserloc = Distance.between(dest, userloc);
+				  
+				  console.log('' + destTouserloc.human_readable());
+				  
+				// distance.get(
+				// 	{
+				// 	  index: 1,
+				// 	  origin: '12.9245184,77.6347648',
+				// 	  destination: '37.871601,-122.269104'
+				// 	},
+				// 	function(err, data) {
+				// 	  if (err) return console.log(err);
+				// 	  console.log(data);
+				// 	});
+			
+			}
+			
+			// res.products.forEach(function(products) {
+			// 	console.log(products.latitude);
+			//   });
+			
+		
         });
 	});
 
@@ -141,8 +204,6 @@ router.get('/', function (req, res, next) {
 	var payment_request_id = req.param('payment_request_id');
 
 	console.log(orderid + "    " +payment_id+ "    "+payment_request_id);
-
-	
 
 	if(payment_id && payment_request_id){
 		console.log("TRUE PAYMENT NEED TO GET DATA");
@@ -258,6 +319,7 @@ router.get('/', function (req, res, next) {
 			// 		}
 			// 	}
 			// ]
+			
 			Product.find({
 				"$and": [{
 					"status": {
@@ -273,6 +335,7 @@ router.get('/', function (req, res, next) {
 					}]
 				}]
 			}
+
 				, function (err, docs) {
 					if (err) {
 						products = {}
@@ -284,7 +347,7 @@ router.get('/', function (req, res, next) {
 					for (var i = (4 - chunkSize); i < docs.length; i += chunkSize) {
 						productChunks.push(docs.slice(i, i + chunkSize));
 					}
-
+					
 					res.render('shop/eshop', {
 						layout: 'eshop/eshop',
 						title: title,
@@ -307,6 +370,7 @@ router.get('/', function (req, res, next) {
 						noMessage: !successMsg,
 						viewTour: viewTour,
 						isLoggedIn: req.isAuthenticated()
+
 					});
 				});
 		});
@@ -561,7 +625,7 @@ router.get('/group/:slug?', function (req, res, next) {
 });
 
 /* GET home page. */
-router.get('/category/Television', function (req, res, next) {
+router.get('/category/', function (req, res, next) {
 	var category_slug = req.params.slug;
 	req.session.category = req.params.slug;
 	var q = req.query.q;

@@ -50,6 +50,6 @@ Product.find({},function(err,products) {
 		//console.log("NAME: " + product.name);
 		//console.log("Product_Group: " + product.Product_Group);
 		//console.log("isVariable: " + product.isVariable);
-		//console.log("isticket: " + product.isTicket);
+		//console.log("new: " + product.new);
 	})
 })

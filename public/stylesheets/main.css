@@ -15,6 +15,43 @@ body {
   position: relative;
   font-weight:400px;
 }
+.dropbtn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+.navbar-inverse {
+  background-color: #efe9e900 !important;
+  border-color: #efebeb0d !important;
+}
+.dropdown-content a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.dropdown:hover .dropbtn
 .header-strip {
   background: #1ca0de;
     padding: 0px 0 1px 0;
@@ -2870,15 +2907,21 @@ font-family: 'Poppins', sans-serif;
 }
 .nav > li > a:hover, .nav > li > a:focus {
   text-decoration: none;
+  color:blueviolet;
   background:none;
 }
-/* .bannermain{
-  background-image: url("/images/mainscr.png");
+.heabg{
+  background-image: url("/images/2.jpg");
   background-repeat: no-repeat;
   background-size:cover;
-  position: relative;
-  padding-top: 250px;
-}  */
+  height: 457px;
+} 
+.gallery{
+  background-image: url("/images/galback.jpg");
+  background-repeat: no-repeat;
+  background-size:cover;
+ 
+} 
 ul li {
   list-style: none;
 }
@@ -2899,10 +2942,9 @@ a {
     -o-transition: 300ms;
     transition: 300ms;
 }
-
 .navbar-collapse.collapse {
-  padding-left: 80px !important;
-  padding-top: 27px !important;
+  padding-left: 690px !important;
+  padding-top: 24px !important;
 }
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Roboto', sans-serif;
