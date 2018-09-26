@@ -37,6 +37,45 @@ router.post('/update-profile', csrfProtection, function (req, res, next) {
 			res.status(400).send(err);
 		});
 });
+
+// Mobile 
+router.post('/update-profile-mobile', function (req, res, next) {
+
+	if(req.body.email){
+		User.update({
+			email: req.body.email
+		}, req.body)
+			.then(function (err, user) {
+				req.user = user;
+				req.flash('success', 'User Updated');
+				// res.redirect('/user/profile');
+				res.send({
+					message:  "Updated Profile",
+					status: true
+				});
+	
+			})
+			.catch(function (err) {
+				//console.log("Error: " + JSON.stringify(err));
+				req.flash('error', 'Problem updating user profile.');
+				res.send({
+					message:  "Some error occurred",
+					status: false
+				});
+	
+			});
+	}else{
+		res.send({
+			message:  "Some error occurred",
+			status: false
+		});
+	}
+
+	
+});
+
+
+
 router.get('/profile', isLoggedIn, csrfProtection, function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -50,6 +89,15 @@ router.get('/profile', isLoggedIn, csrfProtection, function (req, res, next) {
 		csrfToken: req.csrfToken()
 	});
 });
+
+// Mobile Profile
+router.get('/profile-mobile', isLoggedIn, csrfProtection, function (req, res, next) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	res.send(req.user);
+});
+
+
 router.get('/orders', isLoggedIn, function (req, res, next) {
 
 	// //console.log(payments);
@@ -88,13 +136,79 @@ router.get('/orders', isLoggedIn, function (req, res, next) {
 			});
 		});
 });
+
+// Mobile Orders
+
+router.get('/orders-mobile', isLoggedIn, function (req, res, next) {
+
+	// //console.log(payments);
+	// res.render('user/profile', {layout:'fullpage.hbs',user: req.user, payments: payments,hasPayments:0});
+
+	Order.find({
+		$or: [ {
+			"user.email": req.user.email
+		}]
+	}, null, {
+			sort: {
+				created: -1
+			}
+		}, function (err, orders) {
+			if (err) {
+				res.send({
+					message:  "Some error occurred",
+					status: false
+				});
+			}
+			// var arr = [];
+			// var total = 0;
+			// for (var order in orders) {
+			//     //console.log("Cart Item: " + orders[order]);
+			//     //console.log("------------");
+			//     for (var item in orders[order].cart.items) {
+			//         //console.log("Item " + item);
+			//         //console.log(orders[order].cart.items[item].item.name);
+			//         total = parseFloat(orders[order].cart.items[item].item.)
+			//     }
+			// }
+			// return arr;
+			res.send(orders);
+		});
+});
+
+
 router.get('/logout', isLoggedIn, function (req, res, next) {
 	meanlogger.log("auth", "logged out", req.user);
 
 	req.session.destroy()
 	req.logout();
 	res.redirect('/');
+
+		// res.status(500).send({
+		// 			message:  "Logged Out Sucessfully",
+		// 			status: true
+		// 		});
+
+	
 });
+
+// MOBILE LOGOUT
+router.get('/logoutmobile', isLoggedIn, function (req, res, next) {
+	meanlogger.log("auth", "logged out", req.user);
+console.log("MOBILE HIT");
+	req.session.destroy()
+	req.logout();
+	// res.redirect('/');
+
+		res.status(500).send({
+					message:  "Logged Out Sucessfully",
+					status: true
+				});
+
+	
+});
+
+
+
 
 router.get('/logout-and-delete', isLoggedIn, function (req, res, next) {
 	meanlogger.log("auth", "logged out and deleted account", req.user);
@@ -109,6 +223,28 @@ router.get('/logout-and-delete', isLoggedIn, function (req, res, next) {
 	//req.session.destroy()
 	req.logout();
 	res.redirect('/');
+});
+
+// Mobile
+router.get('/logout-and-delete-mobile', isLoggedIn, function (req, res, next) {
+	meanlogger.log("auth", "logged out and deleted account", req.user);
+	User.findByIdAndRemove(req.user._id, function (err, result) {
+		if (err) {
+			//console.log("Problem removing user record.");
+			req.flash('error', 'Unable to delete user record.');
+			res.send({
+				message:  "Error ",
+				status: false
+			});
+		}
+		req.flash('success', 'User record deleted and logged out.');
+	})
+	//req.session.destroy()
+	req.logout();
+	res.send({
+		message:  "Logged Out Sucessfully and Deleted",
+		status: true
+	});
 });
 
 router.get('/forgot', function (req, res, next) {
@@ -268,6 +404,177 @@ router.post('/forgot', function (req, res, next) {
 	});
 });
 
+// Mobile Forgot
+router.post('/forgot-mobile', function (req, res, next) {
+	async.waterfall([
+		function (done) {
+			crypto.randomBytes(20, function (err, buf) {
+				var token = buf.toString('hex');
+				done(err, token);
+			});
+		},
+		function (token, done) {
+			User.findOne({
+				email: req.body.email
+			}, function (err, user) {
+				console.log("USERR"+user);
+				if (user===null || !user ) {
+					console.log("ERRRRRRRR");
+					req.flash('error', 'No account with that email address exists.');
+					//console.log('no account with that email.');
+					res.send({
+						message:  "No account with that email address exists.",
+						status: false
+					});
+
+				}
+				else{
+					user.resetPasswordToken = token;
+				user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+				user.save(function (err) {
+					if (err) {
+						req.flash('error', 'An error occurred.');
+						res.send({
+							message:  "An error occurred.",
+							status: false
+						});
+					}
+					//console.log("Saved User: " + JSON.stringify(user));
+					done(err, token, user);
+				});
+				}
+			});
+		},
+		function (token, user, done) {
+			// let transporter = nodemailer.createTransport({
+			// 	host: 'mail.zo-online.com',
+			// 	port: 587,
+			// 	secure: false, // true for 465, false for other ports
+			// 	auth: {
+			// 		user: 'admin@zo-online.com', // generated ethereal user
+			// 		pass: '22watch22@DS'  // generated ethereal password
+			// 	},
+			// 	tls: {
+			// 		rejectUnauthorized: false
+			// 	}
+			// });
+			//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+			// var smtpTransport = nodemailer.createTransport('SMTP', {
+			//   service: 'SendGrid',
+			//   auth: {
+			//     user: 'admin@zo-online.com',
+			//     pass: '22watch22@DS'
+			//   }
+			// });
+
+			// var smtpConfig = {
+			//     host: 'mail.zo-online.com',
+			//     port: 587,
+			//     secure: true, // use SSL
+			//     auth: {
+			//         user: 'admin@zo-online.com',
+			//         pass: '22watch22@DS'
+			//     }
+			// };
+			// 	var transporter = nodemailer.createTransport(smtpConfig.connectString);
+			//     let mailOptions = {
+			// 		from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+			// 		replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+			// 		to: req.user.email, // list of receivers
+			// 		subject: 'Node Contact Request', // Subject line
+			// 		text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+			// 	 		'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+			// 	 		'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
+			// 	 		'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+			// 	 };
+			// 	var mailOptions = {
+			// 		to: user.email,
+			// 		from: 'sdsameer24@gmail.com',
+			// 		subject: 'Password Reset',
+			// 		text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+			// 			'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+			// 			'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
+			// 			'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+			// 	};
+			// 	transporter.sendMail(mailOptions, function (err) {
+			// 		if (!err) {
+			// 			req.flash('success', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+			// 			res.redirect('/');
+			// 		} else {
+			// 			req.flash('error', 'A problem has occurred while sending the email.');
+			// 			return res.redirect('/user/forgot');
+			// 		}
+			// 	});
+			
+		
+			let transporter = nodemailer.createTransport({
+				host: 'mail.zo-online.com',
+				port: 587,
+				secure: false, // true for 465, false for other ports
+				auth: {
+					user: 'admin@zo-online.com', // generated ethereal user
+					pass: '22watch22@DS'  // generated ethereal password
+				},
+				tls: {
+					rejectUnauthorized: false
+				}
+			});
+
+			// setup email data with unicode symbols
+			let mailOptions = {
+				from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				to: user.email, // list of receivers
+				subject: 'Password Reset',
+				text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+					'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+					'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
+					'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+			};
+
+			// send mail with defined transport object
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+
+					console.log("ERROR" + error);
+					res.send({
+						message:  "An error occurred.",
+						status: false
+					});
+				}
+
+
+				console.log("INFo" + info);
+				console.log('Message sent: %s', info.messageId);
+				console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+				req.flash('success', "SENT MAIL, KINDLY CHECK!");
+				res.send({
+					message:  "Sent Forgot Email.",
+					status: true
+				});	
+				//	res.render('contact', { msg: 'Email has been sent' });
+			});
+			// end of order comnfirmation mail sending  ..........................................
+		}
+	], function (err) {
+		if (err) {
+			req.flash('error', 'A problem has occurred ' + err);
+			res.send({
+				message:  "An error occurred.",
+				status: false
+			});
+		}else{
+			res.send({
+				message:  "Sent Forgot Email.",
+				status: true
+			});	
+		}
+		//res.redirect('/user/forgot');
+	});
+});
+
+
 router.get('/reset/:token', function (req, res) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -291,6 +598,33 @@ router.get('/reset/:token', function (req, res) {
 		});
 	});
 
+// Mobile Rest token
+router.get('/reset-mobile/:token', function (req, res) {
+		var successMsg = req.flash('success')[0];
+		var errorMsg = req.flash('error')[0];
+		User.findOne({
+			resetPasswordToken: req.params.token,
+			resetPasswordExpires: {
+				$gt: Date.now()
+			}
+		}, function (err, user) {
+
+			if(err){
+				res.send({
+					message:  "An error occurred.",
+					status: false
+				});
+
+			}else{
+				console.log("Found User: " + JSON.stringify(user));
+			
+				res.send(user);	
+			}
+			
+		
+			
+			});
+		});
 
 router.post('/reset/:token', function (req, res) {
 	var successMsg = req.flash('success')[0];
@@ -360,6 +694,89 @@ router.post('/reset/:token', function (req, res) {
 	});
 });
 
+// Mobile Post 
+
+router.post('/reset-mobile/:token', function (req, res) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	pass = req.body.password;
+	conf = req.body.confirmation;
+	token = req.params.token;	
+	async.waterfall([
+		function (done) {
+			User.findOne({
+				resetPasswordToken: req.params.token,
+				resetPasswordExpires: {
+					$gt: Date.now()
+				}
+			}, function (err, user) {
+				if (err) {
+					//console.log("Error: " + err.message);
+					res.send({
+						message:  "An error occurred.",
+						status: false
+					});
+				}else{
+					console.log("User: " + JSON.stringify(user));
+				// if (!user) {
+				// 	errorMsg = req.flash('error', 'Password reset token is invalid or has expired.');
+				// 	return res.redirect('back');
+				// }
+				user.password = req.body.password;
+				user.resetPasswordToken = undefined;
+				user.resetPasswordExpires = undefined;
+
+				user.save(function (err) {
+					req.logIn(user, function (err) {
+						done(err, user);
+					});
+				});
+				res.send(user);
+
+				}
+				
+			});
+		},
+		function (user, done) {
+			var transporter = nodemailer.createTransport({
+				host: 'mail.zo-online.com',
+				port: 587,
+				secure: false, // true for 465, false for other ports
+				auth: {
+					user: 'admin@zo-online.com', // generated ethereal user
+					pass: '22watch22@DS'  // generated ethereal password
+				},
+				tls: {
+					rejectUnauthorized: false
+				}
+			});
+
+			var mailOptions = {
+				to: user.email,
+				from: 'passwordreset@demo.com',
+				subject: 'Your password has been changed',
+				text: 'Hello,\n\n' +
+					'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+			};
+			transporter.sendMail(mailOptions, function (err) {
+				req.flash('success', 'Success! Your password has been changed.');
+				res.redirect('/');
+				done(err);
+			});
+		}
+	], function (err) {
+		if (err) {
+			req.flash('error', 'Unknown Error during reset.')
+		//	res.redirect('user/reset');
+		res.send({
+			message:  "An error occurred.",
+			status: false
+		});
+		}
+	});
+});
+
+
 router.use('/', notLoggedIn, function (req, res, next) {
 	next();
 });
@@ -400,6 +817,60 @@ router.post('/signup', passport.authenticate('local.signup', {
 	} else {
 		res.redirect('/user/profile');
 	}
+});
+
+// Mobile register 
+router.post('/register', function (req, res, next) {
+
+	req.session.first_name = req.body.first_name;
+	req.session.last_name = req.body.last_name;
+	req.session.addr1 = req.body.addr1;
+	req.session.city = req.body.city;
+	req.session.state = req.body.state;
+	req.session.email = req.body.email;
+	req.session.telephone = req.body.telephone;
+	req.session.zipcode = req.body.zipcode;
+
+	console.log("REGISTER HIT");
+	if(req.body.email || req.body.password || req.body.first_name || req.body.last_name || req.body.addr1 || req.body.city ||  req.body.addr2 ||  req.body.state ||req.body.zipcode || req.body.telephone ){
+		var newUser = new User();
+		newUser.email = req.body.email;
+		// newUser.password = newUser.encryptPassword(password);
+		newUser.password = req.body.password;
+		newUser.first_name = req.body.first_name;
+		newUser.last_name = req.body.last_name;
+		newUser.addr1 = req.body.addr1;
+		newUser.addr2 = req.body.addr2;
+		newUser.city = req.body.city;
+		newUser.state = req.body.state;
+		newUser.zipcode = req.body.zipcode;
+		newUser.telephone = req.body.telephone;
+		newUser.role = 'visitor';
+		newUser.save(function (err, result) {
+			if (err) {
+				res.send({
+					message:  "Error",
+					status: false
+				});
+			}
+			//console.log('User successfully registered');
+			req.flash('success', 'User successfully registered.');
+			res.send({
+				message:  "Customer Registered",
+				status: true
+			});
+		});
+	}else{
+		res.send({
+			message:  "Error",
+			status: false
+		});
+	}
+
+	
+
+
+
 });
 
 router.get('/signin', csrfProtection, function (req, res, next) {
@@ -507,6 +978,14 @@ router.post('/signin', function (req, res, next) {
 				req.flash('error', 'Invalid credentials');
 				//console.log("Error Login - invalid credentials");
 				return res.redirect('/user/signin');
+
+				
+				// res.status(500).send({
+				// 	message:  "Some error occurred while creating the Note.",
+				// 	status: false
+				// });
+
+
 				// return res.render('user/signin', {
 				// 	layout: 'eshop/blank',
 				// 	authFacebook: authFacebook,
@@ -523,6 +1002,11 @@ router.post('/signin', function (req, res, next) {
 					//console.log("Error Login - invalid credentials");
 					return res.redirect('/user/signin');
 
+				// 	res.status(500).send({
+				// 	message:  "Signin incoorect",
+				// 	status: false
+				// });
+
 					// return res.render('user/signin', {
 					// 	layout: 'eshop/blank',
 					// 	authFacebook: authFacebook,
@@ -534,7 +1018,9 @@ router.post('/signin', function (req, res, next) {
 					// })
 				}
 				req.flash('success', 'Logged In Successfully');
-				return res.redirect('/user/profile');
+				// res.send(user);
+				
+			  return res.redirect('/user/profile');
 			});
 		})(req, res, next);
 });
@@ -590,3 +1076,107 @@ function saveSession(req, res, next) {
 	req.session.first_name = req.body.first_name;
 	return next();
 }
+
+
+
+/* -------------------- MOBILE DEVELOPMENT -------------------- */
+
+router.post('/login', function (req, res, next) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	if (process.env.FACEBOOK_ID) {
+		var authFacebook = true
+	} else {
+		var authFacebook = false;
+	}
+	if (process.env.GOOGLE_ID) {
+		var authGoogle = true;
+	} else {
+		var authGoogle = false;
+	}
+	req.session.oldUrl = req.get('referer');
+	var messages = req.flash('error');
+	passport.authenticate('local.signin', {
+		session: true
+	},
+		function (err, user, info) {
+			//console.log("trying to log in");
+			if (err) {
+				req.flash('error', 'Internal Server Error');
+				//console.log("Error: " + err.message);
+				// res.redirect('/user/signin');
+					res.status(500).send({
+					message:  "Some error occurred while creating the Note.",
+					status: false
+				});
+
+				res.render('user/signin', {
+					layout: 'eshop/blank',
+					authFacebook: authFacebook,
+					authGoogle: authGoogle,
+					noErrorMessage: !errorMsg,
+					noErrorMsg: !errorMsg,
+					successMsg: successMsg,
+					noMessage: !successMsg
+				});
+				// return res.redirect('/user/signin');
+			}
+			if (!user) {
+				// req.flash('error', 'Invalid credentials');
+				// //console.log("Error Login - invalid credentials");
+				// return res.redirect('/user/signin');
+
+				
+				res.send({
+					message:  "Some error occurred",
+					status: false
+				});
+
+
+				// return res.render('user/signin', {
+				// 	layout: 'eshop/blank',
+				// 	authFacebook: authFacebook,
+				// 	authGoogle: authGoogle,
+				// 	noErrorMessage: !errorMsg,
+				// 	noErrorMsg: !errorMsg,
+				// 	successMsg: successMsg,
+				// 	noMessage: !successMsg,
+				// })
+			}
+			req.logIn(user, function (err) {
+				if (err) {
+					// req.flash('error', 'Invalid credentials');
+					// //console.log("Error Login - invalid credentials");
+					// return res.redirect('/user/signin');
+
+				// 	res.send({
+				// 	message:  "Signin incoorect",
+				// 	status: false
+				// });
+
+					// return res.render('user/signin', {
+					// 	layout: 'eshop/blank',
+					// 	authFacebook: authFacebook,
+					// 	authGoogle: authGoogle,
+					// 	noErrorMessage: !errorMsg,
+					// 	noErrorMsg: !errorMsg,
+					// 	successMsg: successMsg,
+					// 	noMessage: !successMsg,
+					// })
+				}else{
+					res.send(user);
+				}
+				// req.flash('success', 'Logged In Successfully');
+				
+				
+			//   return res.redirect('/user/profile');
+			});
+		})(req, res, next);
+});
+
+
+
+
+
+
+

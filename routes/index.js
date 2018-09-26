@@ -119,6 +119,20 @@ router.get('/shop', function (req, res, next) {
         });
 	});
 
+// Get Shop Mobile
+router.get('/shop-mobile', function (req, res, next) {
+   
+	Product.find(function (err, products) {
+		productChunks = [];
+		chunkSize = 5;
+		for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
+			productChunks.push(products.slice(i, i + chunkSize))
+		}
+	   
+		res.send(products);
+	});
+});
+
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -373,7 +387,128 @@ router.get('/sale', function (req, res, next) {
 });
 
 
+/* Mobile Get sale items */
+router.get('/sale-mobile', function (req, res, next) {
+
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	var navcats = req.app.get('navcats');
+	var navgroups = req.app.get('navgroups');
+
+	// ////console.log("Local navcats " + res.locals.navcats);
+
+	var tutorial = req.params.tutorial;
+	if (tutorial == 1) {
+		req.session.tutorial = true;
+	} else {
+		req.session.tutorial = false;
+	}
+	Product.aggregate(
+		[{
+			$match: {
+				"$sale_attributes.sale": true
+			}
+		}, {
+			$group: {
+				_id: "$Product_Group",
+				count: {
+					$sum: 1
+				}
+			}
+		}, {
+			$sort: {
+				_id: 1
+			}
+		}],
+		function (err, Product_Group) {
+			if(err){
+				res.send({
+					message:  "Error",
+					status: false
+				});
+
+			}else{
+
+				if (frontPageCategory) {
+					categCondition = {
+						category: frontPageCategory
+					};
+				} else {
+					categCondition = {};
+				}
+				Product.Product.find(categCondition, function (err, docs) {
+	
+					if(err){
+						res.send({
+							message:  "Error",
+							status: false
+						});
+	
+					}else{
+						productChunks = [];
+						productJSON = [];
+						chunkSize = 4;
+						for (var i = (4 - chunkSize); i < docs.length; i += chunkSize) {
+							productChunks.push(docs.slice(i, i + chunkSize));
+						}
+						res.send(productChunks);
+					}
+					
+				});
+
+			}
+			
+		});
+});
+
+
 /* GET home page. */
+router.get('/group/:slug?', function (req, res, next) {
+	var group_slug = req.params.slug;
+	req.session.group = req.params.slug; // Save Group for later
+	var q = req.query.q;
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	if (group_slug == '' || !group_slug) {
+		var group_search = {}
+	} else {
+		var group_search = {
+			Product_Group: group_slug
+		}
+	}
+	Product.find(
+		group_search,
+		function (err, products) {
+			if (err) {
+				////console.log("Error finding group " + group_slug);
+				req.flash('error', 'Cannot find group');
+				res.send({
+					message:  "Error",
+					status: false
+				});
+
+			}
+			if (!products) {
+				////console.log("Error finding group " + group_slug);
+				req.flash('error', 'Cannot find group');
+				res.send({
+					message:  "Error",
+					status: false
+				});
+
+			}
+			productChunks = [];
+			chunkSize = 4;
+			for (var i = (4 - chunkSize); i < products.length; i += chunkSize) {
+				productChunks.push(products.slice(i, i + chunkSize))
+			};
+			products = productChunks;
+			res.send(products);
+		});
+});
+
+
+/* Mobile GET home page. */
 router.get('/group/:slug?', function (req, res, next) {
 	var group_slug = req.params.slug;
 	req.session.group = req.params.slug; // Save Group for later
@@ -673,6 +808,7 @@ router.get('/category/Television', function (req, res, next) {
 		})
 	})
 })
+
 router.get('/category/:slug', function (req, res, next) {
 	var category_slug = req.params.slug;
 	req.session.category = req.params.slug;
@@ -839,6 +975,170 @@ router.get('/category/:slug', function (req, res, next) {
 		})
 	})
 });
+
+// Mobile Category Slug
+router.get('/category-mobile/:slug', function (req, res, next) {
+	var category_slug = req.params.slug;
+	req.session.category = req.params.slug;
+	var q = req.query.q;
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	if (req.params.q) {
+		search = {
+			$match: {
+				$and: [{
+					$text: {
+						$search: q
+					}
+				}
+					// { category: new RegEx(category_slug, 'i')}
+				]
+			}
+		}
+	} else {
+		search = {
+			$match: {
+				// category: new RegExp(category_slug, 'i')
+			}
+		}
+	}
+	/* Create a list of categories and product counts within CAMERAS (100) */
+
+	Product.aggregate([{
+		$sortByCount: "$category"
+	}], function (err, allcats) {
+		Product.aggregate([
+			search, {
+				$sortByCount: "$category"
+			}
+		], function (err, navcats) {
+			Category.findOne({
+				// slug: new RegExp(category_slug, 'i')
+				$or: [{
+					'slug': new RegExp(category_slug, 'i')
+				}, {
+					'name': new RegExp(category_slug, 'i')
+				}],
+
+			}, function (err, category) {
+				if (err) {
+					////console.log("Error finding category " + category_slug);
+					req.flash('error', 'Cannot find category');
+					res.send({
+						message:  "Error",
+						status: false
+					});
+				}
+				if (!category) {
+					////console.log("Error finding category " + category_slug);
+					req.flash('error', 'Cannot find category');
+					res.send({
+						message:  "Error",
+						status: false
+					});
+				}
+				Product.aggregate([search, {
+					$sortByCount: "$Product_Group"
+				}], function (err, navgroups) {
+					if (q) {
+						srch = {
+							$text: {
+								search: q
+							}
+						}
+					} else {
+						srch = {}
+					}
+					/* find all products in category selected */
+
+					categCondition = {
+						$match: {
+							$and: [{
+								$or: [{
+									'category': new RegExp(category.slug, 'i')
+								}, {
+									'category': new RegExp(category.name, 'i')
+								}]
+							},
+							{
+								status: {
+									$ne: 'deleted'
+								}
+							},
+							{
+								$or: [{
+									"inventory.onHand": {
+										$gt: 0
+									}
+								}, {
+									"inventory.disableOnZero": false
+								}]
+							}
+							]
+						}
+					}
+					categCondition = {
+						$and: [{
+							$or: [{
+								'category': new RegExp(category.slug, 'i')
+							}, {
+								'category': new RegExp(category.name, 'i')
+							}]
+						},
+						{
+							status: {
+								$ne: 'deleted'
+							}
+						},
+						{
+							$or: [{
+								"inventory.onHand": {
+									$gt: 0
+								}
+							}, {
+								"inventory.disableOnZero": false
+							}]
+						}
+						]
+					}
+					Product.find(categCondition, function (err, products) {
+						// Product.aggregate([
+						// 	// $match: {
+						// 	//     $and: [{
+						// 	//         $or: [{
+						// 	//             'category': new RegExp(category.slug, 'i')
+						// 	//         }, {
+						// 	//             'category': new RegExp(category.name, 'i')
+						// 	//         }]
+						// 	//     }, srch]
+						// 	// }
+						// 	categCondition
+						// ], function(err, products) {
+						if (err || !products || products === 'undefined') {
+							////console.log("Error: " + err.message);
+							req.flash('error', 'Problem finding products');
+							res.send({
+								message:  "Error",
+								status: false
+							});
+						}
+						if (category.format != 'table') {
+							productChunks = [];
+							chunkSize = 4;
+							for (var i = (4 - chunkSize); i < products.length; i += chunkSize) {
+								productChunks.push(products.slice(i, i + chunkSize))
+							};
+							// products = productChunks
+						}
+						res.send(productChunks);
+					});
+				});
+			});
+		})
+	})
+});
+
+
 
 router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 	var successMsg = req.flash('success')[0];
