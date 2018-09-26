@@ -607,6 +607,7 @@ router.get('/products:filter?', isAdmin, function (req, res, next) {
         var allProducts = true;
         var deletedProducts = false;
         // qryFilter = {status: { $ne: 'deleted'}};
+        console.log("req.user._id " + req.user._id);
         qryFilter = {"vendor_id": req.user._id};
     } else {
         if (filter == 'deletedProducts') {

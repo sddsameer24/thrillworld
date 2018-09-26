@@ -234,7 +234,8 @@ router.get('/', function (req, res, next) {
 	
 	}else if(req.session.group) {
 		////console.log(req);
-		return res.redirect('/group/SIMPLE?q=');
+		// Required ??
+	//	return res.redirect('/group/SIMPLE?q=');
 	}
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -249,7 +250,7 @@ router.get('/', function (req, res, next) {
 		"name": "Television",
 		"slug": "Television",
 		"attributes": [],
-		"ancestors": [],
+		"ancestors": [],  
 		"__v": 0
 	};
 	Product.aggregate(
@@ -372,6 +373,9 @@ router.get('/', function (req, res, next) {
 						isLoggedIn: req.isAuthenticated()
 
 					});
+					console.log(Product_Group);
+					console.log(productChunks);
+					
 				});
 		});
 });
@@ -526,8 +530,8 @@ router.get('/sale-mobile', function (req, res, next) {
 });
 
 
-/* GET home page. */
-router.get('/group/:slug?', function (req, res, next) {
+/* MOBILE GET home page. */
+router.get('/group-mobile/:slug?', function (req, res, next) {
 	var group_slug = req.params.slug;
 	req.session.group = req.params.slug; // Save Group for later
 	var q = req.query.q;
@@ -572,7 +576,7 @@ router.get('/group/:slug?', function (req, res, next) {
 });
 
 
-/* Mobile GET home page. */
+/*  GET home page. */
 router.get('/group/:slug?', function (req, res, next) {
 	var group_slug = req.params.slug;
 	req.session.group = req.params.slug; // Save Group for later
