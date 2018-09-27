@@ -38,6 +38,8 @@ var Insta = require('instamojo-nodejs');
 Insta.setKeys("test_a3c5ddaf80ebda935933f83e311", "test_6d44edf82ee5b6627d0e938218d");
 Insta.isSandboxMode(true);
 
+
+
 var options = {
 	provider: 'google',
    
@@ -256,7 +258,7 @@ router.get('/', function (req, res, next) {
 	Product.aggregate(
 		[{
 			$group: {
-				_id: "$Product_Group",
+				_id: "$category",
 				count: {
 					$sum: 1
 				}
@@ -265,8 +267,17 @@ router.get('/', function (req, res, next) {
 			$sort: {
 				order: 1
 			}
-		}],
-		function (err, Product_Group) {
+		},{
+			$lookup:
+			  {
+				from: "categories",
+				localField: "category",
+				foreignField: "name",
+				as: "category_docs"
+			  }
+		}
+	],
+		function (err, category) {
 			if (frontPageCategory) {
 				categCondition = {
 					"$match": {
@@ -320,6 +331,16 @@ router.get('/', function (req, res, next) {
 			// 		}
 			// 	}
 			// ]
+			// MongoClient.connect(url, function(err, db) {
+
+			// 	var cursor = db.collection('category').find();
+			
+			// 	cursor.each(function(err, doc) {
+			
+			// 		console.log(doc);
+			
+			// 	});
+			// });
 			
 			Product.find({
 				"$and": [{
@@ -361,7 +382,7 @@ router.get('/', function (req, res, next) {
 						keywords: Config.keywords,
 						products: productChunks,
 						recommended: docs,
-						Product_Group: Product_Group,
+						category: category,
 						user: req.user,
 						errorMsg: errorMsg,
 						noErrorMsg: !errorMsg,
@@ -373,7 +394,7 @@ router.get('/', function (req, res, next) {
 						isLoggedIn: req.isAuthenticated()
 
 					});
-					console.log(Product_Group);
+					console.log(category);
 					console.log(productChunks);
 					
 				});
@@ -1916,7 +1937,7 @@ const nexmo = new Nexmo({
 		
 		//console.log(response.success);
 		console.log("instamojo SUCESS"+response);
-		console.log(response.payment_request.longurl);
+		// console.log(response.payment_request.longurl);
 		//console.log("REQUIRED URL"+JSON.stringify(response));
 	//	console.log(response['payment_request']);
 	//	console.log(JSON.parse(response['payment_request']));

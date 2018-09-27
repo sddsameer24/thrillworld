@@ -92,20 +92,41 @@
 
                                                                 <div class="col-md-5">
                                                                     <label for='Latitude'>Latitude</label>
-                                                                    <input class="form-control" id="lati" name='Latitude' type="text" placeholder="{{y}}">
+                                                                    <input class="form-control" id="lati" name='Latitude' type="text">
+
                                                                 </div>
                                                                 <div class="col-md-5">
                                                                     <label for='Longitude'>Longitude</label>
-                                                                    <input  class="form-control" id="long" name='Longitude' type="text" value="{{x}}">
+                                                                    <input class="form-control" id="long" name='Longitude' type="text">
+
                                                                 </div>
-                                                                  <div class="col-md-2">
-                                                                     <label for='Auto'>Auto</label>
-                                                                   <a type="button" onclick="getLocation()"><img height="32px" src="/images/Location-Geo.png" > </a>  
-                                                                    
-                                                                </div>
-                                                               
+
+                                                            <div class="col-md-2">
+                                                                <label for='Auto'>Auto</label>
+                                                                <a type="button" onclick="getLocation()">
+                                                                    <img height="32px" src="../images/Location-Auto-Locate-Current-Location-Geo-512.png"> </a>
+
                                                             </div>
-                                                        </li>
+                                                            {{!-- position.coords.longitude --}}
+                                                </div>
+                                                </li>
+                                                <script>
+                                                    var x = document.getElementById("lati");
+                                                    var y = document.getElementById("long");
+
+                                                    function getLocation() {
+                                                        if (navigator.geolocation) {
+                                                            navigator.geolocation.getCurrentPosition(showPosition);
+                                                        } else {
+                                                            x.innerHTML = "Geolocation is not supported by this browser.";
+                                                        }
+                                                    }
+
+                                                    function showPosition(position) {
+                                                        x.value = position.coords.latitude;
+                                                        y.value = position.coords.longitude;
+                                                    }
+                                                </script>
 
 
                                                         <div class="row">
@@ -425,20 +446,3 @@
 </div>
 <!-- /.container-fluid -->
 </div>
-<script>
-    var x = document.getElementById("lati");
-    var y = document.getElementById("long");
-
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-    } else { 
-        x.innerHTML = "Geolocation is not supported by this browser.";
-    }
-}
-
-function showPosition(position) {
-    x = position.coords.latitude; 
-    y = position.coords.longitude;
-}
-</script>

@@ -58,6 +58,7 @@
     "intro.js": "2.9.3",
     "ipware": "1.0.0",
     "jquery-zoom": "1.7.21",
+    "js-datepicker": "^3.3.2",
     "json2csv": "^3.11.5",
     "marked": "0.4.0",
     "moment": "2.22.2",
