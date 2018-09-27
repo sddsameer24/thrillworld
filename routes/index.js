@@ -256,26 +256,22 @@ router.get('/', function (req, res, next) {
 		"__v": 0
 	};
 	Product.aggregate(
-		[{
-			$group: {
-				_id: "$category",
-				count: {
-					$sum: 1
-				}
-			}
-		}, {
-			$sort: {
-				order: 1
-			}
-		},{
-			$lookup:
-			  {
-				from: "categories",
-				localField: "category",
-				foreignField: "name",
-				as: "category_docs"
-			  }
-		}
+		[
+		// [{
+		// 	$group: {
+		// 		_id: "$category",
+		// 		count: {
+		// 			$sum: 1
+		// 		}
+		// 	}
+		// }, {
+		// 	$sort: {
+		// 		order: 1
+		// 	}
+		// },
+	{$group : {_id : "$category",count: {$sum: 1}}},
+    {$lookup: {from: "categories", localField: "_id", foreignField: "slug", as: "details"}},
+    
 	],
 		function (err, category) {
 			if (frontPageCategory) {
@@ -395,7 +391,7 @@ router.get('/', function (req, res, next) {
 
 					});
 					console.log(category);
-					console.log(productChunks);
+					
 					
 				});
 		});

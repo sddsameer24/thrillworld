@@ -29,7 +29,14 @@
 <body>
     {{>eshop/header}} 
     <div class="row">
-          {{category}}
+        {{>eshop/category}}
+        {{!-- {{#each category}}
+           {{this._id}}
+           {{this.count}}
+            {{#each this.details}}
+             {{this.imagePath}}
+             {{/each}}
+          {{/each}} --}}
          
     </div>
         
