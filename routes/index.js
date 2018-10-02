@@ -894,171 +894,55 @@ router.get('/category/', function (req, res, next) {
 	})
 })
 
-router.get('/category/:slug', function (req, res, next) {
-	var category_slug = req.params.slug;
-	req.session.category = req.params.slug;
+router.get('/category/:slug?', function (req, res, next) {
+	var group_slug = req.params.slug;
+	req.session.group = req.params.slug; // Save Group for later
 	var q = req.query.q;
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-	if (req.params.q) {
-		search = {
-			$match: {
-				$and: [{
-					$text: {
-						$search: q
-					}
-				}
-					// { category: new RegEx(category_slug, 'i')}
-				]
-			}
-		}
+	if (group_slug == '' || !group_slug) {
+		var group_search = {}
 	} else {
-		search = {
-			$match: {
-				// category: new RegExp(category_slug, 'i')
-			}
+		var group_search = {
+			category: group_slug
 		}
 	}
-	/* Create a list of categories and product counts within CAMERAS (100) */
-
-	Product.aggregate([{
-		$sortByCount: "$category"
-	}], function (err, allcats) {
-		Product.aggregate([
-			search, {
-				$sortByCount: "$category"
+	Product.find(
+		group_search,
+		function (err, products) {
+			if (err) {
+				////console.log("Error finding group " + group_slug);
+				req.flash('error', 'Cannot find group');
+				return res.redirect('/');
 			}
-		], function (err, navcats) {
-			Category.findOne({
-				// slug: new RegExp(category_slug, 'i')
-				$or: [{
-					'slug': new RegExp(category_slug, 'i')
-				}, {
-					'name': new RegExp(category_slug, 'i')
-				}],
-
-			}, function (err, category) {
-				if (err) {
-					////console.log("Error finding category " + category_slug);
-					req.flash('error', 'Cannot find category');
-					return res.redirect('/');
-				}
-				if (!category) {
-					////console.log("Error finding category " + category_slug);
-					req.flash('error', 'Cannot find category');
-					return res.redirect('/');
-				}
-				Product.aggregate([search, {
-					$sortByCount: "$Product_Group"
-				}], function (err, navgroups) {
-					if (q) {
-						srch = {
-							$text: {
-								search: q
-							}
-						}
-					} else {
-						srch = {}
-					}
-					/* find all products in category selected */
-
-					categCondition = {
-						$match: {
-							$and: [{
-								$or: [{
-									'category': new RegExp(category.slug, 'i')
-								}, {
-									'category': new RegExp(category.name, 'i')
-								}]
-							},
-							{
-								status: {
-									$ne: 'deleted'
-								}
-							},
-							{
-								$or: [{
-									"inventory.onHand": {
-										$gt: 0
-									}
-								}, {
-									"inventory.disableOnZero": false
-								}]
-							}
-							]
-						}
-					}
-					categCondition = {
-						$and: [{
-							$or: [{
-								'category': new RegExp(category.slug, 'i')
-							}, {
-								'category': new RegExp(category.name, 'i')
-							}]
-						},
-						{
-							status: {
-								$ne: 'deleted'
-							}
-						},
-						{
-							$or: [{
-								"inventory.onHand": {
-									$gt: 0
-								}
-							}, {
-								"inventory.disableOnZero": false
-							}]
-						}
-						]
-					}
-					Product.find(categCondition, function (err, products) {
-						// Product.aggregate([
-						// 	// $match: {
-						// 	//     $and: [{
-						// 	//         $or: [{
-						// 	//             'category': new RegExp(category.slug, 'i')
-						// 	//         }, {
-						// 	//             'category': new RegExp(category.name, 'i')
-						// 	//         }]
-						// 	//     }, srch]
-						// 	// }
-						// 	categCondition
-						// ], function(err, products) {
-						if (err || !products || products === 'undefined') {
-							////console.log("Error: " + err.message);
-							req.flash('error', 'Problem finding products');
-							res.redirect('/');
-						}
-						if (category.format != 'table') {
-							productChunks = [];
-							chunkSize = 4;
-							for (var i = (4 - chunkSize); i < products.length; i += chunkSize) {
-								productChunks.push(products.slice(i, i + chunkSize))
-							};
-							// products = productChunks
-						}
-						res.render('shop/eshop', {
-							layout: 'eshop/eshop',
-							navcats: navcats,
-							navgroups: navgroups,
-							viewDocuments: viewDocuments,
-							category: category,
-							products: productChunks,
-							productChunks: productChunks,
-							user: req.user,
-							q: q,
-							errorMsg: errorMsg,
-							noErrorMsg: !errorMsg,
-							successMsg: successMsg,
-							noMessage: !successMsg,
-							isLoggedIn: req.isAuthenticated()
-						});
-					});
-				});
+			if (!products) {
+				////console.log("Error finding group " + group_slug);
+				req.flash('error', 'Cannot find group');
+				return res.redirect('/');
+			}
+			productChunks = [];
+			chunkSize = 4;
+			for (var i = (4 - chunkSize); i < products.length; i += chunkSize) {
+				productChunks.push(products.slice(i, i + chunkSize))
+			};
+			products = productChunks;
+			res.render('shop/eshop', {
+				layout: 'eshop/eshop',
+				navcats: req.app.get('navcats'),
+				navgroups: req.app.get('navgroups'),
+				group: group_slug,
+				viewDocuments: viewDocuments,
+				products: productChunks,
+				productChunks: productChunks,
+				user: req.user,
+				q: q,
+				errorMsg: errorMsg,
+				noErrorMsg: !errorMsg,
+				successMsg: successMsg,
+				noMessage: !successMsg,
+				isLoggedIn: req.isAuthenticated()
 			});
-		})
-	})
+		});
 });
 
 // Mobile Category Slug
