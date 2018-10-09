@@ -1,3 +1,5 @@
+<script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/0.9.0rc1/jspdf.min.js"></script>
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-md-12">
@@ -147,7 +149,10 @@
 									<!-- Text input-->
 
 								</div>
-								<table class="table table-condensed">
+								<div id="content">
+
+								
+								<table id="content" class="table table-condensed">
 									<thead>
 										<tr>
 											<td>
@@ -169,12 +174,13 @@
 										</tr>
 									</thead>
 									<tbody>
-										<input type="hidden" name="upload" value="1"> {{# each products }}
-										<input type="hidden" name="item_name_{{inc @index }}" value="{{this.item.title}}">
-										<input type="hidden" name="item_number_{{inc @index }}" value="{{this.item._id}}">
-										<input type="hidden" name="amount_{{inc @index }}" value="{{this.price}}">
-										<input type="hidden" name="itemTotal_{{inc @index }}" value="{{this.itemTotal}}">
-										<input type="hidden" name="option[{{ @index}}]" value="{{this.option}}">
+										<input type="hidden" name="upload" value="1"/>
+										 {{# each products }}
+										<input type="hidden" name="item_name_{{inc @index }}" value="{{this.item.title}}"/>
+										<input type="hidden" name="item_number_{{inc @index }}" value="{{this.item._id}}"/>
+										<input type="hidden" name="amount_{{inc @index }}" value="{{this.price}}"/>
+										<input type="hidden" name="itemTotal_{{inc @index }}" value="{{this.itemTotal}}"/>
+										<input type="hidden" name="option[{{ @index}}]" value="{{this.option}}"/>
 										<input type="hidden" name="item_name[null]" value="" />
 										<input type="hidden" name="item_name[{{ @index }}]" value="{{this.item.name}}" />
 										<input type="hidden" name="item_title[{{ @index }}]" value="{{this.item.title}}" />
@@ -248,14 +254,15 @@
 										</tr>
 									</tbody>
 								</table>
+								</div>
 								<li class="list-group-item">
 									<a href="https://instamojo.com/@sdsameer24" rel="im-checkout" data-behaviour="remote" data-style="light" data-text="Checkout"></a>
 									<script src="https://d2xwmjc4uy2hr5.cloudfront.net/im-embed/im-embed.min.js"></script>
 									<div class="text-right">
-										<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">pay by card</button>
+										<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg pdf" style="width: 100%;">pay by card</button>
 										<p></p>
 										<p></p>
-										<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">pay on arrival</button>
+										<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg pdf" style="width: 100%;">pay on arrival</button>
 										<div class="text-left">
 											{{#if ../enableShipping}}
 											<input id='update' name='update' type='submit' value='Update Shipping' class='btn btn-warning text-right'> {{/if}}
@@ -335,4 +342,25 @@
     }
 
   });
+</script>
+
+<script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/0.9.0rc1/jspdf.min.js"></script>
+<script>
+
+var doc = new jsPDF();
+var specialElementHandlers = {
+    '#editor': function (element, renderer) {
+        return true;
+    }
+};
+
+$('.pdf').click(function () {   
+    doc.fromHTML($('#content').html(), 15, 15, {
+        'width': 170,
+            'elementHandlers': specialElementHandlers
+    });
+    doc.save('Invoice.pdf');
+});
+
 </script>

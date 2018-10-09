@@ -1,241 +1,585 @@
 <div class="product">
-	 {{#each product}}
-	 <div class="container">				
-		 <div class="product-price1">
-			 <div class="top-sing">
-				  <div class="col-md-7 single-top">	
-					 <div class="flexslider">
-							  <ul class="slides">
-								<li data-thumb="{{this.imagePath}}">
-									<div class="thumb-image"> <img src="{{this.imagePathg1}}" data-imagezoom="true" class="img-responsive" alt=""/> </div>
-								</li>
-								<li data-thumb="{{this.imagePathg2}}">
-									 <div class="thumb-image"> <img src="{{this.imagePathg2}}" data-imagezoom="true" class="img-responsive" alt=""/> </div>
-								</li>
-								<li data-thumb="{{this.imagePathg3}}">
-								   <div class="thumb-image"> <img src="{{this.imagePathg3}}"  data-imagezoom="true" class="img-responsive" alt=""/> </div>
-								</li> 
-							  </ul>
-						</div>					 					 
-					 <script src="/javascripts/imagezoom.js"></script>
-						<script defer src="/javascripts/jquery.flexslider.js"></script>
-						<script>
-						// Can also be used with $(document).ready()
-						$(window).load(function() {
-						  $('.flexslider').flexslider({
-							animation: "slide",
-							controlNav: "thumbnails"
-						  });
-						});
-						</script>
+    {{#each product}}
+    <div class="container">
+        <div class="card">
+            <div class="card-body row">
+                <div class="col-sm-12 col-md-6" id="image-container">
+                    <div id="main-img">
+                        <main class="primary" style="background-image:url({{this.imagePath}})" class="mx-auto"></main>
+                    </div>
+                    <div class="container-fluid">
+                        <div class="row mx-auto" id="thumbnail-container">
+                            <a href="#" class="thumbnail selected" data-big="{{this.imagePathg1}}">
+                                <div class="thumb" style="background-image:url({{this.imagePathg1}}); background-size:cover;">
+                                </div>
+                            </a>
+                            <a href="#" class="thumbnail" data-big="{{this.imagePathg2}}">
+                                <div class="thumb" style="background-image:url({{this.imagePathg2}}); background-size:cover;">
+                                </div>
+                            </a>
+                            <a href="#" class="thumbnail" data-big="{{this.imagePathg3}}">
+                                <div class="thumb" style="background-image:url({{this.imagePathg3}}); background-size:cover;">
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <span id="favorite-button" class="btn">
+                        <div class="text-left">
+                            {{#if ../../isLoggedIn}}
+                            <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
+                                <i class="fa fa-heart"></i> {{ this.likes.length }}</a>
+                            {{else}}
+                            <i class="fa fa-heart"></i> {{ this.likes.length }} {{/if}}
+                            <script>
+                                $(document).ready(function () {
+                                    $('[data-toggle="tooltip"]').tooltip();
+                                });
+                            </script>
+                        </div>
+                    </span>
 
-				 </div>	
-			     <div class="col-md-5 single-top-in simpleCart_shelfItem">
-					  <div class="product-information">
-            <div class="caption-full">
-                <h3 class="pull-right"><strong>Rs{{money this.price}}</strong></h3>
-                <h4>
-                    <a href="#">{{this.name}}</a>`  
-                </h4>
-				 <div class="text-left">
-                                        {{#if ../../isLoggedIn}}
-                                        <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
-                                            <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
-                                        {{else}}
-                                        <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }} {{/if}}
-                                        <script>
-                                            $(document).ready(function () {
-                                                $('[data-toggle="tooltip"]').tooltip();
-                                            });
-                                        </script>
-                                    </div>
-            </div>
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="active">
-                    <a href="#description" aria-controls="description" role="tab" data-toggle="tab">Description</a>
-                </li>
-                <li role="presentation">
-                    <a href="#features" aria-controls="features" role="tab" data-toggle="tab">Features</a>
-                </li>
-                <li role="presentation">
-                    <a href="#reviews" aria-controls="reviews" role="tab" data-toggle="tab">Reviews</a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="description">
-                    <div class="product-tab-area">
-                        <div class='description'>
-                            {{this.description}}
+
+
+
+                </div>
+                <div class="col-sm-12 col-md-6" id="product-information">
+                    <h4 class="p-0 m-0" id="product-title">{{this.name}}</h4>
+                    <span id="product-short">
+                        <small>{{this.description}}</small>
+                    </span>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <span id="old-price" class="text-danger">
+                                <strike></strike>
+                            </span> &nbsp; &nbsp;
+                            <h5 id="price">Rs{{money this.price}}</h5>
                         </div>
                     </div>
-                </div>
-                <div role="tabpanel" class="tab-pane top-10" id="features">
-                    <div class="product-tab-area">
-                        <div class="features">
-                            <ul>
-                                {{#if parking}}
-                                <p>Parking</p>
-                                <li>
-                                    <i class="fa fa-car" aria-hidden="true"></i>
-                                </li>
-                                {{/if}} {{#if Pool}}
-                                <p>Pool</p>
-                                <li>
-                                    <i class="fa fa-car" aria-hidden="true"></i>
-                                </li>
-                                {{/if}} {{#if campfire}}
-                                <p>Campfire</p>
-                                <li>
-                                    <i class="fa fa-free-code-camp" aria-hidden="true"></i>
-                                </li>
-                                {{/if}} {{#if Wifi}}
-                                <p>Wifi</p>
-                                <li>
-                                    <i class="fa fa-wifi" aria-hidden="true"></i>
-                                </li>
-                                {{/if}}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div role="tabpanel" class="tab-pane" id="reviews">
-                    <div class="blog-comment">
-                        <h3 class="text-success">Reviews</h3>
-                        <hr/>
-                        <ul class="comments">
-                            {{#each comment}}
-                            <h5>user:{{user.first_name}}</h5>
-                            <h5>comment:{{product.comment}}</h5>
-                            {{/each}}
-                        </ul>
-                    
-                         
-                        <form action='/reviews' method='POST'>
-                            <h3>Share your experience </h3>
-                            <input name="review" value="comment here">
-                            <input  name='first_name' value='{{this.first_name}}'>
-                            <input type="hidden" name='productId' value='{{ this._id }}'>
-                            <input type='submit' value='Submit' class="btn btn-success add-to-cart" role="button">
-                        </form>
-                      
+                    <div id="product-variables">
+                        <label>Number of Guest</label>
+                        <br>
+                        <select class="form-control" class="mb-2">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                        </select>
                         
-                      
-
+                        <span class="align-middle">
+                            <label for="subscribe-btn">Read all terms and conditions</label>
+                            <input type="checkbox" id="subscribe-btn"> &nbsp;
+                        </span>
+                        <div id="text">
+                            <ul>
+                                <li>policy statement</li>
+                                <li>Confirmation Policy</li>
+                                <li>Cancellation Policy</li>
+                                <li>Refund Policy</li>
+                            </ul>
+                         
+                        </div>
+                    </div>
+                       <small>
+                                <label>Apply coupon</label>
+                                <input>
+                                <button type="submit">Apply</button>
+                            </small>
+                    <div id="add-to-cart" class="mt-2">
+                        <button action="/add-to-cart" class="add-to-cart"> Add to Wishlist</button>
+                    </div>
+                     <div id="add-to-cart" class="mt-2">
+                        <button action="/add-to-cart" class="add-to-cart"> Book now</button>
                     </div>
                 </div>
+
             </div>
-            <p>
-                <div class="row">
-                    <form action='/add-to-cart' method='POST'>
-                        <input type='hidden' id='id' name='productId' value='{{ product._id }}'>
-                        <input type='hidden' id='type' name='type' value='{{product.Product_Group}}'>
-                        <p class="text-center">
-                            <input type='submit' value='Add to Cart' class="btn btn-success add-to-cart" role="button">
-                        </p>
-                    </form>
-                </div>
+            <div id="map" style="width:100%;height:500px;"></div>
+
+
+<script>
+function myMap() {
+  var myCenter = new google.maps.LatLng({{this.Latitude}},{{this.Longitude}});
+  var mapCanvas = document.getElementById("map");
+  var mapOptions = {center: myCenter, zoom: 5};
+  var map = new google.maps.Map(mapCanvas, mapOptions);
+  var marker = new google.maps.Marker({position:myCenter});
+  marker.setMap(map);
+   var infowindow = new google.maps.InfoWindow({
+    content:"{{this.title}}" 
+  });
+  infowindow.open(map,marker);
+}
+</script>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAidN5MszkfMW2VYcES7uoePsX1qQmuG7M&callback=myMap"></script>
+
         </div>
-				 </div>
-				 <div class="clearfix"> </div>
-			 </div>
-	     </div>
-         {{!-- <div class="map">
-					   			<iframe src="https://maps.google.co.in/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Lighthouse+Point,+FL,+United+States&amp;aq=4&amp;oq=light&amp;sll={{this.Longitude}},{{this.Latitude}}&amp;sspn=0.04941,0.104628&amp;ie=UTF8&amp;hq=&amp;hnear=Lighthouse+Point,+Broward,+Florida,+United+States&amp;t=m&amp;z=14&amp;ll={{this.Longitude}},{{this.Latitude}}&amp;output=embed"></iframe>
-					   		</div> --}}
-                               <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <script>
-      var map;
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
-          zoom: 8
-        });
-      }
-    </script>
-		 <div class="bottom-prdt">
-			 <div class="btm-grid-sec">
-				 <div class="col-md-2 btm-grid">
-					 <a href="product.html">
-						{{!-- <img src="images/p3.jpg" alt=""/> --}}
-						<h4>Product#1</h4>
-						<span>$1200</span></a>
-				 </div>
-				 <div class="col-md-2 btm-grid">
-					 <a href="product.html">
-	{{!-- <img src="images/p3.jpg" alt=""/> --}}
-						<h4>Product#1</h4>
-						<span>$700</span></a>
-				 </div>
-				 <div class="col-md-2 btm-grid">
-					  <a href="product.html">
-				{{!-- <img src="images/p3.jpg" alt=""/> --}}
-						<h4>Product#1</h4>
-						<span>$1300</span></a>
-				 </div>
-				 <div class="col-md-2 btm-grid">
-					  <a href="product.html">
-					{{!-- <img src="images/p3.jpg" alt=""/> --}}
-						<h4>Product#1</h4>
-						<span>$9000</span></a>
-				 </div>
-				 <div class="col-md-2 btm-grid">
-					  <a href="product.html">
-						{{!-- <img src="images/p3.jpg" alt=""/> --}}
-						<h4>Product#1</h4>
-						<span>$450</span></a>
-				 </div>
-				  <div class="clearfix"></div>
-			 </div>			
-		 </div>
-	 </div>
-	 {{/each}}
+        <!-- end card -->
+        
+    </div>
+    <!-- end container-->
+    {{/each}}
 </div>
 <style>
-    
-.thumb-image {
-    width: 290px;
-		height:200px;
-}
-	.single-top {
-    width: 32%;
-	    margin-right: 5em;
-}
-.thumb-image { width: 323px;
-	padding:1em;
- }
+    button:active,
+    #favorite-button:active,
+    .btn:active {
+        transform: translateY(3px);
+        transition: 0.15s;
+    }
 
-.thumb-image > img { width: 100%; }
-.single-top-in {
-    width: 61%;
-}
-.imagezoom-view{
-position: absolute;
-    left: 650.5px!important;
-    top: 150px!important;
-    width: 495px;
-    height: 390px!important;
-    z-index: 2147483647;
-    overflow: hidden;
-    border: none;
-    background: rgb(0, 0, 0);
-}
-.single-top-in{
-	width:44%;
-}
+    button,
+    input~button,
+    input+button,
+    select,
+    .btn,
+    input[type="checkbox"],
+    label[for=subscribe-btn] {
+        cursor: pointer;
+    }
+
+    .card {
+        background: #fff;
+        width: 90%;
+        margin: 40px auto
+    }
+
+    .card>#image-container {
+        position: relative;
+    }
+
+    .card #image-container #main-img {
+        height: 300px;
+    }
+
+    .card #image-container main.primary {
+        margin: 0 auto;
+        display: block;
+        width: 60%;
+        height: auto;
+        min-height: 300px;
+        background-size: cover;
+    }
+
+    .card #image-container #thumbnail-container {
+        margin-top: 5px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .card #image-container #thumbnail-container div.thumb {
+        width: 35px;
+        height: 35px;
+        margin: 2px;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        box-sizing: border-box;
+    }
+
+    .card #image-container #thumbnail-container div.thumb:hover {
+        transform: scale(0.9);
+        transition: 0.3s;
+        transition-timing-function: ease-in;
+    }
+
+    .card #image-container span#favorite-button {
+        color: rgba(231, 76, 60, 0.5);
+        font-family: "Font Awesome 5 Free";
+        font-size: 1.5em;
+        content: "\f004";
+        position: absolute;
+        top: 15px;
+        right: 4vw;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        border-radius: 50%;
+        padding-top: 7px;
+        height: 50px;
+        width: 50px;
+        text-align: center;
+        box-shadow: 0px 1px 40px 0px rgba(0, 0, 0, 0.25);
+        ;
+    }
+
+    .card #image-container span#favorite-button:hover,
+    .card #image-container span#favorite-button.active {
+        color: rgba(231, 76, 60, 1);
+        transition-timing-function: ease-in-out;
+        transition: 0.3s;
+    }
+
+    .card #product-information #product-short {
+        text-transform: uppercase;
+        color: #777;
+    }
+
+    .card #product-information label {
+        font-weight: bold;
+        margin-top: 8px;
+        margin-bottom: 0;
+    }
+
+    .card #product-information select {
+        max-width: 18vw;
+    }
+
+
+    .card .nice-number {
+        display: inline-flex;
+        justify-content: stretch;
+    }
+
+    .card .nice-number button {
+        background: #27ae60;
+        color: #fff;
+        width: 3vw;
+        min-width: 35px;
+        border: 0;
+    }
+
+    .card .nice-number input {
+        width: 3.5vw;
+        min-width: 50px;
+        height: 40px;
+        vertical-align: middle;
+        -moz-appearance: textfield;
+        box-sizing: content-box;
+        margin: 0;
+        text-align: center;
+    }
+
+    .card .nice-number+button {
+        background: #27ae60;
+        color: #fff;
+        width: 13vw;
+        border: 0;
+        margin-left: 2px;
+        padding-top: 10.5px;
+        padding-bottom: 11px;
+        transition: 0.35s;
+    }
+
+    .card .nice-number button:hover,
+    .card .nice-number+button:hover {
+        background: #1e8449;
+        transition: 0.25s;
+    }
+
+    .disabled,
+    .thumbnail.selected,
+    .thumbnail.selected:hover {
+        opacity: 0.6;
+        cursor: none;
+    }
+
+    .nice-number input::-webkit-inner-spin-button,
+    .nice-number input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .card .nice-number+button.success {
+        border-radius: 10px;
+        background-color: orange;
+        transition: 0.2s;
+        float: none;
+    }
+
+    /*FOR MOBILE*/
+
+    @media only screen and (max-width:992px) {
+        .card #image-container main.primary {
+            width: 80%;
+            max-height: 300px;
+        }
+    }
+
+    @media only screen and (max-width:767px) {
+        .card #image-container main.primary {
+            width: 65%;
+            max-height: 300px;
+        }
+
+        .card #image-container #thumbnail-container {
+            margin-bottom: 5px;
+        }
+
+        .card #image-container #thumbnail-container div.thumb {
+            width: 25px;
+            height: 25px;
+        }
+
+
+        .card .nice-number button {
+            width: 7vw !important;
+        }
+
+        .card .nice-number+button.add-to-cart {
+            width: 33vw !important;
+            min-width: 50%;
+            float: right;
+        }
+
+        .card #product-information #product-title,
+        .card #product-information #product-short {
+            text-align: center;
+            display: block;
+        }
+
+        div#product-variables {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .card #product-information select {
+            min-width: 100%;
+        }
+    }
+
+    @media only screen and (max-width: 575px) {
+        .card #image-container main.primary {
+            width: 60% !important;
+            max-height: 300px !important;
+        }
+    }
+
+    @media only screen and (max-width:375px) {
+        body~container {
+            padding: 0;
+        }
+
+        .card #image-container main.primary {
+            width: 90% !important;
+            max-height: 150px !important;
+        }
+
+        div#product-variables {
+            max-width: 90% !important;
+            margin: 0 auto;
+        }
+        .card .nice-number {
+            min-width: 100%;
+        }
+
+        .card .nice-number button,
+        .card .nice-number input {
+            width: 33.33% !important;
+            margin-bottom: 5px;
+        }
+
+        .card .nice-number+button.add-to-cart {
+            min-width: 100%;
+        }
+    }
 </style>
+<script>
+    (function ($) {
+        $.fn.niceNumber = function (options) {
+            var settings = $.extend({
+                autoSize: false,
+                autoSizeBuffer: 1,
+                buttonDecrement: '-',
+                buttonIncrement: "+",
+                buttonPosition: 'around'
+            }, options);
+
+            return this.each(function () {
+                var currentInput = this,
+                    $currentInput = $(currentInput),
+                    attrMax = 999,
+                    attrMin = 0;
+
+                // Handle max and min values
+                if (
+                    typeof $currentInput.attr('max') !== typeof undefined
+                    && $currentInput.attr('max') !== false
+                ) {
+                    attrMax = parseFloat($currentInput.attr('max'));
+                }
+
+                if (
+                    typeof $currentInput.attr('min') !== typeof undefined
+                    && $currentInput.attr('min') !== false
+                ) {
+                    attrMin = parseFloat($currentInput.attr('min'));
+                }
+
+                // Fix issue with initial value being < min
+                if (
+                    attrMin
+                    && !currentInput.value
+                ) {
+                    $currentInput.val(attrMin);
+                }
+
+                // Generate container
+                var $inputContainer = $('<div/>', {
+                    class: 'nice-number'
+                })
+                    .insertAfter(currentInput);
+
+                // Generate interval (object so it is passed by reference)
+                var interval = {};
+
+                // Generate buttons
+                var $minusButton = $('<button/>')
+                    .attr('type', 'button')
+                    .html(settings.buttonDecrement)
+                    .on('mousedown mouseup mouseleave', function (event) {
+                        changeInterval(event.type, interval, function () {
+                            if (
+                                attrMin == null
+                                || attrMin < parseFloat(currentInput.value)
+                            ) {
+                                currentInput.value--;
+                            }
+                        });
+
+                        // Trigger the input event here to avoid event spam
+                        if (
+                            event.type == 'mouseup'
+                            || event.type == 'mouseleave'
+                        ) {
+                            $currentInput.trigger('input');
+                        }
+                    });
+
+                var $plusButton = $('<button/>')
+                    .attr('type', 'button')
+                    .html(settings.buttonIncrement)
+                    .on('mousedown mouseup mouseleave', function (event) {
+                        changeInterval(event.type, interval, function () {
+                            if (
+                                attrMax == null
+                                || attrMax > parseFloat(currentInput.value)
+                            ) {
+                                currentInput.value++;
+                            }
+                        });
+
+                        // Trigger the input event here to avoid event spam
+                        if (
+                            event.type == 'mouseup'
+                            || event.type == 'mouseleave'
+                        ) {
+                            $currentInput.trigger('input');
+                        }
+                    });
+
+                // Append elements
+                switch (settings.buttonPosition) {
+                    case 'left':
+                        $minusButton.appendTo($inputContainer);
+                        $plusButton.appendTo($inputContainer);
+                        $currentInput.appendTo($inputContainer);
+                        break;
+                    case 'right':
+                        $currentInput.appendTo($inputContainer);
+                        $minusButton.appendTo($inputContainer);
+                        $plusButton.appendTo($inputContainer);
+                        break;
+                    case 'around':
+                    default:
+                        $minusButton.appendTo($inputContainer);
+                        $currentInput.appendTo($inputContainer);
+                        $plusButton.appendTo($inputContainer);
+                        break;
+                }
+
+                // Nicely size input
+                if (settings.autoSize) {
+                    $currentInput.width(
+                        $currentInput.val().length + settings.autoSizeBuffer + "ch"
+                    );
+                    $currentInput.on('keyup input', function () {
+                        $currentInput.animate({
+                            'width': $currentInput.val().length + settings.autoSizeBuffer + "ch"
+                        }, 200);
+                    });
+                }
+            });
+        };
+
+        function changeInterval(eventType, interval, callback) {
+            if (eventType == "mousedown") {
+                interval.timeout = setTimeout(function () {
+                    interval.actualInterval = setInterval(function () {
+                        callback();
+                    }, 100);
+                }, 200);
+                callback();
+            } else {
+                if (interval.timeout) {
+                    clearTimeout(interval.timeout);
+                }
+                if (interval.actualInterval) {
+                    clearInterval(interval.actualInterval);
+                }
+            }
+        }
+    }(jQuery));
+
+    $('input#add-to-cart-qty').niceNumber();
+
+    $('input#add-to-cart-qty').keydown(function (e) {
+        if (e.keyCode == 190 || e.keyCode == 110 || e.keyCode == 69 || e.keyCode == 189 || e.keyCode == 109) {
+            e.preventDefault();
+        }
+
+        if (isNaN(parseInt(window.getSelection()))) {
+            var code = (e.keyCode >= 96) ? e.keyCode - 48 : e.keyCode;
+            var keyval = parseInt(String.fromCharCode(code));
+
+            if (!isNaN(keyval)) {
+                if ($(this).val() + keyval > parseInt($(this).attr('max'))) {
+                    e.preventDefault();
+                }
+            }
+        }
+    });
+    $('input#add-to-cart-qty').keyup(function (e) {
+        if ($(this).val() != '') {
+            $(this).val(parseInt($(this).val()));
+        }
+    });
+    // ------------- //
+
+
+    $('#text').hide();
+
+    $('#subscribe-btn').change(function () {
+        // use the :checked selector to find any that are checked
+        if ($("#subscribe-btn").is(':checked')) {
+            $('#text').slideDown();
+        } else {
+            $('#text').slideUp();
+        }
+    });
+
+    /* Images */
+    $('.thumbnail').on('click', function () {
+        var clicked = $(this);
+        var newSelection = clicked.data('big');
+        var $img = $('.primary').css("background-image", "url(" + newSelection + ")");
+        clicked.parent().find('.thumbnail').removeClass('selected');
+        clicked.addClass('selected');
+        $('.primary').empty().append($img.hide().fadeIn(500));
+        return false;
+    });
+
+
+
+
+    $('button.add-to-cart').on('click', function () {
+        var cartBtn = $(this);
+        cartBtn.addClass('success').text("Success!").attr('disabled', true);
+        setTimeout(function () { cartBtn.removeClass('success').addClass('active').text("Add to Cart").attr('disabled', false); }, 1500);
+    });
+
+
+    $('#favorite-button').on('click', function () {
+        $(this).toggleClass('active');
+    })
+</script>

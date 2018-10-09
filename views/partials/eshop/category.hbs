@@ -1,18 +1,18 @@
+ <h1 class="feah">Explore the better INDIA</h1>
 {{#each category}}
 <div class="col-md-3">
 {{!-- <img class="zoomImg img-responsive" src="{{ this.imagePath }}" alt="sameer"> --}}
 <div class="panel panel-default">
      {{#each this.details}}
-    <img src="{{this.imagePath}}" alt="Smiley face" height="42" width="42">
+    <img src="{{this.imagePath}}" alt="Smiley face" height="195px;" width="307px;">
     {{/each}}
     <div class="panel-heading">
         <h4 class="panel-title">
             <a href="/category/{{this._id}}?q={{../q}}">{{this._id}}
                 <span class="pull-right">({{this.count}})</span>
             </a>
-        </h4>
+        </h4>     
     </div>
 </div>
 </div>
- 
 {{/each}}

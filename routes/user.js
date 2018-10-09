@@ -292,67 +292,6 @@ router.post('/forgot', function (req, res, next) {
 			});
 		},
 		function (token, user, done) {
-			// let transporter = nodemailer.createTransport({
-			// 	host: 'mail.zo-online.com',
-			// 	port: 587,
-			// 	secure: false, // true for 465, false for other ports
-			// 	auth: {
-			// 		user: 'admin@zo-online.com', // generated ethereal user
-			// 		pass: '22watch22@DS'  // generated ethereal password
-			// 	},
-			// 	tls: {
-			// 		rejectUnauthorized: false
-			// 	}
-			// });
-			//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-			// var smtpTransport = nodemailer.createTransport('SMTP', {
-			//   service: 'SendGrid',
-			//   auth: {
-			//     user: 'admin@zo-online.com',
-			//     pass: '22watch22@DS'
-			//   }
-			// });
-
-			// var smtpConfig = {
-			//     host: 'mail.zo-online.com',
-			//     port: 587,
-			//     secure: true, // use SSL
-			//     auth: {
-			//         user: 'admin@zo-online.com',
-			//         pass: '22watch22@DS'
-			//     }
-			// };
-			// 	var transporter = nodemailer.createTransport(smtpConfig.connectString);
-			//     let mailOptions = {
-			// 		from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-			// 		replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-			// 		to: req.user.email, // list of receivers
-			// 		subject: 'Node Contact Request', // Subject line
-			// 		text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-			// 	 		'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-			// 	 		'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
-			// 	 		'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-			// 	 };
-			// 	var mailOptions = {
-			// 		to: user.email,
-			// 		from: 'sdsameer24@gmail.com',
-			// 		subject: 'Password Reset',
-			// 		text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-			// 			'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-			// 			'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
-			// 			'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-			// 	};
-			// 	transporter.sendMail(mailOptions, function (err) {
-			// 		if (!err) {
-			// 			req.flash('success', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
-			// 			res.redirect('/');
-			// 		} else {
-			// 			req.flash('error', 'A problem has occurred while sending the email.');
-			// 			return res.redirect('/user/forgot');
-			// 		}
-			// 	});
-			
-		
 			let transporter = nodemailer.createTransport({
 				host: 'mail.zo-online.com',
 				port: 587,
@@ -795,11 +734,13 @@ router.get('/signup', function (req, res, next) {
 		"noErrorMsg": !messages,
 	});
 });
+
 router.post('/signup', passport.authenticate('local.signup', {
 	successRedirect: '/user/profile',
 	failureRedirect: '/user/signup',
 	failureFlash: true
 }), function (req, res, next) {
+	alert("signup");
 	meanlogger.log("auth", "signup attempt", req.user);
 	req.session.first_name = req.body.first_name;
 	req.session.last_name = req.body.last_name;
@@ -818,7 +759,50 @@ router.post('/signup', passport.authenticate('local.signup', {
 		res.redirect('/user/profile');
 	}
 });
+//......................................host signup...................................
+// router.get('/hostsignup', function (req, res, next) {
+// 	var messages = req.flash('error');
+// 	var successMsg = req.flash('success')[0];
+// 	var errorMsg = req.flash('error')[0];
+// 	res.render('user/hostsignup', {
+// 		layout: 'eshop/blank',
+// 		//csrfToken: req.csrfToken(),
+// 		"successMsg": successMsg,
+// 		"noMessage": !successMsg,
+// 		"message": messages,
+// 		"errorMsg": messages[0],
+// 		"noErrorMsg": !messages,
+// 	});
+// });
+// router.post('/hostsignup', passport.authenticate('local.signup', {
+	
+// 	successRedirect: '/vendor',
+// 	failureRedirect: '/hostsignup',
+// 	failureFlash: true
+// }), function (req, res, next) {
+// 	//alert("vendor signup");
+// 	console.log("hostsignup"+req.session);
+// 	//meanlogger.log("auth", "signup attempt", req.user);
+// 	req.session.first_name = req.body.first_name;
+// 	req.session.last_name = req.body.last_name;
+// 	req.session.addr1 = req.body.addr1;
+// 	req.session.city = req.body.city;
+// 	req.session.state = req.body.state;
+// 	req.session.email = req.body.email;
+// 	req.session.telephone = req.body.telephone;
+// 	req.session.zipcode = req.body.zipcode;
+// 	req.session.role = req.body.role;
 
+// 	// if (req.session.oldUrl) {
+// 	// 	var oldUrl = req.session.oldUrl
+// 	// 	req.session.oldUrl = null;
+// 	// 	res.redirect(oldUrl);
+// 	// } else {
+// 	// 	res.redirect('/vendor');
+// 	// }
+// });
+	
+//.....................................host signup....................................
 // Mobile register 
 router.post('/register', function (req, res, next) {
 
@@ -866,11 +850,6 @@ router.post('/register', function (req, res, next) {
 			status: false
 		});
 	}
-
-	
-
-
-
 });
 
 router.get('/signin', csrfProtection, function (req, res, next) {

@@ -1,4 +1,4 @@
-var app = angular.module('ThrillWorldAdmin', ['ngRoute']);
+var app = angular.module('ThrillWorldAdmin', ['ngRoute','multipleDatePicker']);
 app.factory("services", ['$http', function($http) {
   var serviceBase = 'api/'
     var obj = {};

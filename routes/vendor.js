@@ -11,6 +11,7 @@ var Event = require('../models/events');
 var async = require('async');
 var Order = require('../models/order');
 var Store = require('../models/store');
+// var mdp = require('multipleDatePicker');
 var sigma = require('sigma');
 var passport = require('passport');
 var moment = require('moment');
@@ -101,7 +102,7 @@ router.get('/', isAdmin, function (req, res, next) {
             // 	products: productChunks,
             // 	user: user
             //   	});
-            res.render('vendor/dashboard', {
+            res.render('vendor/Activity', {
                 layout: 'vendor-page.hbs',
                 products: productChunks,
                 errorMsg: errorMsg,
@@ -312,7 +313,11 @@ router.post('/edit-user', isAdmin, function (req, res, next) {
     });
 
 });
-
+// router.get('/add-product', function (req, res, next) {
+// 	res.render('vendor/add-product'), {
+// 		layout: 'eshop/vendor-page.hbs'
+//     }
+// });
 
 /* Delete Users */
 
@@ -646,6 +651,104 @@ router.get('/products:filter?', isAdmin, function (req, res, next) {
         });
     });
 });
+router.get('/propertydetails',isAdmin, function (req, res, next) {
+    successMsg = req.flash('success')[0];
+    errorMsg = req.flash('error')[0];
+    var adminPageTitle = "My Events";
+    var adminPageUrl = "/vendor/propertydetails";
+
+    var filter = req.query.filter;
+    console.log("Filter " + filter);
+  
+    Product.find(function (err, products) {
+        Category.find({}, function (err, allcats) {
+
+            Stats.getStats(function (err, stats) {
+                if (err) {
+                    console.log(error.message);
+                    res.send(500, "error fetching products");
+                }
+                res.render('vendor/propertydetails', {
+                    adminPageTitle: adminPageTitle,
+                    adminPageUrl: adminPageUrl,
+                    layout: 'vendor-page.hbs',
+                    
+                    noMessage: !successMsg,
+                    noErrorMsg: !errorMsg,
+                    errorMsg: errorMsg,
+                    user: req.user,
+                    stats: stats,
+                    products: products,
+                    allcats: allcats,
+                    isLoggedIn: req.isAuthenticated(),
+                    successMsg: successMsg
+                });
+            })
+        });
+    });
+});
+router.get('/product/:slug3', function (req, res, next) {
+	var slug3 = req.params.slug3;
+	qryFilter = { "name": slug3 };
+
+	// if we have a cart, pass it - otherwise, pass an empty object
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+
+
+	Product.find(qryFilter, function (err, product) {
+		// console.log("Product: " + JSON.stringify(product));
+console.log(product);
+		if (err || product === 'undefined' || product == null) {
+			// replace with err handling
+			var errorMsg = req.flash('error', 'unable to find product');
+			return res.redirect('/');
+		}
+
+		if (!product) {
+			req.flash('error', 'Product is not found.');
+			res.redirect('/');
+		}
+		event = new Event({
+			namespace: 'products',
+			person: {
+				id: req.user._id,
+				first_name: req.user.first_name,
+				last_name: req.user.last_name,
+				email: req.user.email,
+			},
+			action: 'view',
+			thing: {
+				type: "product",
+				id: product._id,
+				name: product.name,
+				category: product.category,
+				Product_Group: product.Product_Group
+			}
+		});
+		event.save(function (err, eventId) {
+			if (err) {
+				////console.log("Error: " + err.message);
+				return -1;
+			}
+			recommendations.GetRecommendations(product, function (err, recommendations) {
+				if (err) {
+					////console.log("error: " + err);
+					req.flash('error', "An error has occurred - " + err.message);
+					return res.redirect('/');
+				}
+				res.render('shop/product', {
+					layout: 'eshop/blank',
+					recommendations: recommendations,
+					product: product,
+					errorMsg: errorMsg,
+					noErrorMsg: !errorMsg
+				});
+			});
+		});
+    });
+});
+
 router.post('/delete-activity', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];

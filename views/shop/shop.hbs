@@ -1,4 +1,5 @@
 <!--shop/shop.hbs-->
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&v=3&libraries=geometry"></script>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -72,6 +73,7 @@
                                     {{else}}
                                     <p class="text-center">
                                         <a href="/user/signin" class="btn btn-primary add-to-cart" role="button">Sign in to Buy</a>
+                                   <p id="demo"></p>
                                     </p>
                                     {{/if}} {{else}}
                                     <!-- if this.isVariable -->
@@ -158,9 +160,46 @@
                                 </div>
                                 <!-- panelbody-->
                             </div>
+                          <p>you are</p> <p id="demo"></p><p>KM away</p>
                             <!-- product wrapper -->
                         </div>
+                        
                         <!-- thumbnail -->
+                        <script>
+                           
+var x = document.getElementById("demo");
+ var distance
+ myFunction();
+
+function myFunction() {
+   
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else { 
+        x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+}
+
+function showPosition(position) {
+    
+    Latitude=position.coords.latitude;
+     
+    Longitude=position.coords.longitude;
+    lat2=this.Latitude;
+    lon2=this.Longitude;
+   var loc1 = new google.maps.LatLng(Latitude, Longitude);
+   var loc2 = new google.maps.LatLng(lat2,lon2);
+
+   console.log(google.maps.geometry.spherical.computeDistanceBetween(loc1,loc2));
+    distance = google.maps.geometry.spherical.computeDistanceBetween(loc1,loc2)
+    
+    x.innerHTML = distance
+}
+ 
+
+
+</script>
+
                     </div>
                     <!-- col md-3 -->
                     {{/each}}
@@ -170,56 +209,5 @@
                 <!-- each products -->
             </div>
         </div>
-        {{!-- <form action='/shop' METHOD='post' encType="multipart/form-data">
-            <li class="list-group-item">
-                <div class="row">
 
-                    <div class="col-md-5">
-                        <label for='Latitude'>Latitude</label>
-                        <input class="form-control" id="lati" name='Latitude' type="text">
 
-                    </div>
-                    <div class="col-md-5">
-                        <label for='Longitude'>Longitude</label>
-                        <input class="form-control" id="long" name='Longitude' type="text">
-
-                    </div>
-                    <div class="col-md-2">
-                        <label for='Auto'>Auto</label>
-                        <a type="button" onclick="getLocation()">
-                            <img height="32px" src="../images/Location-Auto-Locate-Current-Location-Geo-512.png"> </a>
-
-                    </div>
-                </div>
-            </li>
-            <script>
-                var x = document.getElementById("lati");
-                var y = document.getElementById("long");
-
-                function getLocation() {
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(showPosition);
-                    } else {
-                        x.innerHTML = "Geolocation is not supported by this browser.";
-                    }
-                }
-
-                function showPosition(position) {
-                    x.value = position.coords.latitude;
-                    y.value = position.coords.longitude;
-                }
-
-            </script>
-            <script>
-                var auto_refresh = setInterval(function () { submitform(); }, 20000);
-                // Form submit function.
-                function submitform() {
-                    if (validate()) // Calling validate function.
-                    {
-                        alert('autodetecting your location.....');
-                        document.getElementById("form").submit();
-                    }
-                }
-            </script>
-
-        </form> --}}

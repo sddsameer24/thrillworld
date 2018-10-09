@@ -1,0 +1,233 @@
+<div class="product">
+	 {{#each product}}
+	 <div class="container">				
+		 <div class="product-price1">
+			 <div class="top-sing">
+				  <div class="col-md-7 single-top">	
+					 <div class="flexslider">
+							  <ul class="slides">
+								<li data-thumb="{{this.imagePath}}">
+									<div class="thumb-image"> <img src="{{this.imagePathg1}}" data-imagezoom="true" class="img-responsive" alt=""/> </div>
+								</li>
+								<li data-thumb="{{this.imagePathg2}}">
+									 <div class="thumb-image"> <img src="{{this.imagePathg2}}" data-imagezoom="true" class="img-responsive" alt=""/> </div>
+								</li>
+								<li data-thumb="{{this.imagePathg3}}">
+								   <div class="thumb-image"> <img src="{{this.imagePathg3}}"  data-imagezoom="true" class="img-responsive" alt=""/> </div>
+								</li> 
+							  </ul>
+						</div>					 					 
+					 <script src="/javascripts/imagezoom.js"></script>
+						<script defer src="/javascripts/jquery.flexslider.js"></script>
+						<script>
+						// Can also be used with $(document).ready()
+						$(window).load(function() {
+						  $('.flexslider').flexslider({
+							animation: "slide",
+							controlNav: "thumbnails"
+						  });
+						});
+						</script>
+
+				 </div>	
+			     <div class="col-md-5 single-top-in simpleCart_shelfItem">
+					  <div class="product-information">
+            <div class="caption-full">
+                <h3 class="pull-right"><strong>Rs{{money this.price}}</strong></h3>
+                <h4>
+                    <a href="#">{{this.name}}</a>`  
+                </h4>
+				 <div class="text-left">
+                                        {{#if ../../isLoggedIn}}
+                                        <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
+                                            <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
+                                        {{else}}
+                                        <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }} {{/if}}
+                                        <script>
+                                            $(document).ready(function () {
+                                                $('[data-toggle="tooltip"]').tooltip();
+                                            });
+                                        </script>
+                                    </div>
+            </div>
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#description" aria-controls="description" role="tab" data-toggle="tab">Description</a>
+                </li>
+                <li role="presentation">
+                    <a href="#features" aria-controls="features" role="tab" data-toggle="tab">Features</a>
+                </li>
+                <li role="presentation">
+                    <a href="#reviews" aria-controls="reviews" role="tab" data-toggle="tab">Reviews</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="description">
+                    <div class="product-tab-area">
+                        <div class='description'>
+                            {{this.description}}
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane top-10" id="features">
+                    <div class="product-tab-area">
+                        <div class="features">
+                            <ul>
+                                {{#if parking}}
+                                <p>Parking</p>
+                                <li>
+                                    <i class="fa fa-car" aria-hidden="true"></i>
+                                </li>
+                                {{/if}} {{#if Pool}}
+                                <p>Pool</p>
+                                <li>
+                                    <i class="fa fa-car" aria-hidden="true"></i>
+                                </li>
+                                {{/if}} {{#if campfire}}
+                                <p>Campfire</p>
+                                <li>
+                                    <i class="fa fa-free-code-camp" aria-hidden="true"></i>
+                                </li>
+                                {{/if}} {{#if Wifi}}
+                                <p>Wifi</p>
+                                <li>
+                                    <i class="fa fa-wifi" aria-hidden="true"></i>
+                                </li>
+                                {{/if}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="reviews">
+                    <div class="blog-comment">
+                        <h3 class="text-success">Reviews</h3>
+                        <hr/>
+                        <ul class="comments">
+                            {{#each comment}}
+                            <h5>user:{{user.first_name}}</h5>
+                            <h5>comment:{{product.comment}}</h5>
+                            {{/each}}
+                        </ul>
+                    
+                         
+                        <form action='/reviews' method='POST'>
+                            <h3>Share your experience </h3>
+                            <input name="review" value="comment here">
+                            <input  name='first_name' value='{{this.first_name}}'>
+                            <input type="hidden" name='productId' value='{{ this._id }}'>
+                            <input type='submit' value='Submit' class="btn btn-success add-to-cart" role="button">
+                        </form>
+                      
+                        
+                      
+
+                    </div>
+                </div>
+            </div>
+            <p>
+               
+        </div>
+				 </div>
+				 <div class="clearfix"> </div>
+			 </div>
+	     </div>
+         {{!-- <div class="map">
+					   			<iframe src="https://maps.google.co.in/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Lighthouse+Point,+FL,+United+States&amp;aq=4&amp;oq=light&amp;sll={{this.Longitude}},{{this.Latitude}}&amp;sspn=0.04941,0.104628&amp;ie=UTF8&amp;hq=&amp;hnear=Lighthouse+Point,+Broward,+Florida,+United+States&amp;t=m&amp;z=14&amp;ll={{this.Longitude}},{{this.Latitude}}&amp;output=embed"></iframe>
+					   		</div> --}}
+                               <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: -34.397, lng: 150.644},
+          zoom: 8
+        });
+      }
+    </script>
+		 <div class="bottom-prdt">
+			 <div class="btm-grid-sec">
+				 <div class="col-md-2 btm-grid">
+					 <a href="product.html">
+						{{!-- <img src="images/p3.jpg" alt=""/> --}}
+						<h4>Product#1</h4>
+						<span>$1200</span></a>
+				 </div>
+				 <div class="col-md-2 btm-grid">
+					 <a href="product.html">
+	{{!-- <img src="images/p3.jpg" alt=""/> --}}
+						<h4>Product#1</h4>
+						<span>$700</span></a>
+				 </div>
+				 <div class="col-md-2 btm-grid">
+					  <a href="product.html">
+				{{!-- <img src="images/p3.jpg" alt=""/> --}}
+						<h4>Product#1</h4>
+						<span>$1300</span></a>
+				 </div>
+				 <div class="col-md-2 btm-grid">
+					  <a href="product.html">
+					{{!-- <img src="images/p3.jpg" alt=""/> --}}
+						<h4>Product#1</h4>
+						<span>$9000</span></a>
+				 </div>
+				 <div class="col-md-2 btm-grid">
+					  <a href="product.html">
+						{{!-- <img src="images/p3.jpg" alt=""/> --}}
+						<h4>Product#1</h4>
+						<span>$450</span></a>
+				 </div>
+				  <div class="clearfix"></div>
+			 </div>			
+		 </div>
+	 </div>
+	 
+</div>
+<style>
+    
+.thumb-image {
+    width: 290px;
+		height:200px;
+}
+	.single-top {
+    width: 32%;
+	    margin-right: 5em;
+}
+.thumb-image { width: 323px;
+	padding:1em;
+ }
+
+.thumb-image > img { width: 100%; }
+.single-top-in {
+    width: 61%;
+}
+.imagezoom-view{
+position: absolute;
+    left: 650.5px!important;
+    top: 150px!important;
+    width: 495px;
+    height: 390px!important;
+    z-index: 2147483647;
+    overflow: hidden;
+    border: none;
+    background: rgb(0, 0, 0);
+}
+.single-top-in{
+	width:44%;
+}
+</style>

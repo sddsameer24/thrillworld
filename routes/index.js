@@ -16,7 +16,6 @@ var ObjectId = require('mongoose').Types.ObjectId;
 var validator = require('express-validator');
 var util = require('util');
 var Distance = require('geo-distance');
-var NodeGeocoder = require('node-geocoder');
 // var smtpConfig = require('../config/smtp-config.js');
 var taxCalc = require('../local_modules/tax-calculator');
 var shippingCalc = require('../local_modules/shipping-calculator');
@@ -33,6 +32,7 @@ var MongoClient = require('mongodb').MongoClient
 var url = 'mongodb://localhost:27017/hackathon';
 // Use connect method to connect to the Server
 
+
 // Instamojo Setup
 var Insta = require('instamojo-nodejs');
 Insta.setKeys("test_a3c5ddaf80ebda935933f83e311", "test_6d44edf82ee5b6627d0e938218d");
@@ -42,14 +42,14 @@ Insta.isSandboxMode(true);
 
 var options = {
 	provider: 'google',
-   
+
 	// Optional depending on the providers
 	httpAdapter: 'https', // Default
 	apiKey: 'AIzaSyAidN5MszkfMW2VYcES7uoePsX1qQmuG7M', // for Mapquest, OpenCage, Google Premier
 	formatter: null         // 'gpx', 'string', ...
-  };
-   
-  var geocoder = NodeGeocoder(options);
+};
+
+// var geocoder = NodeGeocoder(options);
 // dotenv.load({
 // 	path: '.env.hackathon'
 // });
@@ -90,10 +90,10 @@ router.get('/whypaypal', function (req, res, next) {
 });
 /* host main Info Page */
 router.get('/listing', function (req, res, next) {
-	res.render('shop/listing'),{
+	res.render('shop/listing'), {
 		layout: 'eshop/blank'
 	}
-	
+
 });
 router.get('/signup', function (req, res, next) {
 	var messages = req.flash('error');
@@ -111,89 +111,51 @@ router.get('/signup', function (req, res, next) {
 });
 
 router.get('/shop', function (req, res, next) {
-	
-		Product.find(function (err, products) {
-            productChunks = [];
-            chunkSize = 5;
-            for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
-                productChunks.push(products.slice(i, i + chunkSize))
-            }
-           
-            res.render('shop/shop', {
-                layout: 'eshop/blank',
-                products: productChunks,
-			});
-			// console.log(products);
-			// window.onload = function getLocation() {
-			// 	var Latitude=position.coords.latitude; 
-			// 	var Longitude=position.coords.longitude; 
-			// 	console.log(Longitude);
-			// };
-			// function getLocation() {
-			// 	if (navigator.geolocation) {
-			// 		navigator.geolocation.getCurrentPosition(showPosition);
-			// 	} else { 
-			// 		x.innerHTML = "Geolocation is not supported by this browser.";
-			// 	}
-			// }
-			// function showPosition(){
-			// 	navigator.geolocation.getCurrentPosition(function(position){
-			// 		return Latitude=position.coords.latitude;
-			// 		return Longitude=position.coords.longitude;
-				 
-			// 	});
-			// }
 
-			// var Latitude=getLocation().Latitude;
-			// var Longitude=getLocation().Longitude;
-
-			// console.log(Longitude);
-
-			for (var i = 0; i < products.length; i ++) {
-				 console.log(products[i].Latitude);
-				 var dest = {
-					lat: products[i].Latitude,
-					lon: products[i].Longitude
-				  };
-				  var userloc = {
-					lat: 12,
-					lon: 13
-				  };
-				  var destTouserloc = Distance.between(dest, userloc);
-				  
-				  console.log('' + destTouserloc.human_readable());
-				  
-				// distance.get(
-				// 	{
-				// 	  index: 1,
-				// 	  origin: '12.9245184,77.6347648',
-				// 	  destination: '37.871601,-122.269104'
-				// 	},
-				// 	function(err, data) {
-				// 	  if (err) return console.log(err);
-				// 	  console.log(data);
-				// 	});
-			
-			}
-			
-			// res.products.forEach(function(products) {
-			// 	console.log(products.latitude);
-			//   });
-			
-		
-        });
-	});
-
-// Get Shop Mobile
-router.get('/shop-mobile', function (req, res, next) {
-   
 	Product.find(function (err, products) {
 		productChunks = [];
 		chunkSize = 5;
 		for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
 			productChunks.push(products.slice(i, i + chunkSize))
 		}
-	   
+
+		res.render('shop/shop', {
+			layout: 'eshop/blank',
+			products: productChunks,
+			user: req.user,
+		});
+		console.log(products);
+		
+
+		for (var i = 0; i < products.length; i++) {
+			console.log(products[i].Latitude);
+			var dest = {
+				lat: products[i].Latitude,
+				lon: products[i].Longitude
+			};
+			var userloc = {
+				lat: 12,
+				lon: 13
+			};
+			var destTouserloc = Distance.between(dest, userloc);
+
+			console.log('' + destTouserloc.human_readable());
+
+		}
+
+		});
+});
+
+// Get Shop Mobile
+router.get('/shop-mobile', function (req, res, next) {
+
+	Product.find(function (err, products) {
+		productChunks = [];
+		chunkSize = 5;
+		for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
+			productChunks.push(products.slice(i, i + chunkSize))
+		}
+
 		res.send(products);
 	});
 });
@@ -205,39 +167,39 @@ router.get('/', function (req, res, next) {
 	var payment_id = req.param('payment_id');
 	var payment_request_id = req.param('payment_request_id');
 
-	console.log(orderid + "    " +payment_id+ "    "+payment_request_id);
+	console.log(orderid + "    " + payment_id + "    " + payment_request_id);
 
-	if(payment_id && payment_request_id){
+	if (payment_id && payment_request_id) {
 		console.log("TRUE PAYMENT NEED TO GET DATA");
 
-		Insta.getPaymentDetails(payment_request_id, payment_id, function(error, response) {
+		Insta.getPaymentDetails(payment_request_id, payment_id, function (error, response) {
 			if (error) {
-			  // Some error
+				// Some error
 			} else {
-			  console.log(response);
-			 // response = JSON.parse(response);
-			  console.log(response.payment_request.status);
+				console.log(response);
+				// response = JSON.parse(response);
+				console.log(response.payment_request.status);
 
-			  if(response.payment_request.status=="Completed"){
-				console.log("STORE SUCESS");
-				Order.update({_id:orderid}, 
-					{ "status": "Paid", "paymentId": payment_id}, function (e) {
-						if (e) {
-							error(e);
-							return;
-						}
-				
-					});
-			  }
+				if (response.payment_request.status == "Completed") {
+					console.log("STORE SUCESS");
+					Order.update({ _id: orderid },
+						{ "status": "Paid", "paymentId": payment_id }, function (e) {
+							if (e) {
+								error(e);
+								return;
+							}
+
+						});
+				}
 			}
-		  });
+		});
 
 
-	
-	}else if(req.session.group) {
+
+	} else if (req.session.group) {
 		////console.log(req);
 		// Required ??
-	//	return res.redirect('/group/SIMPLE?q=');
+		//	return res.redirect('/group/SIMPLE?q=');
 	}
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -252,27 +214,27 @@ router.get('/', function (req, res, next) {
 		"name": "Television",
 		"slug": "Television",
 		"attributes": [],
-		"ancestors": [],  
+		"ancestors": [],
 		"__v": 0
 	};
 	Product.aggregate(
 		[
-		// [{
-		// 	$group: {
-		// 		_id: "$category",
-		// 		count: {
-		// 			$sum: 1
-		// 		}
-		// 	}
-		// }, {
-		// 	$sort: {
-		// 		order: 1
-		// 	}
-		// },
-	{$group : {_id : "$category",count: {$sum: 1}}},
-    {$lookup: {from: "categories", localField: "_id", foreignField: "slug", as: "details"}},
-    
-	],
+			// [{
+			// 	$group: {
+			// 		_id: "$category",
+			// 		count: {
+			// 			$sum: 1
+			// 		}
+			// 	}
+			// }, {
+			// 	$sort: {
+			// 		order: 1
+			// 	}
+			// },
+			{ $group: { _id: "$category", count: { $sum: 1 } } },
+			{ $lookup: { from: "categories", localField: "_id", foreignField: "slug", as: "details" } },
+
+		],
 		function (err, category) {
 			if (frontPageCategory) {
 				categCondition = {
@@ -298,7 +260,6 @@ router.get('/', function (req, res, next) {
 					}
 				}
 			} else {
-				// categCondition = { $sample: { size: 40 } };
 				categCondition = {
 					"$match": {
 						"$and": [{
@@ -330,14 +291,14 @@ router.get('/', function (req, res, next) {
 			// MongoClient.connect(url, function(err, db) {
 
 			// 	var cursor = db.collection('category').find();
-			
+
 			// 	cursor.each(function(err, doc) {
-			
+
 			// 		console.log(doc);
-			
+
 			// 	});
 			// });
-			
+
 			Product.find({
 				"$and": [{
 					"status": {
@@ -365,7 +326,7 @@ router.get('/', function (req, res, next) {
 					for (var i = (4 - chunkSize); i < docs.length; i += chunkSize) {
 						productChunks.push(docs.slice(i, i + chunkSize));
 					}
-					
+
 					res.render('shop/eshop', {
 						layout: 'eshop/eshop',
 						title: title,
@@ -391,85 +352,150 @@ router.get('/', function (req, res, next) {
 
 					});
 					console.log(category);
-					
-					
+
+
 				});
 		});
+});
+router.get('/hostsignup', function (req, res, next) {
+	var messages = req.flash('error');
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	res.render('user/hostsignup', {
+		layout: 'eshop/blank',
+		//csrfToken: req.csrfToken(),
+		"successMsg": successMsg,
+		"noMessage": !successMsg,
+		"message": messages,
+		"errorMsg": messages[0],
+		"noErrorMsg": !messages,
+	});
+});
+router.post('/hostsignup', passport.authenticate('local.signup', {
+	successRedirect: '/vendor',
+	failureRedirect: '/hostsignup',
+	failureFlash: true
+}), function (req, res, next) {
+	alert("signup");
+	meanlogger.log("auth", "signup attempt", req.user);
+	req.session.first_name = req.body.first_name;
+	req.session.last_name = req.body.last_name;
+	req.session.addr1 = req.body.addr1;
+	req.session.city = req.body.city;
+	req.session.state = req.body.state;
+	req.session.email = req.body.email;
+	req.session.telephone = req.body.telephone;
+	req.session.zipcode = req.body.zipcode;
+	req.session.role = req.body.role;
+
+	console.log("REGI host");
+	if (req.body.email || req.body.password || req.body.first_name || req.body.last_name || req.body.addr1 || req.body.city || req.body.addr2 || req.body.state || req.body.zipcode || req.body.telephone) {
+		var newUser = new User();
+		console.log("REGI host AGAIN");
+		newUser.email = req.body.email;
+		// newUser.password = newUser.encryptPassword(password);
+		newUser.password = req.body.password;
+		newUser.role = req.body.role;
+		newUser.first_name = req.body.first_name;
+		newUser.last_name = req.body.last_name;
+		newUser.addr1 = req.body.addr1;
+		newUser.addr2 = req.body.addr2;
+		newUser.city = req.body.city;
+		newUser.state = req.body.state;
+		newUser.zipcode = req.body.zipcode;
+		newUser.telephone = req.body.telephone;
+		newUser.role = 'vendor';
+		newUser.save(function (err, result) {
+			if (err) {
+				res.redirect('/hostsignup');
+				//console.log('User unsuccessfully registered');
+			}
+			console.log('User successfully registered');
+			console.log(newUser);
+			req.flash('success', 'User successfully registered check your mail for vendor access.');
+			res.redirect('/vendor');
+		});
+	} else {
+		res.send({
+			message: "Error",
+			status: false
+		});
+	}
 });
 
 /* Get sale items */
-router.get('/sale', function (req, res, next) {
+// router.get('/sale', function (req, res, next) {
 
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	var navcats = req.app.get('navcats');
-	var navgroups = req.app.get('navgroups');
+// 	var successMsg = req.flash('success')[0];
+// 	var errorMsg = req.flash('error')[0];
+// 	var navcats = req.app.get('navcats');
+// 	var navgroups = req.app.get('navgroups');
 
-	// ////console.log("Local navcats " + res.locals.navcats);
-
-	var tutorial = req.params.tutorial;
-	if (tutorial == 1) {
-		req.session.tutorial = true;
-	} else {
-		req.session.tutorial = false;
-	}
-	Product.aggregate(
-		[{
-			$match: {
-				"$sale_attributes.sale": true
-			}
-		}, {
-			$group: {
-				_id: "$Product_Group",
-				count: {
-					$sum: 1
-				}
-			}
-		}, {
-			$sort: {
-				_id: 1
-			}
-		}],
-		function (err, Product_Group) {
-			if (frontPageCategory) {
-				categCondition = {
-					category: frontPageCategory
-				};
-			} else {
-				categCondition = {};
-			}
-			Product.Product.find(categCondition, function (err, docs) {
-				productChunks = [];
-				productJSON = [];
-				chunkSize = 4;
-				for (var i = (4 - chunkSize); i < docs.length; i += chunkSize) {
-					productChunks.push(docs.slice(i, i + chunkSize));
-				}
-				res.render('shop/eshop', {
-					layout: 'eshop/eshop',
-					title: title,
-					navcats: req.app.get('navcats'),
-					navgroups: req.app.get('navgroups'),
-					salegroups: req.app.get('salegroups'),
-					showRecommendations: eval(res.locals.showRecommendations),
-					keywords: Config.keywords,
-					products: productChunks,
-					recommended: docs,
-					Product_Group: Product_Group,
-					user: req.user,
-					navcats: navcats,
-					errorMsg: errorMsg,
-					noErrorMsg: !errorMsg,
-					successMsg: successMsg,
-					viewDocuments: viewDocuments,
-					tutorial: tutorial,
-					noMessage: !successMsg,
-					viewTour: viewTour,
-					isLoggedIn: req.isAuthenticated()
-				});
-			});
-		});
-});
+	// console.log("Local navcats " + res.locals.navcats);
+-
+	// var tutorial = req.params.tutorial;
+// 	if (tutorial == 1) {
+// 		req.session.tutorial = true;
+// 	} else {
+// 		req.session.tutorial = false;
+// 	}
+// 	Product.aggregate(
+// 		[{
+// 			$match: {
+// 				"$sale_attributes.sale": true
+// 			}
+// 		}, {
+// 			$group: {
+// 				_id: "$Product_Group",
+// 				count: {
+// 					$sum: 1
+// 				}
+// 			}
+// 		}, {
+// 			$sort: {
+// 				_id: 1
+// 			}
+// 		}],
+// 		function (err, Product_Group) {
+// 			if (frontPageCategory) {
+// 				categCondition = {
+// 					category: frontPageCategory
+// 				};
+// 			} else {
+// 				categCondition = {};
+// 			}
+// 			Product.Product.find(categCondition, function (err, docs) {
+// 				productChunks = [];
+// 				productJSON = [];
+// 				chunkSize = 4;
+// 				for (var i = (4 - chunkSize); i < docs.length; i += chunkSize) {
+// 					productChunks.push(docs.slice(i, i + chunkSize));
+// 				}
+// 				res.render('shop/eshop', {
+// 					layout: 'eshop/eshop',
+// 					title: title,
+// 					navcats: req.app.get('navcats'),
+// 					navgroups: req.app.get('navgroups'),
+// 					salegroups: req.app.get('salegroups'),
+// 					showRecommendations: eval(res.locals.showRecommendations),
+// 					keywords: Config.keywords,
+// 					products: productChunks,
+// 					recommended: docs,
+// 					Product_Group: Product_Group,
+// 					user: req.user,
+// 					navcats: navcats,
+// 					errorMsg: errorMsg,
+// 					noErrorMsg: !errorMsg,
+// 					successMsg: successMsg,
+// 					viewDocuments: viewDocuments,
+// 					tutorial: tutorial,
+// 					noMessage: !successMsg,
+// 					viewTour: viewTour,
+// 					isLoggedIn: req.isAuthenticated()
+// 				});
+// 			});
+// 		});
+// });
 
 
 /* Mobile Get sale items */
@@ -506,13 +532,13 @@ router.get('/sale-mobile', function (req, res, next) {
 			}
 		}],
 		function (err, Product_Group) {
-			if(err){
+			if (err) {
 				res.send({
-					message:  "Error",
+					message: "Error",
 					status: false
 				});
 
-			}else{
+			} else {
 
 				if (frontPageCategory) {
 					categCondition = {
@@ -522,14 +548,14 @@ router.get('/sale-mobile', function (req, res, next) {
 					categCondition = {};
 				}
 				Product.Product.find(categCondition, function (err, docs) {
-	
-					if(err){
+
+					if (err) {
 						res.send({
-							message:  "Error",
+							message: "Error",
 							status: false
 						});
-	
-					}else{
+
+					} else {
 						productChunks = [];
 						productJSON = [];
 						chunkSize = 4;
@@ -538,11 +564,11 @@ router.get('/sale-mobile', function (req, res, next) {
 						}
 						res.send(productChunks);
 					}
-					
+
 				});
 
 			}
-			
+
 		});
 });
 
@@ -568,7 +594,7 @@ router.get('/group-mobile/:slug?', function (req, res, next) {
 				////console.log("Error finding group " + group_slug);
 				req.flash('error', 'Cannot find group');
 				res.send({
-					message:  "Error",
+					message: "Error",
 					status: false
 				});
 
@@ -577,7 +603,7 @@ router.get('/group-mobile/:slug?', function (req, res, next) {
 				////console.log("Error finding group " + group_slug);
 				req.flash('error', 'Cannot find group');
 				res.send({
-					message:  "Error",
+					message: "Error",
 					status: false
 				});
 
@@ -894,6 +920,57 @@ router.get('/category/', function (req, res, next) {
 	})
 })
 
+router.get('/frontpage', function (req, res, next) {
+	var group_slug = 'High-Altitude';
+	req.session.group = req.params.slug; // Save Group for later
+	var q = req.query.q;
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	if (group_slug == '' || !group_slug) {
+		var group_search = {}
+	} else {
+		var group_search = {
+			category: group_slug
+		}
+	}
+	Product.find(
+		group_search,
+		function (err, products) {
+			if (err) {
+				////console.log("Error finding group " + group_slug);
+				req.flash('error', 'Cannot find group');
+				return res.redirect('/');
+			}
+			if (!products) {
+				////console.log("Error finding group " + group_slug);
+				req.flash('error', 'Cannot find group');
+				return res.redirect('/');
+			}
+			productChunks = [];
+			chunkSize = 4;
+			for (var i = (4 - chunkSize); i < products.length; i += chunkSize) {
+				productChunks.push(products.slice(i, i + chunkSize))
+			};
+			products = productChunks;
+			res.render('shop/eshop', {
+				layout: 'eshop/eshop',
+				navcats: req.app.get('navcats'),
+				navgroups: req.app.get('navgroups'),
+				group: High-Altitude,
+				viewDocuments: viewDocuments,
+				products: productChunks,
+				productChunks: productChunks,
+				user: req.user,
+				q: q,
+				errorMsg: errorMsg,
+				noErrorMsg: !errorMsg,
+				successMsg: successMsg,
+				noMessage: !successMsg,
+				isLoggedIn: req.isAuthenticated()
+			});
+		});
+});
+
 router.get('/category/:slug?', function (req, res, next) {
 	var group_slug = req.params.slug;
 	req.session.group = req.params.slug; // Save Group for later
@@ -994,7 +1071,7 @@ router.get('/category-mobile/:slug', function (req, res, next) {
 					////console.log("Error finding category " + category_slug);
 					req.flash('error', 'Cannot find category');
 					res.send({
-						message:  "Error",
+						message: "Error",
 						status: false
 					});
 				}
@@ -1002,7 +1079,7 @@ router.get('/category-mobile/:slug', function (req, res, next) {
 					////console.log("Error finding category " + category_slug);
 					req.flash('error', 'Cannot find category');
 					res.send({
-						message:  "Error",
+						message: "Error",
 						status: false
 					});
 				}
@@ -1087,7 +1164,7 @@ router.get('/category-mobile/:slug', function (req, res, next) {
 							////console.log("Error: " + err.message);
 							req.flash('error', 'Problem finding products');
 							res.send({
-								message:  "Error",
+								message: "Error",
 								status: false
 							});
 						}
@@ -1143,7 +1220,7 @@ router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 			noMessage: true
 		};
 		req.flash('error', 'Invalid email address.  Please re-enter.');
-		return res.redirect('/');
+		return res.redirect('/shopping-cart');
 	}
 
 	var option = req.body.option || null;
@@ -1153,7 +1230,7 @@ router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 		if (err || product === 'undefined' || product == null) {
 			// replace with err handling
 			var errorMsg = req.flash('error', 'unable to find product');
-			return res.redirect('/');
+			return res.redirect('/shopping-cart');
 		}
 		if (product.Product_Group == 'DONATION') {
 			////console.log("PRICE: " + parseFloat(price * 100));
@@ -1167,7 +1244,7 @@ router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 
 		if (added) {
 			req.flash('error', added.message);
-			res.redirect('/');
+			return res.redirect('/shopping-cart');
 		} else {
 			cart.totalShipping = 0;
 			req.session.cart = cart;
@@ -1186,7 +1263,7 @@ router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 					res.redirect('/group/' + req.session.group);
 				}
 			}
-			res.redirect('/');
+			return res.redirect('/shopping-cart');
 		}
 		// });
 	});
@@ -1218,7 +1295,7 @@ router.get('/add-to-cart/:id/', function (req, res, next) {
 			// store cart in session
 
 			req.flash('success', 'Item Successfully added to cart.' + JSON.stringify(cart));
-			res.redirect('/');
+			return res.redirect('/shopping-cart');
 		});
 	});
 });
@@ -1564,7 +1641,7 @@ router.post('/create', function (req, res, next) {
 	if (!req.session.cart) {
 		return res.redirect('/shopping-cart');
 	}
-	
+
 
 	var cart = new Cart(req.session.cart);
 	products = cart.generateArray();
@@ -1641,6 +1718,8 @@ router.post('/create', function (req, res, next) {
 		}
 		orders.push(order);
 	}
+
+
 	if (method === 'instamojo') {
 		create_payment.payer.payment_method = 'instamojo';
 		return_url = "http://" + req.headers.host + "/execute";
@@ -1664,6 +1743,7 @@ router.post('/create', function (req, res, next) {
 		create_payment.custom = custom;
 		create_payment.payer.funding_instruments = funding_instruments;
 	}
+
 	// order comnfirmation mail sending  ..........................................
 	const output = `
 		<p>Booking Confirmation</p>
@@ -1701,17 +1781,17 @@ router.post('/create', function (req, res, next) {
 	// send mail with defined transport object
 	transporter.sendMail(mailOptions, (error, info) => {
 		if (error) {
-			
-			console.log("ERROR"+error);
+
+			console.log("ERROR" + error);
 			return ////console.log(error);
 		}
-		
-		
-		console.log("INFo"+info);
+
+
+		console.log("INFo" + info);
 		console.log('Message sent: %s', info.messageId);
 		console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 		req.flash('success', "SENT MAIL, KINDLY CHECK!");
-	//	res.render('contact', { msg: 'Email has been sent' });
+		//	res.render('contact', { msg: 'Email has been sent' });
 	});
 	// end of order comnfirmation mail sending  ..........................................
 	// order comnfirmation sms sending  ..........................................
@@ -1719,39 +1799,39 @@ router.post('/create', function (req, res, next) {
 	console.log(number);
 	// const text = req.body.text;
 	const text = "Booking successfull Thank You, Thrillworld";
-	console.log("NUMBRER"+number);
-	console.log("NUMBRER"+number[0]+number[1]);
-	console.log("TEXT"+text);
+	console.log("NUMBRER" + number);
+	console.log("NUMBRER" + number[0] + number[1]);
+	console.log("TEXT" + text);
 
-	if(number.length<=10){
-		 number="91"+number;
-		console.log("NEW"+ number);
+	if (number.length <= 10) {
+		number = "91" + number;
+		console.log("NEW" + number);
 	}
+// .......................................{{nexmo commented}}........................................................................................
 
 	// Init Nexmo
-const nexmo = new Nexmo({
-	apiKey: '38d2edbc',
-	apiSecret: 'grzR4xHCJDGhDqi2'
-	}, {debug: true})
+	// const nexmo = new Nexmo({
+	// 	apiKey: '38d2edbc',
+	// 	apiSecret: 'grzR4xHCJDGhDqi2'
+	// }, { debug: true })
+	// nexmo.message.sendSms(
+	// 	'917795565771', number, text, { type: 'unicode' },
+	// 	(err, responseData) => {
+	// 		if (err) {
+	// 			console.log("SMS" + err);
+	// 		} else {
+	// 			console.dir(responseData);
+	// 			// Get data from response
+	// 			const data = {
+	// 				id: responseData.messages[0]['your booking successful'],
+	// 				number: responseData.messages[0]['number']
+	// 			}
 
-	nexmo.message.sendSms(
-		'917795565771', number, text, { type: 'unicode' },
-		(err, responseData) => {
-			if (err) {
-				console.log("SMS"+err);
-			} else {
-				console.dir(responseData);
-				// Get data from response
-				const data = {
-					id: responseData.messages[0]['your booking successful'],
-					number: responseData.messages[0]['number']
-				}
-
-				// Emit to the client
-			//	io.emit('smsStatus', data);
-			}
-		}
-	);
+	// 			// Emit to the client
+	// 			//	io.emit('smsStatus', data);
+	// 		}
+	// 	}
+	// );
 	// end of order comnfirmation sms sending  ..........................................
 	//
 	// Send the payment request to paypal
@@ -1783,7 +1863,7 @@ const nexmo = new Nexmo({
 		status: 'pending',
 		total: parseFloat(cart.grandTotal)
 	});
-	order.save(function (err,orderdata) {
+	order.save(function (err, orderdata) {
 		if (err) {
 			////console.log("Error: " + err.message)
 			req.flash('error', 'Unable to save order... ' + err.message);
@@ -1795,36 +1875,36 @@ const nexmo = new Nexmo({
 
 		var data = new Insta.PaymentData();
 
-	data.purpose = "Test";            // REQUIRED
-	data.amount = parseFloat(cart.grandTotal);                  // REQUIRED
-	data.currency                = 'INR';
-	data.buyer_name              = req.user.first_name;
-	data.email                   = req.user.email;
-	data.phone                   = req.user.telephone;
-	data.send_sms                = 'True';
-	data.send_email              = 'True';
-	data.allow_repeated_payments = 'False';
-	data.setRedirectUrl("http://localhost:3000/?orderid="+orderdata.id+"&");
+		data.purpose = "Test";            // REQUIRED
+		data.amount = parseFloat(cart.grandTotal);                  // REQUIRED
+		data.currency = 'INR';
+		data.buyer_name = req.user.first_name;
+		data.email = req.user.email;
+		data.phone = req.user.telephone;
+		data.send_sms = 'True';
+		data.send_email = 'True';
+		data.allow_repeated_payments = 'False';
+		data.setRedirectUrl("http://localhost:3000/?orderid=" + orderdata.id + "&");
 
-	Insta.createPayment(data, function(error, response) {
-  	if (error) {
-	// some error
-	console.log("instamojo ERROR"+error);
- 	 } else {
-    // Payment redirection link at response.payment_request.longurl
-		
-		response = JSON.parse(response);
-		
-		//console.log(response.success);
-		console.log("instamojo SUCESS"+response);
-		// console.log(response.payment_request.longurl);
-		//console.log("REQUIRED URL"+JSON.stringify(response));
-	//	console.log(response['payment_request']);
-	//	console.log(JSON.parse(response['payment_request']));
-		return res.redirect(response.payment_request.longurl);
-		
- 	 }
-	});
+		Insta.createPayment(data, function (error, response) {
+			if (error) {
+				// some error
+				console.log("instamojo ERROR" + error);
+			} else {
+				// Payment redirection link at response.payment_request.longurl
+
+				response = JSON.parse(response);
+
+				//console.log(response.success);
+				console.log("instamojo SUCESS" + response);
+				// console.log(response.payment_request.longurl);
+				//console.log("REQUIRED URL"+JSON.stringify(response));
+				//	console.log(response['payment_request']);
+				//	console.log(JSON.parse(response['payment_request']));
+				return res.redirect(response.payment_request.longurl);
+
+			}
+		});
 		// return res.redirect('/');
 	})
 
@@ -1897,7 +1977,7 @@ const nexmo = new Nexmo({
 	// });
 
 
-	
+
 });
 
 router.get('/like/:id', isLoggedIn, function (req, res, next) {
@@ -1940,12 +2020,12 @@ router.get('/like/:id', isLoggedIn, function (req, res, next) {
 });
 router.post('/reviews', isLoggedIn, function (req, res, next) {
 	var theId = new ObjectId(req.params.id);
-	
-	
+
+
 	console.log(req.body.review);
 	// console.log(product._id);
-	var review={
-		"review":req.body.review,
+	var review = {
+		"review": req.body.review,
 	};
 
 	Product.findOneAndUpdate({
@@ -2243,7 +2323,7 @@ router.post('/search', function (req, res, next) {
 								meanlogger.log('search', 'Searched for  ' + q, req.user);
 							}
 							res.render('shop/eshop', {
-								layout: 'eshop/eshop',
+								layout: 'eshop/blank',
 								title: title,
 								showRecommendations: eval(res.locals.showRecommendations),
 								keywords: Config.keywords,
@@ -2280,21 +2360,21 @@ router.post('/search', function (req, res, next) {
 });
 
 router.get('/product/:slug3', function (req, res, next) {
-	
+
 	var slug3 = req.params.slug3;
 
-	
 
-	qryFilter = {"_id": slug3};
+
+	qryFilter = { "_id": slug3 };
 
 	// if we have a cart, pass it - otherwise, pass an empty object
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-	
-	
-	Product.find(qryFilter , function (err, product) {
+
+
+	Product.find(qryFilter, function (err, product) {
 		// console.log("Product: " + JSON.stringify(product));
-	
+
 		if (err || product === 'undefined' || product == null) {
 			// replace with err handling
 			var errorMsg = req.flash('error', 'unable to find product');
@@ -2305,93 +2385,6 @@ router.get('/product/:slug3', function (req, res, next) {
 			req.flash('error', 'Product is not found.');
 			res.redirect('/');
 		}
-		//................................................................
-	// var geocoder = new google.maps.Geocoder();
-	// var address = "San Diego, CA, 92111"; //Add your address here, all on one line.
-	// addresses = ["San Diego, CA 92111",
-	// 						 "Cancun, Mexico",
-	// 						 "Sydney, Australia"];
-	
-	// var latitude;
-	// var longitude;
-	// var color = "#85cad1"; //Set your tint color. Needs to be a hex value.
-	
-	// function getGeocode() {
-	// 	geocoder.geocode( { 'address': address}, function(results, status) {
-	// 		if (status == google.maps.GeocoderStatus.OK) {
-	// 			latitude = results[0].geometry.location.lat();
-	// 			longitude = results[0].geometry.location.lng(); 
-	// 			initGoogleMap();
-	// 		} 
-	// 	});
-	// }
-	
-	// function initGoogleMap() {
-	// 	var styles = [
-	// 		{
-	// 		  stylers: [
-	// 			{ saturation: -100 }
-	// 		  ]
-	// 		}
-	// 	];
-		
-	// 	var options = {
-	// 		mapTypeControlOptions: {
-	// 			mapTypeIds: ['Styled']
-	// 		},
-	// 		center: new google.maps.LatLng(latitude, longitude),
-	// 		zoom: 2,
-	// 		scrollwheel: false,
-	// 		navigationControl: false,
-	// 		mapTypeControl: false,
-	// 		zoomControl: true,
-	// 		disableDefaultUI: true,	
-	// 		mapTypeId: 'Styled'
-	// 	};
-	// 	var div = document.getElementById('googleMap');
-	// 	var map = new google.maps.Map(div, options);
-	// 	marker = new google.maps.Marker({
-	// 		map:map,
-	// 		draggable:false,
-	// 		animation: google.maps.Animation.DROP,
-	// 		position: new google.maps.LatLng(latitude,longitude)
-	// 	});
-	// 	var styledMapType = new google.maps.StyledMapType(styles, { name: 'Styled' });
-	// 	map.mapTypes.set('Styled', styledMapType);
-		
-	// 	var infowindow = new google.maps.InfoWindow({
-	// 		  content: "<div class='iwContent'>"+address+"</div>"
-	// 	});
-	// 	google.maps.event.addListener(marker, 'click', function() {
-	// 		window.location = "http://local.wordpress.dev/blog";
-	// 	});
-	// 	google.maps.event.addListener(marker, 'mouseover', function() {
-	// 		infowindow.open(map,marker);
-	// 	});
-			
-		
-	// 	bounds = new google.maps.LatLngBounds(
-	// 	  new google.maps.LatLng(-84.999999, -179.999999), 
-	// 	  new google.maps.LatLng(84.999999, 179.999999));
-	
-	// 	rect = new google.maps.Rectangle({
-	// 		bounds: bounds,
-	// 		fillColor: color,
-	// 		fillOpacity: 0.2,
-	// 		strokeWeight: 0,
-	// 		map: map
-	// 	});
-	
-	// 	var listener = google.maps.event.addListener(map, "idle", function() { 
-	// 		$('#map-banner').show();
-	// 		$("#map-header").fitText(1.2, { minFontSize: '20px', maxFontSize: '400px'});
-	// 	  google.maps.event.removeListener(listener); 
-	// 	});
-	
-	// }
-	// google.maps.event.addDomListener(window, 'load', getGeocode);
-	//................................................................
-		
 		event = new Event({
 			namespace: 'products',
 			person: {
@@ -2411,18 +2404,17 @@ router.get('/product/:slug3', function (req, res, next) {
 		});
 		event.save(function (err, eventId) {
 			if (err) {
-				////console.log("Error: " + err.message);
 				return -1;
 			}
 			recommendations.GetRecommendations(product, function (err, recommendations) {
 				if (err) {
-					////console.log("error: " + err);
 					req.flash('error', "An error has occurred - " + err.message);
 					return res.redirect('/');
 				}
 				res.render('shop/product', {
 					layout: 'eshop/blank',
 					recommendations: recommendations,
+					user: req.user,
 					product: product,
 					errorMsg: errorMsg,
 					noErrorMsg: !errorMsg
@@ -2430,6 +2422,40 @@ router.get('/product/:slug3', function (req, res, next) {
 			});
 		});
 	});
+	router.post('/product-mobile:slug3', function (req, res, next) {
+          console.log("events");
+		var slug3 = req.params.slug3;
+		qryFilter = { "_id": slug3 };
+	
+		// if we have a cart, pass it - otherwise, pass an empty object
+		var successMsg = req.flash('success')[0];
+		var errorMsg = req.flash('error')[0];
+		Product.find(qryFilter, function (err, product) {
+			// console.log("Product: " + JSON.stringify(product));
+	
+			if (err || product === 'undefined' || product == null) {
+				// replace with err handling
+				res.send({
+					message:  "Error",
+					status: false
+				});
+			}
+	
+			if (!product) {
+				res.send({
+					message:  "no such event",
+					status: false
+				});
+			}else{
+				req.flash('success');
+				res.send(product);
+			}
+			
+		});
+		});
+	// .................................................
+	
+	
 });
 
 router.get('/privacy', function (req, res, next) {
