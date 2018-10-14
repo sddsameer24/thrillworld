@@ -75,6 +75,7 @@
                                 </thead>
                                 <tbody>
                                     {{#each orders }}
+                                  
                                     <tr class="odd gradeX">
                                         <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
                                         <td>{{formatDate this.created "MM/DD/YYYY"}}
@@ -103,7 +104,7 @@
                                                             <br>{{this.ticket_email}} {{/if}} {{#if this.option }} Option: {{this.option}}
                                                             {{/if}}
                                                         </td>
-                                                        <td>{{money this.product_price}}
+                                                        <td>{{money this.product_price}}</td>
                                                     </tr>
                                                     {{/each}}
                                                 </tbody>
@@ -396,7 +397,7 @@
             'dataType': "json",
             'success': function (data) {
                 json = data;
-                //console.log(json);
+                ////console.log(json);
                 $.each(data, function (i, product) {
                     $('#product').append($('<option>').text(product.name).attr('value', product.sku));
                 });

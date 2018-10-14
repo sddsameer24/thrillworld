@@ -66,10 +66,10 @@ var categoryrecord = {
 
 var app = express();
 if (process.env.NODE_ENV) {
-  // //console.log("USING .env.hackathon-" + process.env.NODE_ENV);
+  // ////console.log("USING .env.hackathon-" + process.env.NODE_ENV);
   dotenv.load({ path: '.env.hackathon-' + process.env.NODE_ENV });
 } else {
-  //console.log("USING .env.hackathon" );
+  ////console.log("USING .env.hackathon" );
   dotenv.load({ path: '.env.hackathon' });
 }
 
@@ -82,14 +82,14 @@ var options = {
 mongoose.Promise = global.Promise;
 // mongoose.connect(process.env.MONGODB_URI,options);
 if (process.env.MONGO_USER) {
-  // //console.log("USING MONGO_USER " + process.env.MONGO_USER);
+  // ////console.log("USING MONGO_USER " + process.env.MONGO_USER);
   var URI = 'mongodb://' + process.env.MONGO_USER + ':' + process.env.MONGO_PASS + '@localhost:27017/hackathon';
   mongoose.connect(URI, options);
 } else {
   mongoose.connect('mongodb://localhost:27017/hackathon');
 }
 mongoose.connection.on('error', () => {
-  //console.log('%s MongoDB connection error in app.js Please make sure MongoDB is running.', chalk.red('✗'));
+  ////console.log('%s MongoDB connection error in app.js Please make sure MongoDB is running.', chalk.red('✗'));
   process.exit();
 });
 require('./config/passport');
@@ -180,7 +180,7 @@ app.use(function(req,res,next) {
           res.send('1000','Error retrieving categories.');
         }
         app.set('navcats',navcats);
-        // //console.log("Navcats in app.js " + JSON.stringify(navcats));
+        // ////console.log("Navcats in app.js " + JSON.stringify(navcats));
         if (process.env.theme) {
           res.locals.themeurl = '/stylesheets/themes/' + process.env.theme + '.css'
         } else {
@@ -214,7 +214,7 @@ app.use(function(req,res,next) {
         }],
         function(err, salegroups) {
           if (err) {
-            //console.log("Err fetching salegroups");
+            ////console.log("Err fetching salegroups");
 
           }
             app.set('salegroups',salegroups);

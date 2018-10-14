@@ -8,11 +8,7 @@ var mongodb = require("mongodb");
 dotenv.load({
 	path: '.env.hackathon'
 });
-
-
-
 var Schema = mongoose.Schema;
-
 var orderSchema = new Schema({
 	user: {
 		type: Object,
@@ -62,6 +58,26 @@ var orderSchema = new Schema({
 		type: String,
 		required: false
 	},
+	arrival: {
+		type: Date,
+		default: Date.now
+	},
+	adult: {
+		type: String,
+		required: false
+	},
+	children: {
+		type: String,
+		required: false
+	},
+	kids: {
+		type: String,
+		required: false
+	},
+	depart: {
+		type: Date,
+		default: Date.now
+	},
 	paymentId: {
 		type: String,
 		required: false
@@ -80,13 +96,13 @@ var orderSchema = new Schema({
 		required: false
 	},
 	total: {
-    type: Number,
-    default: 0
-  },
+		type: Number,
+		default: 0
+	},
 	paidBy: {
 		type: String,
 		default: 'Instamojo',
-		enum: ['Paypal','Instamojo','Cash', 'Check'],
+		enum: ['Paypal', 'Instamojo', 'Cash', 'Check'],
 		required: true
 	},
 	note: {
@@ -99,7 +115,7 @@ var orderSchema = new Schema({
 });
 
 /* This method called when an order is saved */
-orderSchema.post('save', function(doc) {
+orderSchema.post('save', function (doc) {
 	/* generate recommendations collection */
 	/* Loop through all cart products:
 	   1. Find a purchase record for the product.
@@ -114,9 +130,9 @@ orderSchema.post('save', function(doc) {
 
 	var MongoClient = mongodb.MongoClient;
 
-	MongoClient.connect(dbHost, function(err, db) {
+	MongoClient.connect(dbHost, function (err, db) {
 		if (err) {
-			//console.log("Error: " + errror.message);
+			////console.log("Error: " + errror.message);
 		}
 		var dateObj = new Date();
 		var month = dateObj.getUTCMonth(); //months from 1-12
@@ -132,35 +148,35 @@ orderSchema.post('save', function(doc) {
 		};
 		// incupdate.$inc['months.' + months[month] + '.sales'] = cart.total;
 		incupdate.$inc['ytd'] = doc.cart.total;
-		db.collection('sales', function(err, collection) {
+		db.collection('sales', function (err, collection) {
 			if (err) {
-				//console.log('error ' + error.message);
+				////console.log('error ' + error.message);
 			}
 			collection.update({
-					year: year
-				},
+				year: year
+			},
 				incupdate, {
 					upsert: true
 				},
-				function(err, result) {
+				function (err, result) {
 					if (err) {
-						//console.log("Error " + err.message);
+						////console.log("Error " + err.message);
 					}
-					//console.log("RESULT: " + JSON.stringify(result));
+					////console.log("RESULT: " + JSON.stringify(result));
 				});
 		})
 
 	});
 });
 
-this.createPurchase = function(product, othersArray, cb) {
+this.createPurchase = function (product, othersArray, cb) {
 	purchase = new Purchase({
 		code: product,
 		alsoPurchased: othersArray
 	});
-	purchase.save(function(err) {
+	purchase.save(function (err) {
 		if (err) {
-			//console.log('error: ' + err.message);
+			////console.log('error: ' + err.message);
 		}
 	})
 	return cb();

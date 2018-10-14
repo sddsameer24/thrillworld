@@ -190,7 +190,7 @@ function showPosition(position) {
    var loc1 = new google.maps.LatLng(Latitude, Longitude);
    var loc2 = new google.maps.LatLng(lat2,lon2);
 
-   console.log(google.maps.geometry.spherical.computeDistanceBetween(loc1,loc2));
+   //console.log(google.maps.geometry.spherical.computeDistanceBetween(loc1,loc2));
     distance = google.maps.geometry.spherical.computeDistanceBetween(loc1,loc2)
     
     x.innerHTML = distance

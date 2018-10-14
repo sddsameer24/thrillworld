@@ -2,6 +2,11 @@
     {{#each product}}
     <div class="container">
         <div class="card">
+            <h2 class="p-0 m-0" style="text-align:center"; id="product-title">{{this.name}}</h2>
+            <p> </p>
+            <p></p>
+            <p> </p>
+            <p></p>
             <div class="card-body row">
                 <div class="col-sm-12 col-md-6" id="image-container">
                     <div id="main-img">
@@ -37,13 +42,11 @@
                             </script>
                         </div>
                     </span>
-
-
-
-
                 </div>
+
                 <div class="col-sm-12 col-md-6" id="product-information">
-                    <h4 class="p-0 m-0" id="product-title">{{this.name}}</h4>
+                 
+                    
                     <span id="product-short">
                         <small>{{this.description}}</small>
                     </span>
@@ -52,73 +55,119 @@
                             <span id="old-price" class="text-danger">
                                 <strike></strike>
                             </span> &nbsp; &nbsp;
-                            <h5 id="price">Rs{{money this.price}}</h5>
+                            <p>Price Per Person : Rs
+                                <span id="ticket_price">{{money this.price}}</span>
+                            </p>
                         </div>
                     </div>
-                    <div id="product-variables">
-                        <label>Number of Guest</label>
-                        <br>
-                        <select class="form-control" class="mb-2">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                            <option>6</option>
-                        </select>
-                        
-                        <span class="align-middle">
-                            <label for="subscribe-btn">Read all terms and conditions</label>
-                            <input type="checkbox" id="subscribe-btn"> &nbsp;
-                        </span>
-                        <div id="text">
-                            <ul>
-                                <li>policy statement</li>
-                                <li>Confirmation Policy</li>
-                                <li>Cancellation Policy</li>
-                                <li>Refund Policy</li>
-                            </ul>
-                         
+                    <span class="align-middle">
+                        <label for="subscribe-btn">Read all terms and conditions</label>
+                        <input type="checkbox" id="subscribe-btn"> &nbsp;
+                    </span>
+                    <div id="text">
+                        <ul>
+                            <li>policy statement</li>
+                            <li>Confirmation Policy</li>
+                            <li>Cancellation Policy</li>
+                            <li>Refund Policy</li>
+                        </ul>
+
+                    </div>
+                    <form action='/add-to-cart' method='POST'>
+                        <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
+                        <input type='hidden' id='type' name='type' value='DONATION'>
+                        <h3 class="product-price text-center">
+                            <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
+                        </h3>
+                        <p class="text-center">
+                            <input type='submit' value='Add to Cart' class="btn btn-primary add-to-cart" role="button">
+                        </p>
+                    </form>
+                    <div id="map" style="width:100%;height:200px;"></div>
+                    {{!--
+
+                    <div class="row">
+                        <div class="col-md-6" id="arrival">
+                            <label>Date of arrival</label>
+                            <input type="date" name="arrival"> &nbsp;
+                        </div>
+                        <div class="col-md-6" id="depart">
+                            <label>Date of depart</label>
+                            <input type="date" name="depart"> &nbsp;
                         </div>
                     </div>
-                       <small>
-                                <label>Apply coupon</label>
-                                <input>
-                                <button type="submit">Apply</button>
-                            </small>
-                    <div id="add-to-cart" class="mt-2">
-                        <button action="/add-to-cart" class="add-to-cart"> Add to Wishlist</button>
+                    <script>
+                        function calc() {
+                            var children = 0;
+                            var adults = document.getElementById("adult").value;
+                            var children = document.getElementById("children").value;
+                            var price = document.getElementById("ticket_price").innerHTML;
+                            var noTickets = parseFloat(adults) + parseFloat(children);
+                            var total = parseFloat(price) * noTickets;
+                            if (!isNaN(total))
+                                document.getElementById("total").innerHTML = total
+                        }
+                    </script>
+
+                    <div class="row">
+                        <div class="col-md-4" id="arrival">
+                            <label>Number of Adult</label>
+                            <input type="number" id="adult" oninput="calc()" name="count">
+                        </div>
+                        <div class="col-md-4" id="depart">
+                            <label>Number of Children</label>
+                            <input type="number" id="children" oninput="calc()" name="count">
+                        </div>
+                        <div class="col-md-4" id="depart">
+                            <label>Kids below 5</label>
+                            <input type="number" name="count" data-toggle="tooltip" data-placement="top" title="Its free but we do need count">
+                        </div>
                     </div>
-                     <div id="add-to-cart" class="mt-2">
-                        <button action="/add-to-cart" class="add-to-cart"> Book now</button>
-                    </div>
+
+                    <h2>
+                        <p>Subtotal :
+                            <b>Rs
+                                <span id="total" name="subtotal" class="user-location">0</span>
+                            </b>
+                        </p>
+                    </h2>
+                    <span class="align-middle">
+                        <label for="subscribe-btn">Read all terms and conditions</label>
+                        <input type="checkbox" id="subscribe-btn"> &nbsp;
+                    </span>
+                    <div id="text">
+                        <ul>
+                            <li>policy statement</li>
+                            <li>Confirmation Policy</li>
+                            <li>Cancellation Policy</li>
+                            <li>Refund Policy</li>
+                        </ul>
+
+                    </div> --}}
                 </div>
-
+                {{!--
+                <input type='submit' href="/add-to-cart" class="btn btn-primary add-to-cart" role="button"> --}}
             </div>
-            <div id="map" style="width:100%;height:500px;"></div>
-
-
-<script>
-function myMap() {
-  var myCenter = new google.maps.LatLng({{this.Latitude}},{{this.Longitude}});
-  var mapCanvas = document.getElementById("map");
-  var mapOptions = {center: myCenter, zoom: 5};
-  var map = new google.maps.Map(mapCanvas, mapOptions);
-  var marker = new google.maps.Marker({position:myCenter});
-  marker.setMap(map);
-   var infowindow = new google.maps.InfoWindow({
-    content:"{{this.title}}" 
-  });
-  infowindow.open(map,marker);
-}
-</script>
-
-
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAidN5MszkfMW2VYcES7uoePsX1qQmuG7M&callback=myMap"></script>
+        </div>
+        
 
         </div>
+        <script>
+            function myMap() {
+                var myCenter = new google.maps.LatLng({{ this.Latitude }}, { { this.Longitude } });
+            var mapCanvas = document.getElementById("map");
+            var mapOptions = { center: myCenter, zoom: 5 };
+            var map = new google.maps.Map(mapCanvas, mapOptions);
+            var marker = new google.maps.Marker({ position: myCenter });
+            marker.setMap(map);
+            var infowindow = new google.maps.InfoWindow({
+                content: "{{this.title}}"
+            });
+            infowindow.open(map, marker);
+}
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAidN5MszkfMW2VYcES7uoePsX1qQmuG7M&callback=myMap"></script>
         <!-- end card -->
-        
     </div>
     <!-- end container-->
     {{/each}}
@@ -143,8 +192,7 @@ function myMap() {
 
     .card {
         background: #fff;
-        width: 90%;
-        margin: 40px auto
+        width: 100%;
     }
 
     .card>#image-container {
@@ -171,9 +219,9 @@ function myMap() {
     }
 
     .card #image-container #thumbnail-container div.thumb {
-        width: 35px;
-        height: 35px;
-        margin: 2px;
+        width: 99px;
+        height: 75px;
+        margin: 5px;
         border: 1px solid rgba(0, 0, 0, 0.25);
         box-sizing: border-box;
     }

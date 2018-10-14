@@ -22,7 +22,7 @@ dotenv.load({
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
-  //console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+  ////console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   logger.log('error','%s MongoDB connection error. Please make sure MongoDB is running.');
   process.exit();
 });
@@ -44,11 +44,11 @@ async.times(100,function(i,next) {
         }
     }], function(err, user) {
         if (err) {
-            //console.log(err);
+            ////console.log(err);
             return -1;
         }
         if (!user || user===undefined) {
-            //console.log("user not found");
+            ////console.log("user not found");
             return -1;
         }
         Product.aggregate([{
@@ -64,7 +64,7 @@ async.times(100,function(i,next) {
             }
         }], function(err, product) {
             if (err || !product) {
-                //console.log(err);
+                ////console.log(err);
                 return -1;
             }
             action = actions[randInterval(0,actions.length-1)];
@@ -88,7 +88,7 @@ async.times(100,function(i,next) {
             });
             event.save(function(err,eventId) {
                 if (err) {
-                    //console.log("Error: " + err.message);
+                    ////console.log("Error: " + err.message);
                     return -1;
                 }
             });

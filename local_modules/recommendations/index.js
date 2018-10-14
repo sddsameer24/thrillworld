@@ -38,7 +38,7 @@ module.exports = {
 		var numProducts = Math.floor(Math.random() * (5 - 2 + 1)) + 2;
 		Product.aggregate([{ $sample: { size: numProducts }}], function(err,prodArray) {
 			if (err) {
-				//console.log(err);
+				////console.log(err);
 			}
 			var similar = []
 			for(prod in prodArray) {
@@ -54,7 +54,7 @@ module.exports = {
 			var numTrending = Math.floor(Math.random() * (6 - 2 + 1)) + 2;
 			Product.aggregate([{ $sample: { size: numTrending }}], function(err,prodArray) {
 				if (err) {
-					//console.log(err);
+					////console.log(err);
 				}
 				var trending = []
 				for(prod in prodArray) {
@@ -70,7 +70,7 @@ module.exports = {
 				var numViewed = Math.floor(Math.random() * (8 - 2 + 1)) + 2;
 				Product.aggregate([{ $sample: { size: numViewed }}], function(err,prodArray) {
 					if (err) {
-						//console.log(err);
+						////console.log(err);
 					}
 					var viewed = []
 					for(prod in prodArray) {
@@ -86,7 +86,7 @@ module.exports = {
 					var numPop = Math.floor(Math.random() * (10 - 2 + 1)) + 2;
 					Product.aggregate([{ $sample: { size: numViewed }}], function(err,prodArray) {
 						if (err) {
-							//console.log(err);
+							////console.log(err);
 						}
 						var popular = []
 						for(prod in prodArray) {
@@ -117,7 +117,7 @@ module.exports = {
 								query: ''
 							}
 						}
-						////console.log(recommendations);
+						//////console.log(recommendations);
 						callback(null,recommendations);
 					});
 				});

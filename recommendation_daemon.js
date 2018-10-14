@@ -12,7 +12,7 @@ mongoose.Promise = global.Promise;
 Product.find({}, function(err,products) {
 	/* get long list of productsIds */
 	if (err) {
-		//console.log(err);
+		////console.log(err);
 	}
     var allProducts = {};
     var cnt = 0;
@@ -22,7 +22,7 @@ Product.find({}, function(err,products) {
       customers = product;
 	});
 
-    //console.log('Total Products: ' + cnt );
+    ////console.log('Total Products: ' + cnt );
 
 })
 
@@ -65,7 +65,7 @@ module.exports = {
 		var numProducts = Math.floor(Math.random() * (5 - 2 + 1)) + 2;
 		Product.aggregate([{ $sample: { size: numProducts }}], function(err,prodArray) {
 			if (err) {
-				//console.log(err);
+				////console.log(err);
 			}
 			var similar = []
 			for(prod in prodArray) {
@@ -81,7 +81,7 @@ module.exports = {
 			var numTrending = Math.floor(Math.random() * (6 - 2 + 1)) + 2;
 			Product.aggregate([{ $sample: { size: numTrending }}], function(err,prodArray) {
 				if (err) {
-					//console.log(err);
+					////console.log(err);
 				}
 				var trending = []
 				for(prod in prodArray) {
@@ -97,7 +97,7 @@ module.exports = {
 				var numViewed = Math.floor(Math.random() * (8 - 2 + 1)) + 2;
 				Product.aggregate([{ $sample: { size: numViewed }}], function(err,prodArray) {
 					if (err) {
-						//console.log(err);
+						////console.log(err);
 					}
 					var viewed = []
 					for(prod in prodArray) {
@@ -113,7 +113,7 @@ module.exports = {
 					var numPop = Math.floor(Math.random() * (10 - 2 + 1)) + 2;
 					Product.aggregate([{ $sample: { size: numViewed }}], function(err,prodArray) {
 						if (err) {
-							//console.log(err);
+							////console.log(err);
 						}
 						var popular = []
 						for(prod in prodArray) {
@@ -132,7 +132,7 @@ module.exports = {
 							'viewed': viewed,
 							'popular': popular
 						}
-						//console.log(recommendations);
+						////console.log(recommendations);
 						callback(null,recommendations);
 					});
 				});

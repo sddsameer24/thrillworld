@@ -21,7 +21,7 @@ dotenv.load({
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
-  //console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+  ////console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   logger.log('error','%s MongoDB connection error. Please make sure MongoDB is running.');
   process.exit();
 });
@@ -48,11 +48,11 @@ async.times(100, function(i, next) {
         }
     }], function(err, users) {
         if (err) {
-            //console.log(err);
+            ////console.log(err);
             return -1;
         }
         if (!users) {
-            //console.log("users not found");
+            ////console.log("users not found");
             return -1;
         }
         var usersArray = [];
@@ -63,7 +63,7 @@ async.times(100, function(i, next) {
         /* This array will be referenced by the recommendation engine        */
 
     	var code = parseInt(1000 + i);
-        //console.log("Code " + code);
+        ////console.log("Code " + code);
         var color = faker.commerce.color();
         var materialBrand = faker.commerce.productMaterial();
         pgroup = Math.floor((Math.random() * product_groups.length - 1) + 1);
@@ -85,7 +85,7 @@ async.times(100, function(i, next) {
         price = Math.floor((Math.random() * 100000 - 1) + 1);
         cost = Math.floor((Math.random() * price) + (price / 2));
         code = 'cam' + Math.floor(i);
-        //console.log(code);
+        ////console.log(code);
         product = new Product({
             code: code,
             inventory: {
@@ -135,7 +135,7 @@ async.times(100, function(i, next) {
         });
         product.save(function(err, productId) {
             if (err) {
-                //console.log('error: ', err.message);
+                ////console.log('error: ', err.message);
             }
             var i = 0;
             async.each(usersArray, function (user, next) {
@@ -159,7 +159,7 @@ async.times(100, function(i, next) {
 });
 
 function getUsers() {
-    //console.log("In getUsers");
+    ////console.log("In getUsers");
     var numUsers = Math.floor(Math.random() * (10 - 2 + 1)) + 2;
     User.aggregate([{
         $sample: {
@@ -171,11 +171,11 @@ function getUsers() {
         }
     }], function(err, users) {
         if (err) {
-            //console.log(err);
+            ////console.log(err);
             return -1;
         }
         if (!users) {
-            //console.log("users not found");
+            ////console.log("users not found");
             return -1;
         }
         var usersArray = [];

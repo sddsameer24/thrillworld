@@ -1,93 +1,121 @@
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="/admin">{{title}}</a>
         <ul class="nav navbar-nav navbar-right">
             <li>
             </li>
-           
             {{#if allcats }}
-            <li class="dropdown">
+            <li class="dropdown-btn">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
                     <span class="fa fa-caret-down" title="User Menu" aria-hidden="true"></span>&nbsp;Categories
+
+            </li>
+            {{/if}}
+            <li>
+                <a id="shopping-cart" href="/shopping-cart">
+                    <i class="fa fa-shopping-cart" aria-hidden="true"></i>&nbsp;Shopping Cart {{#if session.cart.totalQty }}
+                    <span class="badge btn-success">{{ session.cart.totalQty }}</span>
+                    {{/if}}
                 </a>
-                <ul class="dropdown-menu">
-                    <li><a href="/">All</a></li>
-                    {{#each allcats}}
-                    <li><a href="/category/{{this._id}}">{{this._id}}</a></li>
-                {{/each}}
-                    <li>
-                        <button class="btn btn-success btn-sm" data-title="View" data-toggle="modal" data-target="#category-modal">View Category Document <span class="glyphicon glyphicon-search"></span>
-                        </button>
-                    </p>
-                <!-- Add Dialog -->
-                </li>
+            </li>
         </ul>
-    </li>
-{{/if}}
-<li>
-    <a id="shopping-cart" href="/shopping-cart">
-        <i class="fa fa-shopping-cart" aria-hidden="true"></i>&nbsp;Shopping Cart
-        {{#if session.cart.totalQty }}
-        <span class="badge btn-success">{{ session.cart.totalQty }}</span>
-    {{/if}}
-</a>
-</li>
-</ul>
-</div>
-<!-- Top Menu Items -->
-<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-<div class="collapse navbar-collapse navbar-ex1-collapse">
-<ul class="nav navbar-nav side-nav">
-<li class="active">
-<a href="index.html"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
-</li>
-<li>
-<a href="/admin/orders"><i class="fa fa-fw fa-bar-chart-o"></i> Orders</a>
-</li>
-<li>
-<a href="/admin/products"><i class="fa fa-fw fa-table"></i> Products</a>
-</li>
-<li>
-<a href="/admin/categories"><i class="fa fa-fw fa-table"></i> Categories</a>
-</li>
-<li>
-<a href="/admin/users"><i class="fa fa-fw fa-user"></i> Users</a>
-</li>
-<li>
-<a href="/admin/test"><i class="fa fa-fw fa-user"></i> Testimonials</a>
-</li>
-<li>
-<a href="/admin/stores"><i class="fa fa-fw fa-map-marker"></i> Stores</a>
-</li>
-<li>
-<a href="/admin/relations"><i class="fa fa-fw fa-map-marker"></i> Relations</a>
-</li>
-<li>
-<a href="/admin/activities"><i class="fa fa-fw fa-table"></i> Activity Log</a>
-</li>
-<li>
-<a href="/admin/events"><i class="fa fa-fw fa-table"></i> Event Log</a>
-</li>
-<li>
-    <a href="javascript:;" data-toggle="collapse" data-target="#export" class="" aria-expanded="true"><i class="fa fa-fw fa-arrows-v"></i> Export <i class="fa fa-fw fa-caret-down"></i></a>
-    <ul id="export" class="collapse in" aria-expanded="true" style="">
-        <li><a href="/exporter/products"><i class="fa fa-fw fa-file-excel-o"></i> Products</a></li>
-        <li><a href="/exporter/categories"><i class="fa fa-fw fa-file-excel-o"></i> Categories</a></li> 
-        <li><a href="/exporter/orders"><i class="fa fa-fw fa-file-excel-o"></i> Orders</a></li> 
-        <li><a href="/exporter/users"><i class="fa fa-fw fa-file-excel-o"></i> Users</a></li> 
-    </ul>
-</li>
+    </div>
+    <!-- Top Menu Items -->
+    <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav side-nav">
+            <li class="active">
+                <a href="/admin">
+                    <i class="fa fa-fw fa-dashboard"></i> Activity</a>
+            </li>
+            <li>
+                <a href="/admin/orders">
+                    <i class="fa fa-fw fa-bar-chart-o"></i>Booking</a>
+            </li>
+            <li>
+                <a href="/admin/products">
+                    <i class="fa fa-window-restore"></i>Property Details</a>
+            </li>
+            <li>
+                <a href="/admin/products">
+                    <i class="fa fa-fw fa-table"></i>Availability</a>
+            </li>
+            <li>
+                <a href="/admin/products">
+                    <i class="fa fa-commenting"></i>Messages</a>
+            </li>
+            <li>
+                <a href="/admin/categories">
+                    <i class="fa fa-database"></i> Categories</a>
+            </li>
+            <li>
+                <a href="/admin/users">
+                    <i class="fa fa-fw fa-user"></i> Users</a>
+            </li>
+            <li>
+                <a href="/admin/test">
+                    <i class="fa fa-fw fa-user"></i> Testimonials</a>
+            </li>
+            <li>
+                <a href="/admin/stores">
+                    <i class="fa fa-fw fa-map-marker"></i>Events Map</a>
+            </li>
+            {{!--
+            <li>
+                <a href="/admin/relations">
+                    <i class="fa fa-fw fa-map-marker"></i> Relations</a>
+            </li> --}}
+            <li>
+                <a href="/admin/activities">
+                    <i class="fa fa-users"></i> Users Log</a>
+            </li>
+            <li>
+                <a href="/admin/events">
+                    <i class="fa fa-user-circle"></i>Account</a>
+            </li>
+            <li>
+                <a href="/admin/products">
+                    <i class="fa fa-fw fa-table"></i> Add Event</a>
+            </li>
+            <li>
+                <a href="/admin/setup">
+                    <i class="fa fa-wrench"></i> Settings</a>
+
+                <li>
+                    <li>
+                        <a href="javascript:;" data-toggle="collapse" data-target="#export" class="" aria-expanded="true">
+                            <i class="fa fa-fw fa-arrows-v"></i> Export
+                            <i class="fa fa-fw fa-caret-down"></i>
+                        </a>
+                        <ul id="export" class="collapse in" aria-expanded="true" style="">
+                            <li>
+                                <a href="/exporter/products">
+                                    <i class="fa fa-fw fa-file-excel-o"></i> Products</a>
+                            </li>
+                            <li>
+                                <a href="/exporter/categories">
+                                    <i class="fa fa-fw fa-file-excel-o"></i> Categories</a>
+                            </li>
+                            <li>
+                                <a href="/exporter/orders">
+                                    <i class="fa fa-fw fa-file-excel-o"></i> Orders</a>
+                            </li>
+                            <li>
+                                <a href="/exporter/users">
+                                    <i class="fa fa-fw fa-file-excel-o"></i> Users</a>
+                            </li>
+                        </ul>
+                    </li>
 
 
-</ul>
+        </ul>
 
-</div>
-<!-- /.navbar-collapse -->
+    </div>
+    <!-- /.navbar-collapse -->
 </nav>

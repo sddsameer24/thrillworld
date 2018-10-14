@@ -25,7 +25,7 @@ module.exports = {
 		var err = null;
 		act.save(act, function(err, data) {
 			if (err) {
-				//console.log("ERROR: " + err.message);
+				////console.log("ERROR: " + err.message);
 			}
 			if (activity=='view')
 			return;

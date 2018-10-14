@@ -25,7 +25,7 @@ dotenv.load({
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
-	//console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+	////console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
 	logger.log('error', '%s MongoDB connection error. Please make sure MongoDB is running.');
 	process.exit();
 });
@@ -50,7 +50,7 @@ async.times(20, function (i, next) {
 				}
 			}],
 			function (err, randdocs) {
-				//console.log(JSON.stringify(randdocs));
+				////console.log(JSON.stringify(randdocs));
 				title = 'ThrillWorld Store ' + randdocs[0].properties.storeNumber;
 				slug = title.toString().toLowerCase()
 					.replace(/\s+/g, '-') // Replace spaces with -
@@ -95,7 +95,7 @@ async.times(20, function (i, next) {
 				});
 				store.save(function (err, productId) {
 					if (err) {
-						//console.log('error: ', err.message);
+						////console.log('error: ', err.message);
 					}
 
 					done++;

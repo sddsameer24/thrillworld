@@ -21,7 +21,7 @@ dotenv.load({
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
-	//console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+	////console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
 	logger.log('error', '%s MongoDB connection error. Please make sure MongoDB is running.');
 	process.exit();
 });
@@ -45,7 +45,7 @@ async.times(100, function(i, next) {
 		}
 	}], function(err, usersArray) {
 		if (err) {
-			//console.log(err);
+			////console.log(err);
 		}
 		var items = []
 		for (user in usersArray) {
@@ -115,7 +115,7 @@ async.times(100, function(i, next) {
 
 		product.save(function(err, productId) {
 			if (err) {
-				//console.log('error: ', err.message);
+				////console.log('error: ', err.message);
 			}
 			for (user in usersArray) {
 				items.push(usersArray[user]._id);

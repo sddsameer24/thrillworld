@@ -38,8 +38,8 @@ function populateMarkers(dataType) {
         });
         $.each(data, function(i, ob) {
             var pos = {lat: this.location.coordinates[1], lng: this.location.coordinates[0]};
-            //console.log("Position: " + JSON.stringify(pos));
-            //console.log(this.location.coordinates[0]);
+            ////console.log("Position: " + JSON.stringify(pos));
+            ////console.log(this.location.coordinates[0]);
             var marker = new google.maps.Marker({
                 map: map,
                 //position: new google.maps.LatLng(this.location.coordinates[1], this.location.coordinates[0]),

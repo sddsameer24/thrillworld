@@ -45,7 +45,7 @@ async.times(100, function(i, next) {
 		}
 	], function(err,usersArray) {
 		if (err) {
-			//console.log(err);
+			////console.log(err);
 			process.abort();
 		}
 		var items = []
@@ -119,7 +119,7 @@ async.times(100, function(i, next) {
 		});
 		product.save(function(err,productId) {
 			if (err) {
-				//console.log('error: ',err.message);
+				////console.log('error: ',err.message);
 			}
 			for(user in usersArray) {
 				items.push(usersArray[user]._id);

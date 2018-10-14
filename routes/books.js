@@ -26,7 +26,7 @@ router.get('/', function(req, res, next) {
             req.flash('error','Error while retrieving products.');
             return res.redirect('/books');
         }
-        //console.log("orders: " + books);
+        ////console.log("orders: " + books);
         Product.find(function(err, books) {
             // productChunks = [];
             // chunkSize = 5;
@@ -69,9 +69,9 @@ router.post('/product/:id', function(req, res, next) {
     });
     product.save(function(err) {
         if (!err) {
-            //console.log("updated");
+            ////console.log("updated");
         } else {
-            //console.log(err);
+            ////console.log(err);
         }
         res.render('admin/index', {
             products: productChunks,
@@ -96,9 +96,9 @@ var totalSales = function() {
         }
     }, function(err, doc) {
     	if (err) {
-    		//console.log("err: " + err.message);
+    		////console.log("err: " + err.message);
     	}
-        //console.log('Total ', doc[0].Total);
+        ////console.log('Total ', doc[0].Total);
 		return doc;
 
     });

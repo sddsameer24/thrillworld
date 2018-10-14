@@ -1,4 +1,4 @@
-<div class="container">
+
 <div class="row">
     <h1 class="page-header">
         {{adminPageTitle}}
@@ -14,22 +14,23 @@
     </ol>
 </div>
 
-<form action='/vendor/add-product' METHOD='post' onload="myFunction()" encType="multipart/form-data">
+<form action='/vendor/add-product' METHOD='post' encType="multipart/form-data">
     <div class="modal-body">
         <div class="form-group">
             <ul class="list-group">
                 <li class="list-group-item">
                     <label for='name'>Name</label>
-                    <input class="form-control" name='name' type="text" placeholder="">
+                    <input class="form-control" name='name' onchange="myFunction()" type="text" placeholder="">
                 </li>
             </ul>
         </div>
         <div class="form-group">
             <ul class="list-group">
                 <li class="list-group-item">
-                    <label for='title'>SKU/Code</label>
-                    <input class="form-control" name='code' id='demo' disable placeholder="">
+                    <label >SKU/Code</label>
+                    <input class="form-control" readonly name='code' id="demo" placeholder="">
                 </li>
+           
                 <li class="list-group-item">
                     <label for='title'>Title</label>
                     <input class="form-control" name='title' type="text" placeholder="">
@@ -40,23 +41,19 @@
                 </li>
                 <li class="list-group-item">
                     <div class="row">
-
                         <div class="col-md-5">
                             <label for='Latitude'>Latitude</label>
                             <input class="form-control" id="lati" name='Latitude' type="text">
-
                         </div>
                         <div class="col-md-5">
                             <label for='Longitude'>Longitude</label>
                             <input class="form-control" id="long" name='Longitude' type="text">
-
                         </div>
-
                         <div class="col-md-2">
                             <label for='Auto'>Auto</label>
                             <a type="button" onclick="getLocation()">
-                                <img height="32px" src="../images/Location-Auto-Locate-Current-Location-Geo-512.png"> </a>
-
+                                <img height="45px" src="../images/Location-Auto-Locate-Current-Location-Geo-512.png">
+                            </a>
                         </div>
                         {{!-- position.coords.longitude --}}
                     </div>
@@ -182,7 +179,7 @@
             <span class="glyphicon glyphicon-plus"></span> Add</button>
     </div>
 </form>
-</div>
+
 <script>
     function myFunction() {
         var x = document.getElementById("demo")

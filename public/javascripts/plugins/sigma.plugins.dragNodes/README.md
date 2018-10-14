@@ -31,6 +31,6 @@ Exemple of event binding:
 
 ````javascript
 dragListener.bind('startdrag', function(event) {
-  //console.log(event);
+  ////console.log(event);
 });
 ````

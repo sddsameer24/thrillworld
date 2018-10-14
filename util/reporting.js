@@ -20,10 +20,10 @@ this.getBalance = function(req, res, next) {
         }
     }], function(err, result) {
         if (err) {
-            //console.log(err);
+            ////console.log(err);
             return;
         }
-        //console.log(result);
+        ////console.log(result);
     });
 }
 var totalTicketsSold = function(req, res, next) {

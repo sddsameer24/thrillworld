@@ -26,6 +26,11 @@ var uuid = require('uuid');
 var Config = require('../config/config');
 var Stats = require('../local_modules/stats');
 var meanlogger = require('../local_modules/meanlogger');
+var q = new Date();
+var m = q.getMonth();
+var d = q.getDay();
+var y = q.getFullYear();
+var date = new Date(y, m, d);
 // var csrfProtection = csrf();
 
 // router.use(csrfProtection);
@@ -35,7 +40,7 @@ router.get('/stores', function (req, res, next) {
     successMsg = req.flash('success')[0];
     var tot = totalSales(function (err, next) {
         if (err) {
-            console.log(err.message);
+            //console.log(err.message);
             return res.error('err');
         }
     });
@@ -62,7 +67,7 @@ router.get('/relations', function (req, res, next) {
     successMsg = req.flash('success')[0];
     var tot = totalSales(function (err, next) {
         if (err) {
-            console.log(err.message);
+            //console.log(err.message);
             return res.error('err');
         }
     });
@@ -85,7 +90,7 @@ router.get('/', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     var tot = totalSales(function (err, next) {
         if (err) {
-            console.log(err.message);
+            //console.log(err.message);
             return res.error('err');
         }
     });
@@ -125,25 +130,25 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
         var allOrders = true;
         var pendingOrders = false;
         var pickedUpOrders = false;
-        console.log(req.user._id);
-        
+        //console.log(req.user._id);
 
-        qryFilter =  { "cart.vendor_id": req.user._id.toString()} ;
-        
+
+        qryFilter = { "cart.vendor_id": req.user._id.toString() };
+
     } else {
         if (filter == 'pendingOrders') {
-            console.log("pending");
+            //console.log("pending");
             var allOrders = false;
             var pendingOrders = true;
             var pickedUpOrders = false;
-            qryFilter = { "cart.vendor_id": req.user._id.toString()},{ receipt_status: 'pending' }, { receipt_status: 'partial' }, { receipt_status: 'New' }, { receipt_status: '' },{"user.id":req.user._id };
+            qryFilter = { "cart.vendor_id": req.user._id.toString() }, { receipt_status: 'pending' }, { receipt_status: 'partial' }, { receipt_status: 'New' }, { receipt_status: '' }, { "user.id": req.user._id };
         } else {
             if (filter == 'pickedUpOrders' || filter == 'complete') {
-                console.log("picked");
+                //console.log("picked");
                 var allOrders = false;
                 var pendingOrders = false;
                 var pickedUpOrders = true;
-                qryFilter = { receipt_status: 'complete' },{"user.id":req.user._id}, { "cart.vendor_id": req.user._id.toString()};
+                qryFilter = { receipt_status: 'complete' }, { "user.id": req.user._id }, { "cart.vendor_id": req.user._id.toString() };
             }
         }
     }
@@ -155,10 +160,14 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
     Order.find(qryFilter).sort({ "created": -1 }).exec(function (err, orders) {
         Stats.getStats(function (err, stats) {
             if (err) {
-                console.log(error.message);
+                //console.log(error.message);
                 res.send(500, "error fetching orders");
             }
-            console.log("ALL ORDERS" +orders);
+            // console.log(orders.created);
+            // this.orders.forEach(function (orders) {
+            //     console.log(item.created);
+            // });
+
             res.render('vendor/orders', {
                 adminPageTitle: adminPageTitle,
                 adminPageUrl: adminPageUrl,
@@ -175,6 +184,7 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
                 orders: orders,
                 isLoggedIn: req.isAuthenticated(),
                 successMsg: successMsg
+
             });
         })
 
@@ -204,7 +214,7 @@ router.post('/update-order', isAdmin, function (req, res, next) {
     var order_id = req.body._id;
     var query = { '_id': order_id };
     Order.findOne({ _id: order_id }, function (err, order) {
-      //  console.log("Order: " + order);
+        console.log("Order: " + order);
         if (err) {
             res.send(500, 'Error deleting order.');
         }
@@ -222,7 +232,7 @@ router.post('/update-order', isAdmin, function (req, res, next) {
 router.get('/users:filter?', isAdmin, function (req, res, next) {
 
     var filter = req.query.filter;
-    console.log("Filter " + filter);
+    //console.log("Filter " + filter);
     qryFilter = {};
 
     if (!filter || filter == 'allOrders') {
@@ -250,11 +260,11 @@ router.get('/users:filter?', isAdmin, function (req, res, next) {
     var adminPageTitle = "Users";
     var adminPageUrl = "/vendor/users";
 
-    console.log("Stats in route " + JSON.stringify(res.locals.stats));
+    //console.log("Stats in route " + JSON.stringify(res.locals.stats));
     User.find(qryFilter, function (err, users) {
         Stats.getStats(function (err, stats) {
             if (err) {
-                console.log(error.message);
+                //console.log(error.message);
                 res.send(500, "error fetching orders");
             }
             res.render('vendor/users', {
@@ -286,7 +296,7 @@ router.post('/edit-user', isAdmin, function (req, res, next) {
     user = {};
     User.findById(req.params.id, function (err, user) {
         if (err) {
-            console.log("ERROR: " + err.message);
+            //console.log("ERROR: " + err.message);
         } else {
             if (!user) {
                 user = new User({
@@ -304,20 +314,16 @@ router.post('/edit-user', isAdmin, function (req, res, next) {
         }
         user.save(function (err) {
             if (!err) {
-                console.log("updated");
+                //console.log("updated");
             } else {
-                console.log(err);
+                //console.log(err);
             }
             res.redirect('/vendor/users');
         })
     });
 
 });
-// router.get('/add-product', function (req, res, next) {
-// 	res.render('vendor/add-product'), {
-// 		layout: 'eshop/vendor-page.hbs'
-//     }
-// });
+
 
 /* Delete Users */
 
@@ -339,7 +345,7 @@ router.get('/tickets', isAdmin, function (req, res, next) {
 
     Ticket.find({}, function (err, tickets) {
         if (err) {
-            console.log("Error: " + err.message);
+            //console.log("Error: " + err.message);
         }
         res.render('vendor/tickets', {
             layout: 'vendor-page.hbs',
@@ -358,7 +364,7 @@ router.get('/tickets', isAdmin, function (req, res, next) {
 /* display logger activities */
 router.get('/activities:filter?', isAdmin, function (req, res, next) {
     var filter = req.query.filter;
-    console.log("Filter " + filter);
+    //console.log("Filter " + filter);
     if (!filter || filter == 'allOrders') {
         var allOrders = true;
         var pendingOrders = false;
@@ -387,7 +393,7 @@ router.get('/activities:filter?', isAdmin, function (req, res, next) {
     Activity.find(qryFilter).sort({ time: 'desc' }).exec(function (err, activities) {
         Stats.getStats(function (err, stats) {
             if (err) {
-                console.log(error.message);
+                //console.log(error.message);
                 res.send(500, "error fetching orders");
             }
             res.render('vendor/activities', {
@@ -490,7 +496,7 @@ router.get('/events:filter?', isAdmin, function (req, res, next) {
         var data = [];
 
         if (err) {
-            console.log("error: " + err.message);
+            //console.log("error: " + err.message);
         } else {
             var i = 0;
             async.each(yearmos, function (yearmo, next) {
@@ -506,7 +512,7 @@ router.get('/events:filter?', isAdmin, function (req, res, next) {
         Event.find(qryFilter).sort({ when: 'desc' }).exec(function (err, events) {
             Stats.getStats(function (err, stats) {
                 if (err) {
-                    console.log(error.message);
+                    //console.log(error.message);
                     res.send(500, "error fetching orders");
                 }
                 res.render('vendor/events', {
@@ -565,9 +571,9 @@ router.get('/import', isAdmin, function (req, res, next) {
 /* Recieve posted CSV */
 router.post('/import', isAdmin, function (req, res, next) {
     var sampleFile;
-    console.log('File name is ' + req.files.csvFile.name);
-    console.log('File size is ' + req.files.csvFile.size);
-    console.log('File size is ' + req.files.csvFile.path);
+    //console.log('File name is ' + req.files.csvFile.name);
+    //console.log('File size is ' + req.files.csvFile.size);
+    //console.log('File size is ' + req.files.csvFile.path);
     var firstHeaders = req.body.header;
     if (!req.files) {
         if (!req.body.csvPaste) {
@@ -593,7 +599,7 @@ router.post('/import', isAdmin, function (req, res, next) {
             reader.addListener('data', function (data) {
                 writer.writeRecord([data[0]]);
             });
-            console.log(data);
+            //console.log(data);
         }
     });
 });
@@ -606,14 +612,14 @@ router.get('/products:filter?', isAdmin, function (req, res, next) {
     var adminPageUrl = "/vendor/products";
 
     var filter = req.query.filter;
-    console.log("Filter " + filter);
+    //console.log("Filter " + filter);
     qryFilter = {};
     if (!filter || filter == 'allProducts') {
         var allProducts = true;
         var deletedProducts = false;
         // qryFilter = {status: { $ne: 'deleted'}};
-        console.log("req.user._id " + req.user._id);
-        qryFilter = {"vendor_id": req.user._id};
+        //console.log("req.user._id " + req.user._id);
+        qryFilter = { "vendor_id": req.user._id };
     } else {
         if (filter == 'deletedProducts') {
             var allOrders = false;
@@ -627,7 +633,7 @@ router.get('/products:filter?', isAdmin, function (req, res, next) {
 
             Stats.getStats(function (err, stats) {
                 if (err) {
-                    console.log(error.message);
+                    //console.log(error.message);
                     res.send(500, "error fetching products");
                 }
                 res.render('vendor/products', {
@@ -651,28 +657,81 @@ router.get('/products:filter?', isAdmin, function (req, res, next) {
         });
     });
 });
-router.get('/propertydetails',isAdmin, function (req, res, next) {
+router.get('/add-product', isAdmin, function (req, res, next) {
+    successMsg = req.flash('success')[0];
+    errorMsg = req.flash('error')[0];
+    var adminPageTitle = "Add Products";
+    var adminPageUrl = "vendor/add-product";
+
+    var filter = req.query.filter;
+    //console.log("Filter " + filter);
+    qryFilter = {};
+    if (!filter || filter == 'allProducts') {
+        var allProducts = true;
+        var deletedProducts = false;
+        // qryFilter = {status: { $ne: 'deleted'}};
+        //console.log("req.user._id " + req.user._id);
+        qryFilter = { "vendor_id": req.user._id };
+    } else {
+        if (filter == 'deletedProducts') {
+            var allOrders = false;
+            var deletedProducts = true;
+            // qryFilter = { status: 'deleted'};
+            qryFilter = {};
+        }
+    }
+    Product.find(qryFilter, function (err, products) {
+        Category.find({}, function (err, allcats) {
+
+            Stats.getStats(function (err, stats) {
+                if (err) {
+                    //console.log(error.message);
+                    res.send(500, "error fetching products");
+                }
+                res.render('vendor/add-product', {
+                    adminPageTitle: adminPageTitle,
+                    adminPageUrl: adminPageUrl,
+                    layout: 'vendor-page.hbs',
+                    allProducts: allProducts,
+                    deletedProducts: deletedProducts,
+                    // csrfToken: req.csrfToken(),
+                    noMessage: !successMsg,
+                    noErrorMsg: !errorMsg,
+                    errorMsg: errorMsg,
+                    user: req.user,
+                    stats: stats,
+                    products: products,
+                    allcats: allcats,
+                    isLoggedIn: req.isAuthenticated(),
+                    successMsg: successMsg
+                });
+            })
+        });
+    });
+});
+
+router.get('/propertydetails', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var adminPageTitle = "My Events";
     var adminPageUrl = "/vendor/propertydetails";
 
     var filter = req.query.filter;
-    console.log("Filter " + filter);
-  
+    //console.log("Filter " + filter);
+
     Product.find(function (err, products) {
         Category.find({}, function (err, allcats) {
 
             Stats.getStats(function (err, stats) {
                 if (err) {
-                    console.log(error.message);
+                    //console.log(error.message);
                     res.send(500, "error fetching products");
                 }
                 res.render('vendor/propertydetails', {
                     adminPageTitle: adminPageTitle,
                     adminPageUrl: adminPageUrl,
                     layout: 'vendor-page.hbs',
-                    
+
                     noMessage: !successMsg,
                     noErrorMsg: !errorMsg,
                     errorMsg: errorMsg,
@@ -688,64 +747,64 @@ router.get('/propertydetails',isAdmin, function (req, res, next) {
     });
 });
 router.get('/product/:slug3', function (req, res, next) {
-	var slug3 = req.params.slug3;
-	qryFilter = { "name": slug3 };
+    var slug3 = req.params.slug3;
+    qryFilter = { "name": slug3 };
 
-	// if we have a cart, pass it - otherwise, pass an empty object
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
+    // if we have a cart, pass it - otherwise, pass an empty object
+    var successMsg = req.flash('success')[0];
+    var errorMsg = req.flash('error')[0];
 
 
-	Product.find(qryFilter, function (err, product) {
-		// console.log("Product: " + JSON.stringify(product));
-console.log(product);
-		if (err || product === 'undefined' || product == null) {
-			// replace with err handling
-			var errorMsg = req.flash('error', 'unable to find product');
-			return res.redirect('/');
-		}
+    Product.find(qryFilter, function (err, product) {
+        // //console.log("Product: " + JSON.stringify(product));
+        //console.log(product);
+        if (err || product === 'undefined' || product == null) {
+            // replace with err handling
+            var errorMsg = req.flash('error', 'unable to find product');
+            return res.redirect('/');
+        }
 
-		if (!product) {
-			req.flash('error', 'Product is not found.');
-			res.redirect('/');
-		}
-		event = new Event({
-			namespace: 'products',
-			person: {
-				id: req.user._id,
-				first_name: req.user.first_name,
-				last_name: req.user.last_name,
-				email: req.user.email,
-			},
-			action: 'view',
-			thing: {
-				type: "product",
-				id: product._id,
-				name: product.name,
-				category: product.category,
-				Product_Group: product.Product_Group
-			}
-		});
-		event.save(function (err, eventId) {
-			if (err) {
-				////console.log("Error: " + err.message);
-				return -1;
-			}
-			recommendations.GetRecommendations(product, function (err, recommendations) {
-				if (err) {
-					////console.log("error: " + err);
-					req.flash('error', "An error has occurred - " + err.message);
-					return res.redirect('/');
-				}
-				res.render('shop/product', {
-					layout: 'eshop/blank',
-					recommendations: recommendations,
-					product: product,
-					errorMsg: errorMsg,
-					noErrorMsg: !errorMsg
-				});
-			});
-		});
+        if (!product) {
+            req.flash('error', 'Product is not found.');
+            res.redirect('/');
+        }
+        event = new Event({
+            namespace: 'products',
+            person: {
+                id: req.user._id,
+                first_name: req.user.first_name,
+                last_name: req.user.last_name,
+                email: req.user.email,
+            },
+            action: 'view',
+            thing: {
+                type: "product",
+                id: product._id,
+                name: product.name,
+                category: product.category,
+                Product_Group: product.Product_Group
+            }
+        });
+        event.save(function (err, eventId) {
+            if (err) {
+                //////console.log("Error: " + err.message);
+                return -1;
+            }
+            recommendations.GetRecommendations(product, function (err, recommendations) {
+                if (err) {
+                    //////console.log("error: " + err);
+                    req.flash('error', "An error has occurred - " + err.message);
+                    return res.redirect('/');
+                }
+                res.render('shop/product', {
+                    layout: 'eshop/blank',
+                    recommendations: recommendations,
+                    product: product,
+                    errorMsg: errorMsg,
+                    noErrorMsg: !errorMsg
+                });
+            });
+        });
     });
 });
 
@@ -776,9 +835,9 @@ router.post('/delete-product', isAdmin, function (req, res, next) {
         product.status = 'deleted';
         product.save(function (err) {
             if (!err) {
-                console.log("updated");
+                //console.log("updated");
             } else {
-                console.log(err);
+                //console.log(err);
             }
 
         });
@@ -802,7 +861,7 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
     }
     if (req.files) {
         imageFile = req.files.imageFile;
-        imageFile.mv('public/images/'+ req.body.name + '.png', function (err) {
+        imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
             if (err) {
                 res.status(500).send(err);
             }
@@ -812,119 +871,121 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
     }
     Product.findOneAndUpdate({ _id: req.body._id }, { $set: updated }, function (err, product) {
         if (err) {
-            console.log("Unable to update product - " + err.message);
+            //console.log("Unable to update product - " + err.message);
             req.flash('error', "Unable to update product - " + err.message);
             return res.redirect('/vendor/products');
         };
-        console.log("Product " + req.body.name + " Updated");
+        //console.log("Product " + req.body.name + " Updated");
         req.flash('success', 'Product ' + req.body.name + ' Updated!');
         return res.redirect('/vendor/products');
     });
 });
 
 router.post('/add-product', isAdmin, function (req, res, next) {
-    console.log(req.files);
+    // //console.log(req.files);
+    //console.log("code:" + req.body.code);
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
     var imageFile;
 
     if (!req.files) {
         res.send('No files were uploaded.');
-        return;errorMsg = req.flash('error')[0];
+        return; errorMsg = req.flash('error')[0];
         successMsg = req.flash('success')[0];
-        var imageFile,imageFile1,imageFile2,imageFile3;
-    
-        if (!req.files) {
-            res.send('No files were uploaded.');
-            return;
-        }
-        imageFile = req.files.imageFile;
-        imageFile1 = req.files.imageFile1;
-        imageFile2 = req.files.imageFile2;
-        imageFile3 = req.files.imageFile3;
-        imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
-            if (err) {
-                res.status(500).send(err);
-            }
-        });
-    
-            imageFile1.mv('public/images/' + req.body.name + 'g1' + '.png', function (err) {
-                if (err) {
-                    res.status(500).send(err);
-                }
-            });
-      
-                imageFile2.mv('public/images/' + req.body.name + 'g2' + '.png', function (err) {
-                    if (err) {
-                        res.status(500).send(err);
-                    }
-                });
-            
-                    imageFile3.mv('public/images/' + req.body.name + 'g3' + '.png', function (err) {
-                        if (err) {
-                            res.status(500).send(err);
-                        }
-                    }); 
-                        product = new Product({
-                            name: req.body.name,
-                            code: req.body.code,
-                            Wifi: req.body.Wifi,
-                            campfire: req.body.campfire,
-                            Pool: req.body.Pool,
-                            parking: req.body.parking,
-                            title: req.body.title,
-                            Product_Group: req.body.Product_Group,
-                            price: parseFloat((req.body.price * 100).toFixed(2)),
-                            description: req.body.description,
-                            shippable: req.body.shippable,
-                            taxable: req.body.taxable,
-                            category: req.body.category,
-                            Longitude:req.body.Longitude,                       
-                            Latitude:req.body.Latitude,                     
-                            imagePath: '/images/' + req.body.name + '.png',
-                            imagePathg1: '/images/' + req.body.name + 'g1' + '.png',
-                            imagePathg2: '/images/' + req.body.name + 'g2' + '.png',
-                            imagePathg3: '/images/' + req.body.name + 'g3' + '.png',
-    
-                        })
     }
-    //console.log(req.user._id);
+    var imageFile, imageFile1, imageFile2, imageFile3;
 
+    if (!req.files) {
+        res.send('No files were uploaded.');
+        return;
+    }
     imageFile = req.files.imageFile;
-//     console.log(process.env.imagePath);
-//     console.log(req.files);
-//    // console.log(req.files);
-//     console.log(__dirname +`\public`);
-    imageFile.mv('public/images/'+ req.body.name + '.png', function (err) {
+    imageFile1 = req.files.imageFile1;
+    imageFile2 = req.files.imageFile2;
+    imageFile3 = req.files.imageFile3;
+    imageFile.mv('public/images/' + req.user._id + req.body.code + req.body.name + '.png', function (err) {
         if (err) {
             res.status(500).send(err);
         }
-        product = new Product({
-            name: req.body.name,
-            code: req.body.code,
-            title: req.body.title,
-            Product_Group: req.body.Product_Group,
-            price: parseFloat((req.body.price * 100).toFixed(2)),
-            description: req.body.description,
-            shippable: req.body.shippable,
-            taxable: req.body.taxable,
-            category: req.body.category,
-            imagePath: '/images/' + req.body.name + '.png',
-            vendor_id: req.user._id
-        })
-        product.save(function (err) {
-            if (err) {
-                req.flash('error', 'Error: ' + err.message);
-                return res.redirect('/vendor/products');
-            }
-            console.log("product: " + product);
+    });
+
+    imageFile1.mv('public/images/' + req.user._id + req.body.code + req.body.name + 'g1' + '.png', function (err) {
+        if (err) {
+            res.status(500).send(err);
+        }
+    });
+
+    imageFile2.mv('public/images/' + req.user._id + req.body.code + req.body.name + 'g2' + '.png', function (err) {
+        if (err) {
+            res.status(500).send(err);
+        }
+    });
+
+    imageFile3.mv('public/images/' + req.user._id + req.body.code + req.body.name + 'g3' + '.png', function (err) {
+        if (err) {
+            res.status(500).send(err);
+        }
+    });
+    product = new Product({
+        name: req.body.name,
+        code: req.body.code,
+        Wifi: req.body.Wifi,
+        campfire: req.body.campfire,
+        Pool: req.body.Pool,
+        parking: req.body.parking,
+        title: req.body.title,
+        Product_Group: req.body.Product_Group,
+        price: parseFloat((req.body.price * 100).toFixed(2)),
+        description: req.body.description,
+        shippable: req.body.shippable,
+        taxable: req.body.taxable,
+        category: req.body.category,
+        Longitude: req.body.Longitude,
+        Latitude: req.body.Latitude,
+        imagePath: '/images/' + req.user._id + req.body.code + req.body.name + '.png',
+        imagePathg1: '/images/' + req.user._id + req.body.code + req.body.name + 'g1' + '.png',
+        imagePathg2: '/images/' + req.user._id + req.body.code + req.body.name + 'g2' + '.png',
+        imagePathg3: '/images/' + req.user._id + req.body.code + req.body.name + 'g3' + '.png',
+        vendor_id: req.user._id
+    })
+
+    ////console.log(req.user._id);
+
+    // imageFile = req.files.imageFile;
+    //     //console.log(process.env.imagePath);
+    //     //console.log(req.files);
+    //    // //console.log(req.files);
+    //     //console.log(__dirname +`\public`);
+    // imageFile.mv('public/images/'+ req.body.name + '.png', function (err) {
+    //     if (err) {
+    //         res.status(500).send(err);
+    //     }
+    //     product = new Product({
+    //         name: req.body.name,
+    //         code: req.body.code,
+    //         title: req.body.title,
+    //         Product_Group: req.body.Product_Group,
+    //         price: parseFloat((req.body.price * 100).toFixed(2)),
+    //         description: req.body.description,
+    //         shippable: req.body.shippable,
+    //         taxable: req.body.taxable,
+    //         category: req.body.category,
+    //         imagePath: '/images/' + req.body.name + '.png',
+    //         vendor_id: req.user._id
+    //     })
+    product.save(function (err) {
+        if (err) {
+            req.flash('error', 'Error: ' + err.message);
             return res.redirect('/vendor/products');
-        });
+        }
+        //console.log("product: " + product);
+        return res.redirect('/vendor/products');
     });
 });
 
+
 router.post('/add-category', isAdmin, function (req, res, next) {
-    console.log(req.files);
+    //console.log(req.files);
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
     var imageFile;
@@ -946,7 +1007,7 @@ router.post('/add-category', isAdmin, function (req, res, next) {
             req.flash('error', 'Error: ' + err.message);
             return res.redirect('/vendor/categories');
         }
-        console.log("category: " + category);
+        //console.log("category: " + category);
         return res.redirect('/vendor/categories');
     });
 });
@@ -973,7 +1034,7 @@ router.get('/categories:filter?', isAdmin, function (req, res, next) {
     Category.find(qryFilter, function (err, categories) {
         Stats.getStats(function (err, stats) {
             if (err) {
-                console.log(error.message);
+                //console.log(error.message);
                 res.send(500, "error fetching categories");
             }
             res.render('vendor/categories', {
@@ -1003,7 +1064,7 @@ router.post('/edit-category', isAdmin, function (req, res, next) {
     Category.findById(req.body.id, function (err, category) {
 
         if (err) {
-            console.log("ERROR: " + err.message);
+            //console.log("ERROR: " + err.message);
         } else {
             if (!category) {
                 category = new Category({
@@ -1020,13 +1081,13 @@ router.post('/edit-category', isAdmin, function (req, res, next) {
                 category.updated = Date.now();
             }
         }
-        console.log("Found: " + JSON.stringify(category));
+        //console.log("Found: " + JSON.stringify(category));
 
         category.save(function (err) {
             if (!err) {
-                console.log("updated");
+                //console.log("updated");
             } else {
-                console.log(err);
+                //console.log(err);
             }
             res.redirect('/vendor/categories');
         })
@@ -1045,11 +1106,11 @@ router.post('/delete-category', isAdmin, function (req, res, next) {
         category.status = 'deleted';
         category.save(function (err) {
             if (!err) {
-                console.log("updated");
+                //console.log("updated");
                 req.flash('success', 'Category deleted.');
 
             } else {
-                console.log(err);
+                //console.log(err);
                 req.flash('error', 'Unable to delete category');
             }
             return res.redirect('/vendor/categories');
@@ -1095,7 +1156,7 @@ router.get('/dashboard', isAdmin, function (req, res, next) {
     var adminPageUrl = "/vendor/dashboard";
     Stats.getStats(function (err, stats) {
         if (err) {
-            console.log(error.message);
+            //console.log(error.message);
             res.send(500, "error fetching orders");
         }
         res.render('vendor/dashboard', {
@@ -1120,7 +1181,7 @@ function isAdmin(req, res, next) {
         return res.redirect('/');
     } else {
         if (req.user.role == 'vendor') {
-            //console.log(req.user._id)
+            ////console.log(req.user._id)
             return next();
         } else {
             return res.redirect('/');
@@ -1156,7 +1217,7 @@ var totalSales = function () {
             }
         }, function (err, doc) {
             if (err) {
-                console.log("err: " + err.message);
+                //console.log("err: " + err.message);
                 return err;
             }
             return doc;

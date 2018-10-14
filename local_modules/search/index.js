@@ -15,7 +15,7 @@ module.exports = {
 	saveSearch: function(search) {
 		filter = new Filter();
 		var cooked = filter.clean(search);
-		//console.log(cooked);
+		////console.log(cooked);
 		var url = 'mongodb://localhost:27017/hackathon';
 		MongoClient.connect(url, function(err, db) {
 			var searchcoll = db.collection('searches');
@@ -26,7 +26,7 @@ module.exports = {
 	            returnNewDocument: true,
 	            upsert: true
           	});
-			//console.log('ret ' + JSON.stringify(ret));
+			////console.log('ret ' + JSON.stringify(ret));
 			MongoClient.close();
 		});
 

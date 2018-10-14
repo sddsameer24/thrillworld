@@ -35,7 +35,7 @@ dotenv.load({ path: '.env.hackathon' });
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
 mongoose.connection.on('error', () => {
-  //console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+  ////console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   logger.log('error','%s MongoDB connection error. Please make sure MongoDB is running.');
   process.exit();
 });
@@ -44,12 +44,12 @@ mongoose.connection.on('error', () => {
 
 Product.find({},function(err,products) {
 	if (err) {
-		//console.log("Error: " + err.message);
+		////console.log("Error: " + err.message);
 	}
 	async.each(products,function(product,next) {
-		//console.log("NAME: " + product.name);
-		//console.log("Product_Group: " + product.Product_Group);
-		//console.log("isVariable: " + product.isVariable);
-		//console.log("new: " + product.new);
+		////console.log("NAME: " + product.name);
+		////console.log("Product_Group: " + product.Product_Group);
+		////console.log("isVariable: " + product.isVariable);
+		////console.log("new: " + product.new);
 	})
 })
