@@ -1,15 +1,97 @@
+var mongoose = require('mongoose');
 var User = require('../models/user');
 var Product = require('../models/product');
 var Ticket = require('../models/ticket');
 var taxCalc = require('../local_modules/tax-calculator');
 var async = require('async');
+var mongodb = require("mongodb");
+const dotenv = require('dotenv');
 var shippingCalc = require('../local_modules/shipping-calculator');
-
 var taxConfig = require('../config/tax-config');
 "use strict"
+dotenv.load({
+	path: '.env.hackathon'
+});
 
+
+
+var Schema = mongoose.Schema;
+var cartSchema = new Schema({
+	product: {
+		type: String,
+		required: false
+	},
+	id: {
+		type: String,
+		required: false
+	},
+	departure: {
+		type: String,
+		required: false
+	},
+	arrival: {
+		type: String,
+		required: false
+	},
+	adult: {
+		type: String,
+		required: false
+	},
+	kids: {
+		type: String,
+		required: false
+	},
+	totalprice: {
+		type: String,
+		required: false
+	},
+	children: {
+		type: String,
+		required: false
+	},
+	option: {
+		type: String,
+		required: false
+	},
+	ticket_name: {
+		type: String,
+		required: false
+	},
+	ticket_email: {
+		type: String,
+		required: false
+	},
+	Product_Group: {
+		type: String,
+		required: false
+	},
+	taxable: {
+		type: String,
+		required: false
+	},
+
+});
+cartSchema.post('save', function (doc) {
+	
+	
+	dbHost = process.env.MONGODB_URI;
+	var db;
+
+	var MongoClient = mongodb.MongoClient;
+
+	MongoClient.connect(dbHost, function (err, db) {
+		if (err) {
+			////console.log("Error: " + errror.message);
+		}
+		
+		// incupdate.$inc['months.' + months[month] + '.sales'] = cart.total;
+		
+
+	});
+});
+module.exports = mongoose.model('cart', cartSchema);
 module.exports = function Cart(oldCart) {
-
+      console.log(oldCart);
 	/* every call comes with the existing / old cart */
 	this.items = oldCart.items || {};
 	this.totalQty = oldCart.totalQty || 0;
@@ -19,14 +101,15 @@ module.exports = function Cart(oldCart) {
 	this.grandTotal = Number(oldCart.totalPrice) || 0; // Grandtotal
 	this.totalPriceWithTax = Number(oldCart.totalPriceWithTax) || 0; // Total with shipping/tax
 
-	////console.log("old cart: " + JSON.stringify(oldCart));
+	
+	// console.log("old cart: " + JSON.stringify(oldCart));
 
 	/* TODO: Figure out how to change the value of this in the cart.add method from within the necessary method calls calculateShipping and calculateTax
 	/* add item to cart */
 	/* TODO: How do I make a call to calculateTax from my cart.js module without losing "this" */
 
 	this.cartShippingTotal = function() {
-		// ////console.log("Cart Total: " + JSON.stringify(this.items));
+		////console.log("Cart Total: " + JSON.stringify(this.items));
 		shippingCalc.calculateShippingAll(this.items,function(err,results) {
 			if (err) {
 				////console.log('error :' + err.message);
@@ -48,15 +131,15 @@ module.exports = function Cart(oldCart) {
 		})
 		this.totalTax = results.taxAmount;
 		// this.totalShipping = results.shippingAmount;
-	};
+	}; 
 
-	this.add = function(item, id, price, option, name, email, type, taxable, shipable, userId) {
+	this.add = function(item, id, departure,arrival,adult,kids,price,children, option, name, email, type, taxable, shipable, userId) {
+		
 		var storedItem = this.items[id];
 		var locals = {};
 		for(var itemid in oldCart.items) {
 	    	if (id==itemid) {
 	    		if (oldCart.items[itemid].item.Product_Group=='DONATION') {
-	    			////console.log("DUPLICATE");
 	    			error = {
 	    				message: 'Unable to add duplicate donations.  Please clear previous donation before adding another.'
 	    			}
@@ -66,15 +149,11 @@ module.exports = function Cart(oldCart) {
 	    }
 		if (!storedItem) {
 			// create a new entry
-			storedItem = this.items[id + name + email + option] = {item: item, qty: 0, ticket_name: name, ticket_email: email, price: price, option: option, type: type, taxAmount: 0, taxable: taxable, shipable: shipable};
+			storedItem = this.items[id + name + email + option] = {item: item, qty: (adult+kids+children),departure: departure,arrival: arrival, ticket_name: name, ticket_email: email, price: price, option: option, type: type, taxAmount: 0, taxable: taxable, shipable: shipable};
 		}
 		storedItem.qty++;
 		storedItem.price = parseFloat(price);
-		// storedItem.itemTotal = Number(price * storedItem.qty).toFixed(2);
-		storedItem.itemTotal = Number((price*100) * storedItem.qty);
-		////console.log("Stored Item Item Total: " + JSON.stringify(storedItem));
-// this.totalShipping = result.totalShipping;
-        // storedItem.taxAmount = result.taxAmount;
+		storedItem.itemTotal = Number(price * storedItem.qty).toFixed(2);
 		storedItem.type = type;
 		if (option!=null) {
 			storedItem.option = option;
@@ -97,9 +176,12 @@ module.exports = function Cart(oldCart) {
 		storedItem.priceWithTax = (parseFloat(price) + parseFloat(storedItem.taxAmount));
 		storedItem.itemTotal = ((parseFloat(price) * storedItem.qty));
 	};
+	// this.save= function(product, id,departure,arrival,adult,kids,totalprice,children, option, ticket_name, ticket_email, Product_Group, taxable, shippable,id){
+	// 	if (err) {
+	// 		////console.log('error: ' + err.message);
+	// 	}	
+	// };
 
-	/* Empty all items from cart */
-	//
 	this.empty = function() {
 		this.items = {};
 		this.totalQty = 0;
@@ -108,11 +190,9 @@ module.exports = function Cart(oldCart) {
 		storedItem = {item: {}, qty: 0, price: 0, option: null, ticket_name: '', ticket_email: ''};
 	};
 
-	/* Reduce the qty of a specific item in the cart by 1 */
 	this.reduce = function(item, id, price, option,taxcalc) {
 		var storedItem = this.items[id];
 		if (!storedItem) {
-			// create a new entry
 			storedItem = this.items[id] = {item: item, qty: 0, price: 0, option: null, taxAmount: 0};
 		}
 		storedItem.qty--;
@@ -223,3 +303,4 @@ module.exports = function Cart(oldCart) {
 
 			} 
 				)}}}};
+				

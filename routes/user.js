@@ -91,10 +91,27 @@ router.get('/profile', isLoggedIn, csrfProtection, function (req, res, next) {
 });
 
 // Mobile Profile
-router.get('/profile-mobile', isLoggedIn, csrfProtection, function (req, res, next) {
+router.post('/profile-mobile', function (req, res, next) {
+	console.log("events");
+	var slug3 = req.body._id;
+	qryFilter = { "_id": slug3 };
+	console.log(slug3);
+	// if we have a cart, pass it - otherwise, pass an empty object
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-	res.send(req.user);
+	console.log("events1");
+
+	User.find(qryFilter, function (err, user) {
+		
+		console.log("user: " + JSON.stringify(user));
+{
+			req.flash('success');
+			for (i = 0; i < user.length; i++) {
+				res.send(user[i]);
+			}
+			
+		}
+	});
 });
 
 

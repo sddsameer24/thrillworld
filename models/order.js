@@ -8,7 +8,11 @@ var mongodb = require("mongodb");
 dotenv.load({
 	path: '.env.hackathon'
 });
+
+
+
 var Schema = mongoose.Schema;
+
 var orderSchema = new Schema({
 	user: {
 		type: Object,
@@ -58,7 +62,7 @@ var orderSchema = new Schema({
 		type: String,
 		required: false
 	},
-	arrival: {
+	checkin: {
 		type: Date,
 		default: Date.now
 	},
@@ -74,7 +78,7 @@ var orderSchema = new Schema({
 		type: String,
 		required: false
 	},
-	depart: {
+	checkout: {
 		type: Date,
 		default: Date.now
 	},
@@ -181,5 +185,10 @@ this.createPurchase = function (product, othersArray, cb) {
 	})
 	return cb();
 };
-
+// schema.virtual('istoday').get(function () {
+// 	if (this.startdate == today) {
+// 		return true;
+// 	}
+// 	return false;
+// });
 module.exports = mongoose.model('Order', orderSchema);

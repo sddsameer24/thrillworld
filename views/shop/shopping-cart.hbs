@@ -89,15 +89,16 @@
 														<b>Option:</b> {{this.option}} {{/if}}
 												</td>
 												<td>
-													<input type="number" id="adult" oninput="calc()" name="count">
+													<input type="number" id="adult" oninput="calc()" name="adult">
 												</td>
 												<td>
-													<input type="number" id="children" oninput="calc()" name="count">
+													<input type="number" id="children" oninput="calc()" name="children">
 												</td>
 												<td>
-													<input type="number" id="kids" name="count">
+													<input type="number" id="kids" name="kids">
 												</td>
-												<td class='text-right' id="ticket_price" text-align="right">{{money this.itemTotal}}</td>
+												
+												<td class='text-right' id="ticket_price" text-align="right">{{this.itemTotal}}</td>
 												<td class='text-right' id="total" name="amount" text-align="right"></td>
 
 												<td>
@@ -122,6 +123,7 @@
 															var children = document.getElementById("children").value;
 															var price = document.getElementById("ticket_price").innerHTML;
 															var noTickets = parseFloat(adults) + parseFloat(children);
+															alert(parseFloat(price));
 															var total = parseFloat(price) * noTickets;
 															if (!isNaN(total))
 																document.getElementById("total").innerHTML = total

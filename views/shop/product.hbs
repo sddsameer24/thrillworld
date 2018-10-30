@@ -2,7 +2,7 @@
     {{#each product}}
     <div class="container">
         <div class="card">
-            <h2 class="p-0 m-0" style="text-align:center"; id="product-title">{{this.name}}</h2>
+            <h2 class="p-0 m-0" style="text-align:center" ; id="product-title">{{this.name}}</h2>
             <p> </p>
             <p></p>
             <p> </p>
@@ -16,6 +16,7 @@
                         <div class="row mx-auto" id="thumbnail-container">
                             <a href="#" class="thumbnail selected" data-big="{{this.imagePathg1}}">
                                 <div class="thumb" style="background-image:url({{this.imagePathg1}}); background-size:cover;">
+
                                 </div>
                             </a>
                             <a href="#" class="thumbnail" data-big="{{this.imagePathg2}}">
@@ -45,8 +46,8 @@
                 </div>
 
                 <div class="col-sm-12 col-md-6" id="product-information">
-                 
-                    
+
+
                     <span id="product-short">
                         <small>{{this.description}}</small>
                     </span>
@@ -79,98 +80,110 @@
                         <h3 class="product-price text-center">
                             <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
                         </h3>
+
+
+                        <div class="row">
+                            <div class="col-md-6" id="arrival">
+                                <label>Date of arrival</label>
+                                <input type="date" name="arrival"> &nbsp;
+                            </div>
+                            <div class="col-md-6" id="depart">
+                                <label>Date of depart</label>
+                                <input type="date" name="depart"> &nbsp;
+                            </div>
+                        </div>
+                        <script>
+                            function calc() {
+                                var children = 0;
+                                var adults = document.getElementById("adult").value;
+                                var children = document.getElementById("children").value;
+                                var price = document.getElementById("ticket_price").innerHTML;
+                                var noTickets = parseFloat(adults) + parseFloat(children);
+                                var total = parseFloat(price) * noTickets;
+                                if (!isNaN(total))
+                                    document.getElementById("total").innerHTML = total
+                            }
+                        </script>
+                        <div class="row">
+                            <div class="col-md-4" id="arrival">
+                                <label>Number of Adult</label>
+                                <input type="number" id="adult" oninput="calc()" name="adult">
+                            </div>
+                            <div class="col-md-4" id="depart">
+                                <label>Number of Children</label>
+                                <input type="number" id="children" oninput="calc()" name="children">
+                            </div>
+                            <div class="col-md-4" id="depart">
+                                <label>Kids below 5</label>
+                                <input type="number" name="kids" data-toggle="tooltip" data-placement="top" title="Its free but we do need count">
+                            </div>
+                        </div>
+
+
+                        <h2>
+                            <p>Subtotal :
+                                <b>Rs
+                                    <span id="total" name="subtotal" class="user-location"></span>
+                                </b>
+                            </p>
+                        </h2>
+
+
                         <p class="text-center">
                             <input type='submit' value='Add to Cart' class="btn btn-primary add-to-cart" role="button">
                         </p>
                     </form>
-                    <div id="map" style="width:100%;height:200px;"></div>
-                    {{!--
 
-                    <div class="row">
-                        <div class="col-md-6" id="arrival">
-                            <label>Date of arrival</label>
-                            <input type="date" name="arrival"> &nbsp;
-                        </div>
-                        <div class="col-md-6" id="depart">
-                            <label>Date of depart</label>
-                            <input type="date" name="depart"> &nbsp;
-                        </div>
-                    </div>
-                    <script>
-                        function calc() {
-                            var children = 0;
-                            var adults = document.getElementById("adult").value;
-                            var children = document.getElementById("children").value;
-                            var price = document.getElementById("ticket_price").innerHTML;
-                            var noTickets = parseFloat(adults) + parseFloat(children);
-                            var total = parseFloat(price) * noTickets;
-                            if (!isNaN(total))
-                                document.getElementById("total").innerHTML = total
-                        }
-                    </script>
 
-                    <div class="row">
-                        <div class="col-md-4" id="arrival">
-                            <label>Number of Adult</label>
-                            <input type="number" id="adult" oninput="calc()" name="count">
-                        </div>
-                        <div class="col-md-4" id="depart">
-                            <label>Number of Children</label>
-                            <input type="number" id="children" oninput="calc()" name="count">
-                        </div>
-                        <div class="col-md-4" id="depart">
-                            <label>Kids below 5</label>
-                            <input type="number" name="count" data-toggle="tooltip" data-placement="top" title="Its free but we do need count">
-                        </div>
-                    </div>
-
-                    <h2>
-                        <p>Subtotal :
-                            <b>Rs
-                                <span id="total" name="subtotal" class="user-location">0</span>
-                            </b>
-                        </p>
-                    </h2>
-                    <span class="align-middle">
-                        <label for="subscribe-btn">Read all terms and conditions</label>
-                        <input type="checkbox" id="subscribe-btn"> &nbsp;
-                    </span>
-                    <div id="text">
-                        <ul>
-                            <li>policy statement</li>
-                            <li>Confirmation Policy</li>
-                            <li>Cancellation Policy</li>
-                            <li>Refund Policy</li>
-                        </ul>
-
-                    </div> --}}
                 </div>
                 {{!--
                 <input type='submit' href="/add-to-cart" class="btn btn-primary add-to-cart" role="button"> --}}
             </div>
         </div>
-        
 
-        </div>
-        <script>
-            function myMap() {
-                var myCenter = new google.maps.LatLng({{ this.Latitude }}, { { this.Longitude } });
-            var mapCanvas = document.getElementById("map");
-            var mapOptions = { center: myCenter, zoom: 5 };
-            var map = new google.maps.Map(mapCanvas, mapOptions);
-            var marker = new google.maps.Marker({ position: myCenter });
-            marker.setMap(map);
-            var infowindow = new google.maps.InfoWindow({
-                content: "{{this.title}}"
-            });
-            infowindow.open(map, marker);
-}
-        </script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAidN5MszkfMW2VYcES7uoePsX1qQmuG7M&callback=myMap"></script>
-        <!-- end card -->
+
     </div>
-    <!-- end container-->
-    {{/each}}
+    {{!--
+    <div id="map" style="width:100%;height:200px;"></div> --}}
+    <script>
+        function myMap() {
+            var myCenter = new google.maps.LatLng({{ this.Latitude }}, { { this.Longitude } });
+        var mapCanvas = document.getElementById("map");
+        var mapOptions = { center: myCenter, zoom: 5 };
+        var map = new google.maps.Map(mapCanvas, mapOptions);
+        var marker = new google.maps.Marker({ position: myCenter });
+        marker.setMap(map);
+        var infowindow = new google.maps.InfoWindow({
+            content: "{{this.title}}"
+        });
+        infowindow.open(map, marker);
+}
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAidN5MszkfMW2VYcES7uoePsX1qQmuG7M&callback=myMap"></script>
+    <!-- end card -->
+</div>
+<!-- end container-->
+{{/each}}
+<form action='/reviews' method='POST'>
+    <input type='hidden' id='type' name='name' value='{{this.user.first_name}} {{this.user.last_name}}'> {{#each product}}
+    <input type='hidden' id='name' name='clone' value='{{ this._id }}'> {{/each}}
+    <input type='hidden' id='firstname' name='productid'>
+    <input type='number' name='rating' value=''>
+    <input type='text' name='review' value=''>
+    <input type='submit' value='submit' class="btn btn-primary add-to-cart" role="button">
+</form>
+<script>
+
+    $(window).load(function () {
+        $('#name').change(function () {
+            $('#firstname').val($(this).val());
+        });
+    });
+window.onload = function(){
+  document.getElementById("firstname").value = document.getElementById("name").value; 
+}
+</script>
+
 </div>
 <style>
     button:active,

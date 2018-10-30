@@ -25,15 +25,14 @@ var schema = new Schema({
 		type: String,
 		required: false
 	},
-	imagePathg1: {
+	gallery: [{
+		type: String
+	}],
+	startdate: {
 		type: String,
 		required: false
 	},
-	imagePathg2: {
-		type: String,
-		required: false
-	},
-	imagePathg3: {
+	enddate: {
 		type: String,
 		required: false
 	},
@@ -85,16 +84,14 @@ var schema = new Schema({
 		type: Currency,
 		required: false
 	},
+
 	likes: [String],
+
 	Product_Group: {
 		type: String,
 		required: false
 	},
-	reviews: [String],
-	Product_Group: {
-		type: String,
-		required: false
-	},
+	
 	sale_attributes: {
 		type: Object, required: false
 	},
@@ -119,6 +116,7 @@ var schema = new Schema({
 			required: false
 		}
 	}],
+	
 	created: {
 		type: Date,
 		default: Date.now()

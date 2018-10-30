@@ -11,12 +11,10 @@ var Event = require('../models/events');
 var async = require('async');
 var Order = require('../models/order');
 var Store = require('../models/store');
-// var mdp = require('multipleDatePicker');
 var sigma = require('sigma');
 var passport = require('passport');
 var moment = require('moment');
 var mongoose = require('mongoose');
-// var csrf = require('csurf');
 var User = require('../models/user');
 var Payment = require('../models/payment');
 var fileUpload = require('express-fileupload');
@@ -167,7 +165,7 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
             // this.orders.forEach(function (orders) {
             //     console.log(item.created);
             // });
-
+            // console.log(cart.vendor_id);
             res.render('vendor/orders', {
                 adminPageTitle: adminPageTitle,
                 adminPageUrl: adminPageUrl,
@@ -191,6 +189,57 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
     })
 });
 
+router.get('/orderdate:filter?', isAdmin, function (req, res, next) {
+    var filter = req.query.filter;
+
+
+    if (!filter || filter == 'allOrders') {
+        var allOrders = true;
+        var pendingOrders = false;
+        var pickedUpOrders = false;
+        //console.log(req.user._id);
+
+
+        qryFilter = { "cart.vendor_id": req.user._id.toString() };
+
+    } else {
+        if (filter == 'pendingOrders') {
+            qryFilter = { "cart.vendor_id": req.user._id.toString() }, { receipt_status: 'pending' }, { receipt_status: 'partial' }, { receipt_status: 'New' }, { receipt_status: '' }, { "user.id": req.user._id };
+        } else {
+            if (filter == 'pickedUpOrders' || filter == 'complete') {
+                qryFilter = { receipt_status: 'complete' }, { "user.id": req.user._id }, { "cart.vendor_id": req.user._id.toString() };
+            }
+        }
+    }
+    successMsg = req.flash('success')[0];
+    errorMsg = req.flash('error')[0];
+
+    Order.find(qryFilter).sort({ "created": -1 }).exec(function (err, orders) {
+        Stats.getStats(function (err, stats) {
+            if (err) {
+                res.send(500, "error fetching orders");
+            }
+            res.render('vendor/orders', {
+                adminPageTitle: adminPageTitle,
+                adminPageUrl: adminPageUrl,
+                layout: 'vendor-page.hbs',
+                noMessage: !successMsg,
+                noErrorMsg: !errorMsg,
+                allOrders: allOrders,
+                pendingOrders: pendingOrders,
+                pickedUpOrders: pickedUpOrders,
+                errorMsg: errorMsg,
+                user: req.user,
+                stats: stats,
+                orders: orders,
+                isLoggedIn: req.isAuthenticated(),
+                successMsg: successMsg
+            });
+        })
+    })
+});
+
+
 router.post('/delete-order', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
@@ -205,141 +254,6 @@ router.post('/delete-order', isAdmin, function (req, res, next) {
     })
 })
 
-router.post('/update-order', isAdmin, function (req, res, next) {
-    successMsg = req.flash('success')[0];
-    errorMsg = req.flash('error')[0];
-    var status = req.body.status;
-    var receiver = req.body.receiver;
-    var note = req.body.note;
-    var order_id = req.body._id;
-    var query = { '_id': order_id };
-    Order.findOne({ _id: order_id }, function (err, order) {
-        console.log("Order: " + order);
-        if (err) {
-            res.send(500, 'Error deleting order.');
-        }
-        order.receipt_status = status;
-        order.note = note;
-        order.receiver = receiver;
-        order.save(function (err) {
-            if (err)
-                console.log("ERROR: " + err.message);
-        })
-        return res.redirect('/vendor/orders');
-    })
-})
-
-router.get('/users:filter?', isAdmin, function (req, res, next) {
-
-    var filter = req.query.filter;
-    //console.log("Filter " + filter);
-    qryFilter = {};
-
-    if (!filter || filter == 'allOrders') {
-        var allUsers = true;
-        var adminUsers = false;
-        var nonAdminUsers = false;
-        qryFilter = {};
-    } else {
-        if (filter == 'adminUsers') {
-            var allUsers = false;
-            var adminUsers = true;
-            var nonAdminUsers = false;
-            qryFilter = { role: 'vendor' };
-        } else {
-            if (filter == 'nonAdminUsers') {
-                var allUsers = false;
-                var adminUsers = false;
-                var nonAdminUsers = true;
-                qryFilter = { $or: [{ role: '' }, { role: 'user' }, { role: 'New' }, { role: 'visitor' }] };
-            }
-        }
-    }
-    successMsg = req.flash('success')[0];
-    errorMsg = req.flash('error')[0];
-    var adminPageTitle = "Users";
-    var adminPageUrl = "/vendor/users";
-
-    //console.log("Stats in route " + JSON.stringify(res.locals.stats));
-    User.find(qryFilter, function (err, users) {
-        Stats.getStats(function (err, stats) {
-            if (err) {
-                //console.log(error.message);
-                res.send(500, "error fetching orders");
-            }
-            res.render('vendor/users', {
-                adminPageTitle: adminPageTitle,
-                adminPageUrl: adminPageUrl,
-                layout: 'vendor-page.hbs',
-                // csrfToken: req.csrfToken(),
-                noMessage: !successMsg,
-                noErrorMsg: !errorMsg,
-                allUsers: allUsers,
-                adminUsers: adminUsers,
-                nonAdminUsers: nonAdminUsers,
-                errorMsg: errorMsg,
-                user: req.user,
-                stats: stats,
-                users: users,
-                isLoggedIn: req.isAuthenticated(),
-                successMsg: successMsg
-            });
-        })
-
-    })
-});
-
-/* Edit User */
-router.post('/edit-user', isAdmin, function (req, res, next) {
-    errorMsg = req.flash('error')[0];
-    successMsg = req.flash('success')[0];
-    user = {};
-    User.findById(req.params.id, function (err, user) {
-        if (err) {
-            //console.log("ERROR: " + err.message);
-        } else {
-            if (!user) {
-                user = new User({
-                    first_name: req.body.first_name,
-                    last_name: req.body.last_name,
-                    email: req.body.email,
-                    role: req.body.role
-                });
-            } else {
-                user.first_name = req.body.first_name || '';
-                user.last_name = req.last_name.name || '';
-                user.email = req.body.email || '';
-                user.role = req.body.role || '';
-            }
-        }
-        user.save(function (err) {
-            if (!err) {
-                //console.log("updated");
-            } else {
-                //console.log(err);
-            }
-            res.redirect('/vendor/users');
-        })
-    });
-
-});
-
-
-/* Delete Users */
-
-router.post('/delete-user', isAdmin, function (req, res, next) {
-    successMsg = req.flash('success')[0];
-    errorMsg = req.flash('error')[0];
-    var user_id = req.body._id;
-    meanlogger.log("trash", "Deleting User " + user_id, req.user);
-
-    User.remove({ _id: user_id }, function (err) {
-        if (err) {
-            res.send(500, 'Error deleting user.');
-        }
-        return res.redirect('/vendor/users');
-    })
-})
 /* Display all tickets purchased */
 router.get('/tickets', isAdmin, function (req, res, next) {
 
@@ -746,67 +660,7 @@ router.get('/propertydetails', isAdmin, function (req, res, next) {
         });
     });
 });
-router.get('/product/:slug3', function (req, res, next) {
-    var slug3 = req.params.slug3;
-    qryFilter = { "name": slug3 };
 
-    // if we have a cart, pass it - otherwise, pass an empty object
-    var successMsg = req.flash('success')[0];
-    var errorMsg = req.flash('error')[0];
-
-
-    Product.find(qryFilter, function (err, product) {
-        // //console.log("Product: " + JSON.stringify(product));
-        //console.log(product);
-        if (err || product === 'undefined' || product == null) {
-            // replace with err handling
-            var errorMsg = req.flash('error', 'unable to find product');
-            return res.redirect('/');
-        }
-
-        if (!product) {
-            req.flash('error', 'Product is not found.');
-            res.redirect('/');
-        }
-        event = new Event({
-            namespace: 'products',
-            person: {
-                id: req.user._id,
-                first_name: req.user.first_name,
-                last_name: req.user.last_name,
-                email: req.user.email,
-            },
-            action: 'view',
-            thing: {
-                type: "product",
-                id: product._id,
-                name: product.name,
-                category: product.category,
-                Product_Group: product.Product_Group
-            }
-        });
-        event.save(function (err, eventId) {
-            if (err) {
-                //////console.log("Error: " + err.message);
-                return -1;
-            }
-            recommendations.GetRecommendations(product, function (err, recommendations) {
-                if (err) {
-                    //////console.log("error: " + err);
-                    req.flash('error', "An error has occurred - " + err.message);
-                    return res.redirect('/');
-                }
-                res.render('shop/product', {
-                    layout: 'eshop/blank',
-                    recommendations: recommendations,
-                    product: product,
-                    errorMsg: errorMsg,
-                    noErrorMsg: !errorMsg
-                });
-            });
-        });
-    });
-});
 
 router.post('/delete-activity', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
@@ -882,8 +736,6 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
 });
 
 router.post('/add-product', isAdmin, function (req, res, next) {
-    // //console.log(req.files);
-    //console.log("code:" + req.body.code);
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
     var imageFile;
@@ -949,30 +801,6 @@ router.post('/add-product', isAdmin, function (req, res, next) {
         vendor_id: req.user._id
     })
 
-    ////console.log(req.user._id);
-
-    // imageFile = req.files.imageFile;
-    //     //console.log(process.env.imagePath);
-    //     //console.log(req.files);
-    //    // //console.log(req.files);
-    //     //console.log(__dirname +`\public`);
-    // imageFile.mv('public/images/'+ req.body.name + '.png', function (err) {
-    //     if (err) {
-    //         res.status(500).send(err);
-    //     }
-    //     product = new Product({
-    //         name: req.body.name,
-    //         code: req.body.code,
-    //         title: req.body.title,
-    //         Product_Group: req.body.Product_Group,
-    //         price: parseFloat((req.body.price * 100).toFixed(2)),
-    //         description: req.body.description,
-    //         shippable: req.body.shippable,
-    //         taxable: req.body.taxable,
-    //         category: req.body.category,
-    //         imagePath: '/images/' + req.body.name + '.png',
-    //         vendor_id: req.user._id
-    //     })
     product.save(function (err) {
         if (err) {
             req.flash('error', 'Error: ' + err.message);
@@ -990,11 +818,6 @@ router.post('/add-category', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     var imageFile;
 
-    // if (!req.files) {
-    //     res.send('No files were uploaded.');
-    //     return;
-    // }
-
     category = new Category({
         description: req.body.description,
         name: req.body.name,
@@ -1007,7 +830,6 @@ router.post('/add-category', isAdmin, function (req, res, next) {
             req.flash('error', 'Error: ' + err.message);
             return res.redirect('/vendor/categories');
         }
-        //console.log("category: " + category);
         return res.redirect('/vendor/categories');
     });
 });

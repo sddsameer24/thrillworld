@@ -1,8 +1,8 @@
 var taxConfig = {
-	ourStateCode: 'PA',
-	ourStateName: 'Pennsylvania',
-	ourStateTaxRate: .06,
-	ourCityTaxRate: .08,
-	ourCityName: 'Philadelphia',
+	ourStateCode: 'MH',
+	ourStateName: 'Maharastra',
+	ourStateTaxRate: .12,
+	ourCityTaxRate: .12,
+	ourCityName: 'Pune',
 };
 module.exports = taxConfig;

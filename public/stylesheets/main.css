@@ -1,7 +1,4 @@
 ﻿
-/*************************
-*******Typography******
-**************************/
 @import url(http://fonts.googleapis.com/css?family=Roboto:400,300,400italic,500,700,100);
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,800,300,600,700);
 @import url(http://fonts.googleapis.com/css?family=Abel);
@@ -9,8 +6,7 @@
 body {
   font-family: 'Roboto', sans-serif;
   background:#cbd4d4;
-  /* background-image: url("/images/fin.png"); */
-  /* background-repeat: no-repeat; */
+
   background-size:cover;
   position: relative;
   font-weight:400px;
@@ -2366,6 +2362,7 @@ label {
 	-o-transition: 0.5s ease;
 	-webkit-transition: 0.5s ease;	
 }
+
 .registration_form input[type="submit"]:hover{
 	background:#ed645c;
 }

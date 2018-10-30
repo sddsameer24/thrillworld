@@ -98,11 +98,7 @@ router.get('/', isAdmin, function (req, res, next) {
             for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
                 productChunks.push(docs.slice(i, i + chunkSize))
             }
-            // res.render('shop/index', {
-            // 	title: 'MEAN Store',
-            // 	products: productChunks,
-            // 	user: user
-            //   	});
+
             res.render('admin/dashboard', {
                 layout: 'admin-page.hbs',
                 products: productChunks,
@@ -153,14 +149,14 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
                 //////console.log(error.message);
                 res.send(500, "error fetching orders");
             }
-            var j=0;
+            var j = 0;
             for (var i = 0; i < orders.length; i++) {
-                if(orders[i].created == Date()){
-                  j++
-                }else
-                console.log("does not match");
-                };
-                console.log(j);
+                if (orders[i].created == Date()) {
+                    j++
+                } else
+                    console.log("does not match");
+            };
+            console.log(j);
             res.render('admin/orders', {
                 adminPageTitle: adminPageTitle,
                 adminPageUrl: adminPageUrl,
@@ -182,24 +178,24 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
     })
 });
 
-router.post('/order', function (req, res, next) {
-    //////console.log(req.files);
-    successMsg = req.flash('success')[0];
-    errorMsg = req.flash('error')[0];
-    var order_id = req.body._id;
-    var query = { '_id': order_id };
+// router.post('/order', function (req, res, next) {
+//     //////console.log(req.files);
+//     successMsg = req.flash('success')[0];
+//     errorMsg = req.flash('error')[0];
+//     var order_id = req.body._id;
+//     var query = { '_id': order_id };
 
-    // Order = new Order({
-    // note = req.body.note,
-    // receiver = req.body.receiver,
-    // })
-    Order.save(function (err) {
-        if (err) {
-            res.send(500, 'Error deleting order.');
-        }
-        return res.redirect('/admin/orders');
-    })
-})
+//     // Order = new Order({
+//     // note = req.body.note,
+//     // receiver = req.body.receiver,
+//     // })
+//     Order.save(function (err) {
+//         if (err) {
+//             res.send(500, 'Error deleting order.');
+//         }
+//         return res.redirect('/admin/orders');
+//     })
+// })
 router.post('/delete-order', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
@@ -932,6 +928,59 @@ router.post('/add-test', isAdmin, function (req, res, next) {
     });
 });
 //...............................testimonials.......................
+router.get('/add-product', isAdmin, function (req, res, next) {
+    successMsg = req.flash('success')[0];
+    errorMsg = req.flash('error')[0];
+    var adminPageTitle = "Add Products";
+    var adminPageUrl = "vendor/add-product";
+
+    var filter = req.query.filter;
+    //console.log("Filter " + filter);
+    qryFilter = {};
+    if (!filter || filter == 'allProducts') {
+        var allProducts = true;
+        var deletedProducts = false;
+        // qryFilter = {status: { $ne: 'deleted'}};
+        //console.log("req.user._id " + req.user._id);
+        qryFilter = { "vendor_id": req.user._id };
+    } else {
+        if (filter == 'deletedProducts') {
+            var allOrders = false;
+            var deletedProducts = true;
+            // qryFilter = { status: 'deleted'};
+            qryFilter = {};
+        }
+    }
+    Product.find(qryFilter, function (err, products) {
+        Category.find({}, function (err, allcats) {
+
+            Stats.getStats(function (err, stats) {
+                if (err) {
+                    //console.log(error.message);
+                    res.send(500, "error fetching products");
+                }
+                res.render('vendor/add-product', {
+                    adminPageTitle: adminPageTitle,
+                    adminPageUrl: adminPageUrl,
+                    layout: 'admin-page.hbs',
+                    allProducts: allProducts,
+                    deletedProducts: deletedProducts,
+                    // csrfToken: req.csrfToken(),
+                    noMessage: !successMsg,
+                    noErrorMsg: !errorMsg,
+                    errorMsg: errorMsg,
+                    user: req.user,
+                    stats: stats,
+                    products: products,
+                    allcats: allcats,
+                    isLoggedIn: req.isAuthenticated(),
+                    successMsg: successMsg
+                });
+            })
+        });
+    });
+});
+
 router.post('/add-product', isAdmin, function (req, res, next) {
     //////console.log(req.files);
     errorMsg = req.flash('error')[0];
@@ -946,25 +995,25 @@ router.post('/add-product', isAdmin, function (req, res, next) {
     imageFile1 = req.files.imageFile1;
     imageFile2 = req.files.imageFile2;
     imageFile3 = req.files.imageFile3;
-    imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
+    imageFile.mv('public/images/' + req.user._id + req.body.code + req.body.name + '.png', function (err) {
         if (err) {
             res.status(500).send(err);
         }
     });
 
-    imageFile1.mv('public/images/' + req.body.name + 'g1' + '.png', function (err) {
+    imageFile1.mv('public/images/' + req.user._id + req.body.code + req.body.name + 'g1' + '.png', function (err) {
         if (err) {
             res.status(500).send(err);
         }
     });
 
-    imageFile2.mv('public/images/' + req.body.name + 'g2' + '.png', function (err) {
+    imageFile2.mv('public/images/' + req.user._id + req.body.code + req.body.name + 'g2' + '.png', function (err) {
         if (err) {
             res.status(500).send(err);
         }
     });
 
-    imageFile3.mv('public/images/' + req.body.name + 'g3' + '.png', function (err) {
+    imageFile3.mv('public/images/' + req.user._id + req.body.code + req.body.name + 'g3' + '.png', function (err) {
         if (err) {
             res.status(500).send(err);
         }
@@ -977,7 +1026,7 @@ router.post('/add-product', isAdmin, function (req, res, next) {
         Pool: req.body.Pool,
         parking: req.body.parking,
         title: req.body.title,
-        Duration:req.body.Duration,
+        Duration: req.body.Duration,
         Product_Group: req.body.Product_Group,
         price: parseFloat((req.body.price * 100).toFixed(2)),
         description: req.body.description,
@@ -986,10 +1035,10 @@ router.post('/add-product', isAdmin, function (req, res, next) {
         category: req.body.category,
         Longitude: req.body.Longitude,
         Latitude: req.body.Latitude,
-        imagePath: '/images/' + req.body.name + '.png',
-        imagePathg1: '/images/' + req.body.name + 'g1' + '.png',
-        imagePathg2: '/images/' + req.body.name + 'g2' + '.png',
-        imagePathg3: '/images/' + req.body.name + 'g3' + '.png',
+        imagePath: '/images/' + req.user._id + req.body.code + req.body.name + '.png',
+        imagePathg1: '/images/' + req.user._id + req.body.code + req.body.name + 'g1' + '.png',
+        imagePathg2: '/images/' + req.user._id + req.body.code + req.body.name + 'g2' + '.png',
+        imagePathg3: '/images/' + req.user._id + req.body.code + req.body.name + 'g3' + '.png',
 
     })
     product.save(function (err) {
