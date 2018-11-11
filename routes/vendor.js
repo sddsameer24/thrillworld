@@ -152,7 +152,7 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
     }
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
-    var adminPageTitle = "Orders";
+    var adminPageTitle = "Bookings";
     var adminPageUrl = "/vendor/orders";
 
     Order.find(qryFilter).sort({ "created": -1 }).exec(function (err, orders) {
@@ -833,7 +833,58 @@ router.post('/add-category', isAdmin, function (req, res, next) {
         return res.redirect('/vendor/categories');
     });
 });
+router.get('/availability', isAdmin, function (req, res, next) {
+    successMsg = req.flash('success')[0];
+    errorMsg = req.flash('error')[0];
+    var adminPageTitle = "Availability";
+    var adminPageUrl = "/vendor/availability";
+    var filter = req.query.filter;
+    meanlogger.log("check", "Viewed orders", req.user);
 
+    if (!filter || filter == 'allOrders') {
+        var allOrders = true;
+        var pendingOrders = false;
+        var pickedUpOrders = false;
+        //console.log(req.user._id);
+
+
+        qryFilter = { "cart.vendor_id": req.user._id.toString() };
+
+    } else {
+        if (filter == 'pendingOrders') {
+            //console.log("pending");
+            var allOrders = false;
+            var pendingOrders = true;
+            var pickedUpOrders = false;
+            qryFilter = { "cart.vendor_id": req.user._id.toString() }, { receipt_status: 'pending' }, { receipt_status: 'partial' }, { receipt_status: 'New' }, { receipt_status: '' }, { "user.id": req.user._id };
+        } else {
+            if (filter == 'pickedUpOrders' || filter == 'complete') {
+                //console.log("picked");
+                var allOrders = false;
+                var pendingOrders = false;
+                var pickedUpOrders = true;
+                qryFilter = { receipt_status: 'complete' }, { "user.id": req.user._id }, { "cart.vendor_id": req.user._id.toString() };
+            }
+        }
+    }
+    Order.find(qryFilter).sort({ "created": -1 }).exec(function (err, orders) {
+        Stats.getStats(function (err, stats) {
+            if (err) {
+                //console.log(error.message);
+                res.send(500, "error fetching orders");
+            }
+     res.render('vendor/availability', {
+                adminPageTitle: adminPageTitle,
+                adminPageUrl: adminPageUrl,
+                layout: 'vendor-page.hbs',
+                orders:orders,
+                allOrders: allOrders,
+                pendingOrders: pendingOrders,
+                pickedUpOrders: pickedUpOrders,
+            });
+        });
+    });
+});
 router.get('/categories:filter?', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];

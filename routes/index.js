@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var Cart = require('../models/cart');
+var cart = require('../models/cart');
+// var cart1 =require('../models/cartl');
 var review = require('../models/reviews');
 var nodemailer = require('nodemailer');
 var Category = require('../models/category');
@@ -125,25 +126,19 @@ router.get('/shop', function (req, res, next) {
 			user: req.user,
 		});
 		//console.log(products);
-
-
 		// for (var i = 0; i < products.length; i++) {
 		// 	//console.log(products[i].Latitude);
 		// 	var dest = {
 		// 		lat: products[i].Latitude,
 		// 		lon: products[i].Longitude
-
 		// 	};
 		// 	var userloc = {
 		// 		lat: 12,
 		// 		lon: 13
 		// 	};
 		// 	var destTouserloc = Distance.between(dest, userloc);
-
 		// 	//console.log('' + destTouserloc.human_readable());
-
 		// }
-
 	});
 });
 
@@ -330,7 +325,7 @@ router.get('/', function (req, res, next) {
 					qryFilter = { "Product_Group": 'SIMPLE' };
 
 					Product.find(qryFilter, function (err, featured) {
-						console.log("Product: " + JSON.stringify(featured));
+						// console.log("Product: " + JSON.stringify(featured));
 
 						if (err || featured === 'undefined' || featured == null) {
 							// replace with err handling
@@ -395,7 +390,6 @@ router.post('/hostsignup', passport.authenticate('local.signup', {
 	failureRedirect: '/hostsignup',
 	failureFlash: true
 }), function (req, res, next) {
-	alert("signup");
 	meanlogger.log("auth", "signup attempt", req.user);
 	req.session.first_name = req.body.first_name;
 	req.session.last_name = req.body.last_name;
@@ -626,7 +620,6 @@ router.post('/hostsignup-mobile', function (req, res, next) {
 						categCondition = {};
 					}
 					Product.Product.find(categCondition, function (err, docs) {
-
 						if (err) {
 							res.send({
 								message: "Error",
@@ -1550,92 +1543,87 @@ router.get('/category-mobile/:slug', function (req, res, next) {
 router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-	var ticket_name = req.body.ticket_name || null;
-	var ticket_email = req.body.ticket_email || null;
-	var price = req.body.price || null;
-	var adult = req.body.adult || null;
-	var children = req.body.children || null;
-	var kids = req.body.kids || null;
-	var arrival = req.body.arrival || null;
-	var departure = req.body.departure || null;
-	var totalprice = req.body.totalprice || null;
-	var type = req.body.Product_Group || null;
-
-	/* new product to be added to cart */
-	var productId = req.body.productId || null;
-	/* tickets need to have name and email recorded */
-	if (type == 'TICKET') {
-		req.checkBody("ticket_email", "Enter a valid email address.").isEmail();
-	}
-
-	if (type == 'DONATION') {
-		if (price >= 1000) {
-			errors = 1;
-			req.flash('error', 'Unable to accept donations greater than');
+	cart = new cart({
+		price: req.body.price,
+		adult: req.body.adult,
+		children: req.body.children,
+		kids: req.body.kids,
+		arrival: req.body.arrival,
+		departure: req.body.depart,
+		totalprice: req.body.subtotal,
+		user_id: req.body.userid,
+		id: req.body.productId,
+	});
+	console.log("cart1556: " + cart);
+	cart.save(function (err) {
+		if (err) {
+			console.log('error', 'Error: ' + err.message);
+			console.log("cart1560: " + cart);
 			return res.redirect('/');
 		}
-		if (price < 1 || price == 0) {
-			req.flash('error', 'Unable to process negative donations.');
-			return res.redirect('/');
-		}
-	}
-	var errors = req.validationErrors();
-	if (errors) {
-		returnObject = {
-			errorMsg: errors,
-			noErrorMsg: false,
-			noMessage: true
-		};
-		req.flash('error', 'Invalid email address.  Please re-enter.');
+		// res.flash('thanks for your feedback');
+		console.log("cart1563: " + cart);
 		return res.redirect('/shopping-cart');
-	}
-
-	var option = req.body.option || null;
-	// if we have a cart, pass it - otherwise, pass an empty object
-	var cart = new Cart(req.session.cart ? req.session.cart : {});
-	Product.findById(productId, function (err, product) {
-		if (err || product === 'undefined' || product == null) {
-			// replace with err handling
-			var errorMsg = req.flash('error', 'unable to find product');
-			return res.redirect('/shopping-cart');
-		}
-		if (product.Product_Group == 'DONATION') {
-			//////console.log("PRICE: " + parseFloat(price * 100));
-			theprice = parseFloat(price);
-		} else {
-			totalprice = product.price;
-		}
-		added = cart.add(product, product.id, departure, arrival, adult, kids, totalprice, children, option, ticket_name, ticket_email, product.Product_Group, product.taxable, product.shippable, req.user._id);
-		console.log(adult);
-
-		meanlogger.log('plus', 'Added ' + product.name + ' to cart', req.user);
-
-		if (added) {
-			req.flash('error', added.message);
-			return res.redirect('/shopping-cart');
-		} else {
-			cart.totalShipping = 0;
-			req.session.cart = cart;
-			req.flash('success', 'Item successfully added to cart. ');
-			if (!req.session.group === null) {
-				res.redirect('/group/' + req.session.group);
-			} else {
-				if (!req.session.category === null) {
-					res.redirect('/category/' + req.session.category);
-				}
-			}
-			if (!req.session.category === null) {
-				res.redirect('/category/' + req.session.category);
-			} else {
-				if (!req.session.group === null) {
-					res.redirect('/group/' + req.session.group);
-				}
-			}
-			return res.redirect('/shopping-cart');
-		}
-		// });
 	});
 });
+
+// 	var errors = req.validationErrors();
+// 	if (errors) {
+// 		returnObject = {
+// 			errorMsg: errors,
+// 			noErrorMsg: false,
+// 			noMessage: true
+// 		};
+// 		req.flash('error', 'Invalid email address.  Please re-enter.');
+// 		return res.redirect('/shopping-cart');
+// 	}
+
+// 	var option = req.body.option || null;
+// 	// if we have a cart, pass it - otherwise, pass an empty object
+// 	var cart = new cart(req.session.cart ? req.session.cart : {});
+// 	Product.findById(productId, function (err, product) {
+// 		if (err || product === 'undefined' || product == null) {
+// 			// replace with err handling
+// 			var errorMsg = req.flash('error', 'unable to find product');
+// 			return res.redirect('/shopping-cart');
+// 		}
+// 		if (product.Product_Group == 'DONATION') {
+// 			//////console.log("PRICE: " + parseFloat(price * 100));
+// 			theprice = parseFloat(price);
+// 		} else {
+// 			totalprice = product.price;
+// 		}
+// 		added = cart.add(product, product.id, departure, arrival, adult, kids, totalprice, children, option, ticket_name, ticket_email, product.Product_Group, product.taxable, product.shippable, req.user._id);
+// 		console.log(adult);
+
+// 		meanlogger.log('plus', 'Added ' + product.name + ' to cart', req.user);
+
+// 		if (added) {
+// 			req.flash('error', added.message);
+// 			return res.redirect('/shopping-cart');
+// 		} else {
+// 			cart.totalShipping = 0;
+// 			req.session.cart = cart;
+// 			req.flash('success', 'Item successfully added to cart. ');
+// 			if (!req.session.group === null) {
+// 				res.redirect('/group/' + req.session.group);
+// 			} else {
+// 				if (!req.session.category === null) {
+// 					res.redirect('/category/' + req.session.category);
+// 				}
+// 			}
+// 			if (!req.session.category === null) {
+// 				res.redirect('/category/' + req.session.category);
+// 			} else {
+// 				if (!req.session.group === null) {
+// 					res.redirect('/group/' + req.session.group);
+// 				}
+// 			}
+// 			return res.redirect('/shopping-cart');
+// 		}
+// 		// });
+// 	});
+// });
 
 // mobile add to cart
 router.post('/add-to-cart-mobile', isLoggedIn, function (req, res, next) {
@@ -1686,7 +1674,7 @@ router.post('/add-to-cart-mobile', isLoggedIn, function (req, res, next) {
 
 	var option = req.body.option || null;
 	// if we have a cart, pass it - otherwise, pass an empty object
-	var cart = new Cart(req.session.cart ? req.session.cart : {});
+	var cart = new cart(req.session.cart ? req.session.cart : {});
 	Product.findById(productId, function (err, product) {
 		if (err || product === 'undefined' || product == null) {
 			// replace with err handling
@@ -1772,7 +1760,7 @@ router.get('/add-to-cart/:id/', function (req, res, next) {
 	var option = req.body.option || "";
 	var productId = req.params.id;
 	// if we have a cart, pass it - otherwise, pass an empty object
-	var cart = new Cart(req.session.cart ? req.session.cart : {});
+	var cart = new cart(req.session.cart ? req.session.cart : {});
 
 	Product.findById(productId, function (err, product) {
 		if (err) {
@@ -1805,7 +1793,7 @@ router.get('/add-to-cart-mobile/:id/', function (req, res, next) {
 	var option = req.body.option || "";
 	var productId = req.params.id;
 	// if we have a cart, pass it - otherwise, pass an empty object
-	var cart = new Cart(req.session.cart ? req.session.cart : {});
+	var cart = new cart(req.session.cart ? req.session.cart : {});
 
 	Product.findById(productId, function (err, product) {
 		if (err) {
@@ -1839,7 +1827,7 @@ router.get('/add-to-cart-mobile/:id/', function (req, res, next) {
 });
 
 router.get('/empty-cart', isLoggedIn, function (req, res, next) {
-	var cart = new Cart({});
+	var cart = new cart({});
 	cart.empty();
 	req.session.cart = cart;
 	meanlogger.log('trash', 'Emptied cart', req.user);
@@ -1849,7 +1837,7 @@ router.get('/empty-cart', isLoggedIn, function (req, res, next) {
 
 // mobile on empty cart 
 router.get('/empty-cart-mobile', isLoggedIn, function (req, res, next) {
-	var cart = new Cart({});
+	var cart = new cart({});
 	cart.empty();
 	req.session.cart = cart;
 
@@ -1863,7 +1851,7 @@ router.get('/empty-cart-mobile', isLoggedIn, function (req, res, next) {
 router.get('/reduce-qty/:id/', function (req, res, next) {
 	var productId = req.params.id;
 	// if we have a cart, pass it - otherwise, pass an empty object
-	var cart = new Cart(req.session.cart ? req.session.cart : {});
+	var cart = new cart(req.session.cart ? req.session.cart : {});
 	Product.findById(productId, function (err, product) {
 		if (err) {
 			// replace with err handling
@@ -1886,7 +1874,7 @@ router.get('/reduce-qty/:id/', function (req, res, next) {
 router.get('/reduce-qty-mobile/:id/', function (req, res, next) {
 	var productId = req.params.id;
 	// if we have a cart, pass it - otherwise, pass an empty object
-	var cart = new Cart(req.session.cart ? req.session.cart : {});
+	var cart = new cart(req.session.cart ? req.session.cart : {});
 	Product.findById(productId, function (err, product) {
 		if (err) {
 			// replace with err handling
@@ -1917,60 +1905,55 @@ router.get('/reduce-qty-mobile/:id/', function (req, res, next) {
 });
 
 router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
+	var slug3 = req.params.slug3;
+	qryFilter = { "user_id": req.user._id };
+	qryFilter1 = { "productid": req._id };
+	// Product.find(qryFilter, function (err, product) {
+	// 	if (err || product === 'undefined' || product == null) {
+	// 		var errorMsg = req.flash('error', 'unable to find product');
+	// 		return res.redirect('/');
+	// 	}
+	// 	if (!product) {
+	// 		req.flash('error', 'Product is not found.');
+	// 		res.redirect('/');
+	// 	}
+	var user = req.user._id;
+	console.log(user);
+	cart.find(qryFilter1, function (err, cart) {
+		console.log(cart);
+		Product.find(qryFilter, function (err, product) {
 
-	if (res.locals.needsAddress || req.user.addr1 === 'undefined' || req.user.addr1 == null) {
-		req.flash('error', 'Please complete your profile with your address information');
-	}
-	errorMsg = req.flash('error')[0];
-	successMsg = req.flash('success')[0];
-	if (!req.session.cart) {
-		return res.render('shop/shopping-cart', {
-			layout: 'eshop/blank',
-			products: null,
-			user: req.user
+
+			console.log(cart);
+			event = new Event({
+				namespace: 'products',
+				person: {
+					id: req.user._id,
+					first_name: req.user.first_name,
+					last_name: req.user.last_name,
+					email: req.user.email,
+				},
+				action: 'view',
+				thing: {
+					type: "product",
+					id: product._id,
+					name: product.name,
+					category: product.category,
+					Product_Group: product.Product_Group
+				}
+			});
+			event.save(function (err, eventId) {
+				if (err) {
+					return -1;
+				}
+
+				res.send(cart);
+			});
 		});
-	}
-	var cart = new Cart(req.session.cart);
-	var cartJSON = cart;
-	var totalTax = parseFloat(Number(cart.totalTax).toFixed(2));
-	var totalPrice = parseFloat(Number(cart.totalPrice).toFixed(2));
-	var totalShipping = parseFloat(Number(cart.totalShipping).toFixed(2));
-	var totalPriceWithTax = parseFloat(Number(cart.totalPriceWithTax).toFixed(2));
-	var totalTax = parseFloat(Number(cart.totalTax).toFixed(2));
-	var grandTotal = parseFloat(Number(cart.grandTotal).toFixed(2));
-	var products = cart.generateArray();
-
-	recommendations.GetRecommendations(cart, function (err, recommendations) {
-		if (err) {
-			errorMsg = req.flash('error', err.message);
-		}
-
-		//////console.log("error: " + errorMsg);
-		res.render('shop/shopping-cart', {
-			layout: 'eshop/blank',
-			products: cart.generateArray(),
-			items: cart.generateObject(),
-			allcats: req.session.allcats,
-			totalTax: totalTax,
-			viewDocuments: viewDocuments,
-			totalPrice: totalPrice,
-			cartJSON: cartJSON,
-			totalShipping: totalShipping,
-			grandTotal: cart.grandTotal,
-			recommendations: recommendations,
-			user: req.user,
-			localUser: (req.user.state == taxConfig.ourStateCode),
-			errorMsg: errorMsg,
-			noErrorMsg: !errorMsg,
-			successMsg: successMsg,
-			noMessage: !successMsg
-		});
-	})
-
-
+	});
 });
 
-// Mobile Shopping Cart
+// Mobile Shopping cart
 router.get('/shopping-cart-mobile', isLoggedIn, function (req, res, next) {
 	if (res.locals.needsAddress || req.user.addr1 === 'undefined' || req.user.addr1 == null) {
 		res.send({
@@ -1980,11 +1963,11 @@ router.get('/shopping-cart-mobile', isLoggedIn, function (req, res, next) {
 	}
 	if (!req.session.cart) {
 		res.send({
-			message: "Shopping Cart empty",
+			message: "Shopping cart empty",
 			status: false
 		});
 	}
-	var cart = new Cart(req.session.cart);
+	var cart = new cart(req.session.cart);
 	var cartJSON = cart;
 	var totalTax = parseFloat(Number(cart.totalTax).toFixed(2));
 	var totalPrice = parseFloat(Number(cart.totalPrice).toFixed(2));
@@ -2026,7 +2009,7 @@ router.post('/update_shipping', isLoggedIn, function (req, res, next) {
 	}
 	errorMsg = req.flash('error')[0];
 	successMsg = req.flash('success')[0];
-	var cart = new Cart(req.session.cart);
+	var cart = new cart(req.session.cart);
 	var errorMsg = req.flash('error')[0];
 
 	res.render('shop/checkout', {
@@ -2050,7 +2033,7 @@ router.post('/update_shipping-mobile', isLoggedIn, function (req, res, next) {
 		});
 	}
 
-	var cart = new Cart(req.session.cart);
+	var cart = new cart(req.session.cart);
 
 
 	res.send({
@@ -2073,7 +2056,7 @@ router.get('/checkout', isLoggedIn, function (req, res, next) {
 	}
 	var shipping_flag = req.body.shipping_flag;
 
-	var cart = new Cart(req.session.cart);
+	var cart = new cart(req.session.cart);
 	meanlogger.log('shopping-cart', 'Viewed checkout', req.user);
 
 	res.render('shop/checkout', {
@@ -2105,7 +2088,7 @@ router.get('/checkout-mobile', isLoggedIn, function (req, res, next) {
 	}
 	var shipping_flag = req.body.shipping_flag;
 
-	var cart = new Cart(req.session.cart);
+	var cart = new cart(req.session.cart);
 	//meanlogger.log('shopping-cart', 'Viewed checkout', req.user);
 
 
@@ -2146,7 +2129,7 @@ router.post('/checkout', function (req, res, next) {
 	var shipping_flag = req.body.shipping_flag;
 	var shipping_flags = req.body.shipping_flags;
 
-	var cart = new Cart(req.session.cart);
+	var cart = new cart(req.session.cart);
 	console.log(cart);
 	if (shipping_flag && process.env.enableShipping) {
 		req.checkBody("shipping_addr1", "Enter a valid shipping address.");
@@ -2303,7 +2286,7 @@ router.post('/checkout-mobile', function (req, res, next) {
 	var shipping_flag = req.body.shipping_flag;
 	var shipping_flags = req.body.shipping_flags;
 
-	var cart = new Cart(req.session.cart);
+	var cart = new cart(req.session.cart);
 	if (shipping_flag && process.env.enableShipping) {
 
 
@@ -2546,7 +2529,7 @@ router.post('/create', function (req, res, next) {
 	}
 
 
-	var cart = new Cart(req.session.cart);
+	var cart = new cart(req.session.cart);
 	products = cart.generateArray();
 	tax = taxCalc.calculateTaxReturn(products, req.user._id);
 	var create_payment = {
@@ -2918,7 +2901,7 @@ router.post('/create-mobile', function (req, res, next) {
 	}
 
 
-	var cart = new Cart(req.session.cart);
+	var cart = new cart(req.session.cart);
 	products = cart.generateArray();
 	tax = taxCalc.calculateTaxReturn(products, req.user._id);
 	var create_payment = {
@@ -3350,8 +3333,6 @@ router.get('/like-mobile/:id', isLoggedIn, function (req, res, next) {
 
 
 router.post('/reviews', isLoggedIn, function (req, res, next) {
-	errorMsg = req.flash('error')[0];
-	successMsg = req.flash('success')[0];
 	review = new review({
 		review: req.body.review,
 		user: req.body.name,
@@ -3364,9 +3345,10 @@ router.post('/reviews', isLoggedIn, function (req, res, next) {
 			req.flash('error', 'Error: ' + err.message);
 			return res.redirect('/');
 		}
+		// res.flash('thanks for your feedback');
 		//console.log("product: " + product);
 		return res.redirect('/');
-		req.flash('thanks for your feedback');
+
 
 	});
 });
@@ -3381,7 +3363,7 @@ router.get('/execute', function (req, res, next) {
 	var details = {
 		"payer_id": PayerID
 	};
-	var cart = new Cart(req.session.cart);
+	var cart = new cart(req.session.cart);
 	products = cart.generateArray();
 	var payment = paypal.payment.execute(paymentId, details, function (error, payment) {
 		if (error) {
@@ -3830,76 +3812,56 @@ router.post('/search-mobile', function (req, res, next) {
 
 router.get('/product/:slug3', function (req, res, next) {
 	var slug3 = req.params.slug3;
-	// var username = req.user.first_name;
 	qryFilter = { "_id": slug3 };
-	reviews.find(qryFilter, function (err, product) {
-		if (err || product === 'undefined' || product == null) {
-			var errorMsg = req.flash('error', 'unable to find product');
-			return res.redirect('/');
-		}
-		if (!product) {
-			req.flash('error', 'Product is not found.');
-			res.redirect('/');
-		}
-		console.log(product);
-	})
+	qryFilter1 = { "productid": slug3 };
+	// Product.find(qryFilter, function (err, product) {
+	// 	if (err || product === 'undefined' || product == null) {
+	// 		var errorMsg = req.flash('error', 'unable to find product');
+	// 		return res.redirect('/');
+	// 	}
+	// 	if (!product) {
+	// 		req.flash('error', 'Product is not found.');
+	// 		res.redirect('/');
+	// 	}
+	var user = req.user._id;
+	console.log(user);
 	Product.find(qryFilter, function (err, product) {
-		if (err || product === 'undefined' || product == null) {
-			var errorMsg = req.flash('error', 'unable to find product');
-			return res.redirect('/');
-		}
-		if (!product) {
-			req.flash('error', 'Product is not found.');
-			res.redirect('/');
-		}
-
-		// Product.aggregate([
-		// 	{
-		// 		$lookup:
-		// 		{
-		// 			from: 'reviews',
-		// 			localField: 'productid',
-		// 			foreignField: '_id',
-		// 			as: 'reviews'
-		// 		}
-		// 	}
-		// ]);console.log(Product);
-
-		event = new Event({
-			namespace: 'products',
-			person: {
-				id: req.user._id,
-				first_name: req.user.first_name,
-				last_name: req.user.last_name,
-				email: req.user.email,
-			},
-			action: 'view',
-			thing: {
-				type: "product",
-				id: product._id,
-				name: product.name,
-				category: product.category,
-				Product_Group: product.Product_Group
-			}
-		});
-		event.save(function (err, eventId) {
-			if (err) {
-				return -1;
-			}
-			recommendations.GetRecommendations(product, function (err, recommendations) {
-				if (err) {
-					req.flash('error', "An error has occurred - " + err.message);
-					return res.redirect('/');
+		review.find(qryFilter1, function (err, reviews) {
+			// console.log(reviews);
+			event = new Event({
+				namespace: 'products',
+				person: {
+					id: req.user._id,
+					first_name: req.user.first_name,
+					last_name: req.user.last_name,
+					email: req.user.email,
+				},
+				action: 'view',
+				thing: {
+					type: "product",
+					id: product._id,
+					name: product.name,
+					category: product.category,
+					Product_Group: product.Product_Group
 				}
-				res.render('shop/product', {
-					layout: 'eshop/blank',
-					recommendations: recommendations,
-					username: username,
-					user: req.user,
-					reviews:reviews,
-					product: product,
-					errorMsg: errorMsg,
-					noErrorMsg: !errorMsg
+			});
+			event.save(function (err, eventId) {
+				if (err) {
+					return -1;
+				}
+				recommendations.GetRecommendations(product, function (err, recommendations) {
+					if (err) {
+						req.flash('error', "An error has occurred - " + err.message);
+						return res.redirect('/');
+					}
+					res.render('shop/product', {
+						layout: 'eshop/blank',
+						recommendations: recommendations,
+						// username: username,
+						user: user,
+						reviews: reviews,
+						product: product,
+					});
 				});
 			});
 		});

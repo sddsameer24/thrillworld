@@ -789,7 +789,6 @@ router.get('/products:filter?', isAdmin, function (req, res, next) {
     }
     Product.find(qryFilter, function (err, products) {
         Category.find({}, function (err, allcats) {
-
             Stats.getStats(function (err, stats) {
                 if (err) {
                     //////console.log(error.message);
@@ -841,14 +840,6 @@ router.post('/delete-product', isAdmin, function (req, res, next) {
             res.send(500, 'Error deleting order.');
         }
         product.status = 'deleted';
-        // product.save(function (err) {
-        //     if (!err) {
-        //         //////console.log("updated");
-        //     } else {
-        //         //////console.log(err);
-        //     }
-
-        // });
         return res.redirect('/admin/products');
     })
 })
@@ -892,42 +883,6 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
         return res.redirect('/admin/products');
     });
 });
-//...............................testimonials.......................
-router.post('/add-test', isAdmin, function (req, res, next) {
-    //////console.log(req.files);
-    errorMsg = req.flash('error')[0];
-    successMsg = req.flash('success')[0];
-    var imageFile;
-
-    if (!req.files) {
-        res.send('No files were uploaded.');
-        return;
-    }
-    imageFile = req.files.imageFile;
-
-    imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
-        if (err) {
-            res.status(500).send(err);
-        }
-    });
-
-
-    test = new test({
-        name: req.body.name,
-        comment: req.body.comment,
-        imagePath: '/images/' + req.body.name + '.png',
-    })
-    test.save(function (err) {
-        if (err) {
-            req.flash('error', 'Error: ' + err.message);
-            return res.redirect('/admin/test');
-        }
-        //console.log("test: " + product);
-        return res.redirect('/admin/test');
-
-    });
-});
-//...............................testimonials.......................
 router.get('/add-product', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];

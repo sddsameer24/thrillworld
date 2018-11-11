@@ -1,180 +1,42 @@
- <h1 class="feah">Featured in Thrillworld</h1>
-<div class="features_items"><!--featured_items-->
-	{{#each featured}}
-       
-		{{#each this}}
-            {{#if this.name }}
-            <div class="col-md-3">
-    			<div class="product-image-wrapper">
-    				<div class="single-products">
-    					<div class="productinfo text-center">
-                            <a href="{{this.imagePath}}" rel="prettyPhoto" title="{{this.title}}" >
-                                <img src="{{this.imagePath}}" width="100" alt="{{this.title}}" />
-                            </a>
-                            <a href="/product/{{this._id}}"><p><h2>{{this.title}}</h2></p>
-                            <p>{{this.description}}</p>
-                            <h4>{{this.code}}</h4></a>
-                            {{#if this.inventory.disableAtZero}}
-                                <p>({{this.inventory.onHand}}) Available</p>
-                            {{/if}}
-                            {{#if ../../isLoggedIn}}
-                                <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
-                                <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
-                            {{else}}
-                                <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}
-                            {{/if}}
- 					        {{#if this.isDonation }}
-                                {{#if this.options }}
-                                <h3>Select:</h3>
-                                <select class="form-control input-sm" name="option">
-                                    {{#each this.options}}
-                                        <option name="{{value}}">{{name}}</option>
-                                    {{/each}}
-                                </select>
-                                {{/if}}
-                                {{#if ../../isLoggedIn}}
-                                    <form action='/add-to-cart' method='POST'>
-                                        <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
-                                        <input type='hidden' id='type' name='Product_Group' value='DONATION'>
-                                        <label for="price">Amount</label>
-                                        <input type='text' class='text-right form-control input-sm' name='price' value='{{money this.price}}'>
-                                        <p class="text-center">
-                                            <input type='submit' value='Add to Cart' class="btn btn-primary add-to-cart" role="button">
-                                        </p>
-                                    </form>
-                                {{else}}
-                                    <p class="text-center">
-                                        <a href="/user/signin" class="btn btn-primary add-to-cart" role="button">Sign in to Buy</a>
-                                    </p>
-                                {{/if}}
-                            {{else}} <!-- if this.isVariable -->
-    							{{#if this.Attributes}}
-                                    <h3>Features</h3>
-                                    <ul class='text-left'>
-                                        {{#each this.Attributes}}
-                                            <li><b>{{Upper this.Name}}:</b> {{this.Value}}</li>
-                                        {{/each}}
-                                     </ul>
-                                {{/if}}
-    							{{#if this.isApparel}}
-                                    <form action='/add-to-cart' method='POST'>
-                                        <div class="form-group">
-                                            <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
-                                            <input type='hidden' id='price' name='price' value='{{ this.price }}'>
-                                            <input type='hidden' id='type' name='type' value='APPAREL'>
-                                            <input type='hidden' id='type' name='Product_Group' value='APPAREL'>
-                                            {{#if this.options }}
-                                            <h3>Select:</h3>
-                                            <select class="form-control input-sm" name="option">
-                                                {{#each this.options}}
-                                                    <option name="{{value}}">{{name}}</option>
-                                                {{/each}}
-                                            </select>
-                                            {{/if}}
-                                            <h2 class="product-price text-center">
-                                                Rs{{money this.price}}
-                                            </h2>
-                                            {{#if ../../isLoggedIn}}
-                                                <p class="text-center">
-                                                    <input type='submit' value='Add to Cart' class="btn btn-primary add-to-cart" role="button">
-                                                </p>
-                                            {{else}}
-                                                <p class="text-center">
-                                                    <a href="/user/signin" class="btn btn-primary add-to-cart" role="button">Sign in to Buy</a>
-                                                </p>
-                                            {{/if}}
-                                        </div>
-                                    </form>
-                                {{else}} <!--if this.isApparel -->
-                                    {{#if this.new}}
-                                        <form action='/add-to-cart' method='POST'>
-                                        <div class="form-group">
-                                            <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
-                                            <input type='hidden' id='price' name='price' value='{{money this.price }}'>
-                                            <input type='hidden' id='type' name='type' value='TICKET'>
-                                            <input type='hidden' id='type' name='Product_Group' value='TICKET'>
-                                            {{#if ../../isLoggedIn}}
-                                            <div class='form-group'>
-                                                <label for='Name'>Name for Ticket</label>
-                                                <input class='form-control input-sm' type='text' name='ticket_name' value="{{../../user.first_name}}">
-                                                <label for='Name'>Email</label>
-                                                <input class='form-control input-sm' type='text' name='ticket_email' value="{{../../user.email}}">
-                                            </div>
-                                            {{/if}}
-                                            {{#if this.options }}
-                                            <h3>Select:</h3>
-                                            <select class="form-control input-sm" name="option">
-                                                {{#each this.options}}
-                                                    <option name="{{value}}">{{name}}</option>
-                                                {{/each}}
-                                            </select>
-                                            {{/if}}
-                                            <h2 class="product-price text-center">
-                                                Rs{{money this.price}}
-                                            </h2>
+<h1 class="feah">Featured in Thrillworld</h1>
+<div class="features_items">
+    <!--featured_items-->
+    {{#each featured}} {{#each this}} {{#if this.name }}
+    <div class="col-md-3">
+        <div class="product-image-wrapper">
+            <div class="single-products">
+                <div class="productinfo text-center">
+                    <a href="{{this.imagePath}}" rel="prettyPhoto" title="{{this.title}}">
+                        <img src="{{this.imagePath}}" width="100" alt="{{this.title}}" />
+                    </a>
+                    <a href="/product/{{this._id}}">
+                        <p>
+                            <h2>{{this.title}}</h2>
+                        </p>
+                    </a>
+                    <p>{{this.description}}</p>
+                    <h4>{{this.code}}</h4>
+                
 
-                                            {{#if ../../isLoggedIn}}
-                                            <p class="text-center">
-                                                <input type='submit' value='Add to Cart' class="btn btn-primary add-to-cart" role="button">
-                                            </p>
-                                            {{else}}
-                                            <p class="text-center">
-                                                <a href="/user/signin" class="btn btn-primary add-to-cart" role="button">Sign in to Buy</a>
-                                            </p>
-                                            {{/if}}
-                                        </div>
-                                        </form>
-                                    {{else}} <!-- if this.new -->
-                                        <form action='/add-to-cart' method='POST'>
-                                            <div class="form-group">
-                                                <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
-                                                <input type='hidden' id='price' name='price' value='{{ money this.price }}'>
-                                                <input type='hidden' id='type' name='type' value='SIMPLE'>
-                                                <input type='hidden' id='type' name='Product_Group' value='SIMPLE'>
-                                                {{#if this.options }}
-                                                    <h3>Select</h3>
-                                                    <select class="form-control input-sm" name="option">
-                                                        {{#each this.options}}
-                                                            <option name="{{value}}">{{name}}</option>
-                                                        {{/each}}
-                                                    </select>
-                                                {{/if}}
-                                                <h2 class="product-price text-center">
-                                                    {{money this.price}}
-                                                </h2>
+                    {{#if ../../isLoggedIn}}
+                    <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
+                        <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
+                    {{else}}
+                    <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }} {{/if}}
 
-                                                {{#if ../../isLoggedIn}}
-                                                <p class="text-center">
-                                                    <input type='submit' value='Add to Cart' class="btn btn-primary add-to-cart" role="button">
-                                                </p>
-                                                {{else}}
-                                                <p class="text-center">
-                                                    <a href="/user/signin" class="btn btn-primary add-to-cart" role="button">Sign in to Buy</a>
-                                                </p>
-                                                {{/if}}
-                                            </div>
-                                        </form>
-                                    {{/if}} <!-- if this.new -->
-                                {{/if}} <!-- if this.isApparel -->
-                            {{/if}} <!-- if this.isVariable -->
-    					</div>
-                         {{#if this.sale_attributes.new}}
-                            <img src="/images/home/new.png" width=42 class="new" alt="">
-                        {{/if}}
-                        {{#if this.sale_attributes.sale}}
-                            <img src="/images/home/sale.png" width=42 class="sale" alt="">
-                        {{/if}}
-    				</div>
-    			</div>
+                    <a class="text-center">
+                        <a href="/product/{{this._id}}" class="btn btn-primary add-to-cart" role="button">View Details</a>
+                    </a>
+
+
+
+                </div>
+              
+
             </div>
-        {{/if}}
-	{{/each}}
-  
-{{/each}}
-	{{!-- <ul class="pagination">
-		<li class="active"><a href="">1</a></li>
-		<li><a href="">2</a></li>
-		<li><a href="">3</a></li>
-		<li><a href="">&raquo;</a></li>
-	</ul> --}}
-	</div><!--featured_items-->
+
+        </div>
+    </div>
+
+{{/if}} {{/each}} {{/each}} 
+

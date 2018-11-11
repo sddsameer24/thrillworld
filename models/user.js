@@ -79,13 +79,7 @@ var userSchema = new Schema({
 			type: Date, default: Date.now()
 		}
 	}],
-	reviews: [String],
-	purchased: [{
-		code: String,
-		purchased: {
-			type: Date, default: Date.now()
-		}
-	}],
+	
 	orders:[{
         paymentId: String,
         status: String,

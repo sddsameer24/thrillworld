@@ -1,5 +1,5 @@
 <div class="product">
-    {{#each product}}
+    <input type="hidden" id="one" name="one" value="{{this.user}}" /> {{#each product}}
     <div class="container">
         <div class="card">
             <h2 class="p-0 m-0" style="text-align:center" ; id="product-title">{{this.name}}</h2>
@@ -76,12 +76,12 @@
                     </div>
                     <form action='/add-to-cart' method='POST'>
                         <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
-                        <input type='hidden' id='type' name='type' value='DONATION'>
+
                         <h3 class="product-price text-center">
                             <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
                         </h3>
 
-
+                        <input type="hidden" id="two" name="userid" />
                         <div class="row">
                             <div class="col-md-6" id="arrival">
                                 <label>Date of arrival</label>
@@ -109,6 +109,7 @@
                                 <label>Number of Adult</label>
                                 <input type="number" id="adult" oninput="calc()" name="adult">
                             </div>
+
                             <div class="col-md-4" id="depart">
                                 <label>Number of Children</label>
                                 <input type="number" id="children" oninput="calc()" name="children">
@@ -117,6 +118,7 @@
                                 <label>Kids below 5</label>
                                 <input type="number" name="kids" data-toggle="tooltip" data-placement="top" title="Its free but we do need count">
                             </div>
+
                         </div>
 
 
@@ -143,8 +145,6 @@
 
 
     </div>
-    {{!--
-    <div id="map" style="width:100%;height:200px;"></div> --}}
     <script>
         function myMap() {
             var myCenter = new google.maps.LatLng({{ this.Latitude }}, { { this.Longitude } });
@@ -164,28 +164,212 @@
 </div>
 <!-- end container-->
 {{/each}}
-<form action='/reviews' method='POST'>
-    <input type='hidden' id='type' name='name' value='{{this.user.first_name}} {{this.user.last_name}}'> {{#each product}}
-    <input type='hidden' id='name' name='clone' value='{{ this._id }}'> {{/each}}
-    <input type='hidden' id='firstname' name='productid'>
-    <input type='number' name='rating' value=''>
-    <input type='text' name='review' value=''>
-    <input type='submit' value='submit' class="btn btn-primary add-to-cart" role="button">
-</form>
+
+
+<div>
+    {{#each reviews}}
+    <div class="scone">
+        <div>
+            <div class="scone__icing">
+                <div class="scone__media">
+                    <img src="https://www.accountingweb.co.uk/sites/default/files/styles/response_avatar/public/picture-190538-1318866062.jpg?itok=KyQrsQYG"
+                        alt="" class="imagescone">
+                </div>
+                <div class="scone__jam">
+                    <div class="scone__name">{{this.user}}</div>
+                    <div class="scone__date">{{this.created}}</div>
+                </div>
+            </div>
+            {{!--
+            <div class="rate">
+                {{#if this.rating "1"}}
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star fa-semi-opacity"></i>
+                <i class="fa fa-star fa-star-faded"></i>
+                <i class="fa fa-star fa-semi-opacity"></i>
+                <i class="fa fa-star fa-star-faded"></i>
+                {{/if}} {{#if this.rating "2"}}
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star fa-star-faded"></i>
+                <i class="fa fa-star fa-semi-opacity"></i>
+                <i class="fa fa-star fa-star-faded"></i>
+                {{/if}} {{#if this.rating "3"}}
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star fa-semi-opacity"></i>
+                <i class="fa fa-star fa-star-faded"></i>
+                {{/if}} {{#if this.rating "4"}}
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star fa-semi-opacity"></i>
+                <i class="fa fa-star fa-star-faded"></i>
+                {{/if}} {{#if this.rating "5"}}
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star fa-star-faded"></i>
+                {{/if}}
+            </div>
+        </div> --}}
+        <div class="scone__cream">
+            <h3 class="scone__title">{{this.review}}</h3>
+            <div class="scone__body">It definitely feels like we get good bang for our buck. There aren't any hidden costs either which is always
+                nice!
+            </div>
+        </div>
+    </div>
+    {{/each}}
+    <form action='/reviews' method='POST'>
+        <input type='hidden' id='type' name='name' value='{{this.user.first_name}} {{this.user.last_name}}'> {{#each product}}
+        <input type='hidden' id='name' name='clone' value='{{ this._id }}'> {{/each}}
+        <input type='hidden' id='firstname' name='productid'>
+        <input type='number' name='rating' value=''>
+        <input type='text' name='review' value=''>
+        <input type='submit' value='submit' class="btn btn-primary add-to-cart" role="button">
+    </form>
+</div>
 <script>
 
     $(window).load(function () {
         $('#name').change(function () {
             $('#firstname').val($(this).val());
         });
+
     });
-window.onload = function(){
-  document.getElementById("firstname").value = document.getElementById("name").value; 
-}
+    window.onload = function () {
+        document.getElementById("firstname").value = document.getElementById("name").value;
+        document.getElementById('two').value = document.getElementById('one').value;
+    }
+
 </script>
 
 </div>
+<div class=”container”>
+    <br>
+    <div class=”jumbotron”>
+        <h1 class="display-4">Send Message</h1>
+        <br>
+        <input id=“ name” class=”form-control” placeholder=”Name”>
+        <br>
+        <textarea id=“ message” class=”form-control” placeholder=”Your Message Here”>
+</textarea>
+        <br>
+        <button id=”send” class=”btn btn-success”>Send</button>
+    </div>
+    <div id=”messages”>
+    </div>
+</div>
+<script>
+    var socket = io();
+    $(() => {
+        $("#send").click(() => {
+            sendMessage({ name: $("#name").val(), message: $("#message").val() });
+        })
+        getMessages()
+    })
+    socket.on('message', addMessages)
+    function addMessages(message) {
+        $("#messages").append(`<h4> ${message.name} </h4> <p> ${message.message} </p>`)
+    }
+    function getMessages() {
+        $.get('http://localhost:3000/messages', (data) => {
+            data.forEach(addMessages);
+        })
+    }
+    function sendMessage(message) {
+        $.post('http://localhost:3000/messages', message)
+    }
+</script>
 <style>
+    .scone {
+        border: 0;
+        background-color: $bg-main;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        font-family: $fonts;
+        height: 100%;
+        padding: 2rem 0;
+    }
+
+    .scone__media {
+        padding: 0.875rem 0.875rem 0 0;
+    }
+
+    .imagescone {
+        // same styles as comment avatars
+        min-width: 2.25rem;
+        border-radius: 50%;
+    }
+
+    .scone__title {
+        font-size: 1.25rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .scone__body {
+        font-size: 1.0625rem;
+        line-height: 2rem;
+        color: #343434;
+    }
+
+    .rate {
+        font-size: 1.25rem;
+        color: #262626;
+    }
+
+    .fa-star {
+        color: #F5A623;
+    }
+
+    .fa-star-faded {
+        color: #F1961C;
+        opacity: 0.4;
+    }
+
+    .fa-semi-opacity:before {
+        background: linear-gradient(to right, rgba(245, 166, 35, 1) 50%, rgba(241, 231, 103, 1) 50%, rgba(251, 216, 158, 1) 50%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: initial;
+        /* reset Font Awesome's display:inline-block */
+    }
+
+    .scone__name {
+        font-size: 0.9375rem;
+        font-weight: bold;
+    }
+
+    .scone__date {
+        font-size: 0.8125rem;
+        color: #7492A5;
+    }
+
+    .scone__size {
+        font-size: 1.0625rem;
+        color: #134370;
+    }
+
+    .scone__icing {
+        display: flex;
+        flex: 1;
+    }
+
+    .scone__jam {
+        padding: 0.875rem 0;
+    }
+
+    .scone__cream {
+        padding: 0.875rem;
+        flex: 2;
+    }
+
+
+
     button:active,
     #favorite-button:active,
     .btn:active {
