@@ -34,6 +34,16 @@ var MongoClient = require('mongodb').MongoClient
 var url = 'mongodb://localhost:27017/hackathon';
 // Use connect method to connect to the Server
 
+//SOCKET SETUP
+
+
+var Message = mongoose.model('Message',{
+	to : String,
+	form : String,
+	message : String
+  })
+
+
 
 // Instamojo Setup
 var Insta = require('instamojo-nodejs');
@@ -155,6 +165,32 @@ router.get('/shop-mobile', function (req, res, next) {
 		res.send(products);
 	});
 });
+
+// SOCKET API
+// router.get('/messages', (req, res) => {
+// 	Message.find({},(err, messages)=> {
+// 	  res.send(messages);
+// 	})
+//   })
+  
+  
+router.get('/messages', (req, res) => {
+	var vendor = req.params.vendor
+	console.log("VENDOR ",vendoridmessage);
+	Message.find({form: req.user._id,to:vendoridmessage},(err, messages)=> {
+	  res.send(messages);
+	})
+})
+
+router.post('/messages', (req, res) => {
+	var message = new Message(req.body);
+	message.save((err) =>{
+	  if(err)
+		sendStatus(500);
+	  //io.emit('message', req.body);
+	  res.sendStatus(200);
+	})
+  })
 
 
 /* GET home page. */
@@ -3809,6 +3845,7 @@ router.post('/search-mobile', function (req, res, next) {
 			});
 	});
 });
+var vendoridmessage;
 
 router.get('/product/:slug3', function (req, res, next) {
 	var slug3 = req.params.slug3;
@@ -3824,6 +3861,7 @@ router.get('/product/:slug3', function (req, res, next) {
 	// 		res.redirect('/');
 	// 	}
 	var user = req.user._id;
+	
 	console.log(user);
 	Product.find(qryFilter, function (err, product) {
 		review.find(qryFilter1, function (err, reviews) {
@@ -3850,6 +3888,8 @@ router.get('/product/:slug3', function (req, res, next) {
 					return -1;
 				}
 				recommendations.GetRecommendations(product, function (err, recommendations) {
+					 vendoridmessage = product[0].vendor_id;
+					 console.log("vendoridmessage",vendoridmessage);
 					if (err) {
 						req.flash('error', "An error has occurred - " + err.message);
 						return res.redirect('/');
@@ -3861,6 +3901,8 @@ router.get('/product/:slug3', function (req, res, next) {
 						user: user,
 						reviews: reviews,
 						product: product,
+						customer:req.user,
+
 					});
 				});
 			});

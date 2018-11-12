@@ -248,40 +248,49 @@
 </script>
 
 </div>
-<div class=”container”>
+  <div class="container">
     <br>
-    <div class=”jumbotron”>
+    <div class="jumbotron">
         <h1 class="display-4">Send Message</h1>
         <br>
-        <input id=“ name” class=”form-control” placeholder=”Name”>
+         {{#each product}}
+        TO<input id="tomsg" class="form-control" value="{{ this.vendor_id }}">
+         {{/each}}
+        FORM<input id="formmsg" class="form-control" value="{{ customer._id }}">
         <br>
-        <textarea id=“ message” class=”form-control” placeholder=”Your Message Here”>
-</textarea>
+        <textarea id="message" class="form-control" placeholder="Your Message Here"></textarea>
         <br>
-        <button id=”send” class=”btn btn-success”>Send</button>
+        <button id="send" class="btn btn-success">Send</button>
     </div>
-    <div id=”messages”>
+    <div id="messages">
+
     </div>
 </div>
+
 <script>
-    var socket = io();
+   var socket = io();
     $(() => {
-        $("#send").click(() => {
-            sendMessage({ name: $("#name").val(), message: $("#message").val() });
+        $("#send").click(()=>{
+            sendMessage({to: $("#tomsg").val(),form: $("#formmsg").val(), message: $("#message").val()});
         })
+
         getMessages()
     })
+
     socket.on('message', addMessages)
-    function addMessages(message) {
-        $("#messages").append(`<h4> ${message.name} </h4> <p> ${message.message} </p>`)
+
+    function addMessages(message){
+        $("#messages").append(`<h4> TO: ${message.to} <br/>FORM: ${message.form} </h4> <p> ${message.message} </p>`)
     }
-    function getMessages() {
-        $.get('http://localhost:3000/messages', (data) => {
-            data.forEach(addMessages);
-        })
+
+    function getMessages(){
+      $.get('http://localhost:3000/messages/', (data) => {
+        data.forEach(addMessages);
+      })
     }
-    function sendMessage(message) {
-        $.post('http://localhost:3000/messages', message)
+
+    function sendMessage(message){
+      $.post('http://localhost:3000/messages', message)
     }
 </script>
 <style>

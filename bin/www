@@ -8,6 +8,8 @@ var app = require('../app');
 var debug = require('debug')('roundup-cart:server');
 var http = require('http');
 
+
+
 /**
  * Get port from environment and store in Express.
  */
@@ -20,6 +22,12 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+var io = require('socket.io').listen(server);
+console.log('wwww')
+io.on('connection', () =>{
+  console.log('a user is connected')
+})
 
 /**
  * Listen on provided port, on all network interfaces.
