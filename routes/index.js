@@ -5,6 +5,7 @@ var cart = require('../models/cart');
 var review = require('../models/reviews');
 var nodemailer = require('nodemailer');
 var Category = require('../models/category');
+var Message = require('../models/chatmessage');
 var Product = require('../models/product');
 var Event = require('../models/events');
 var Purchase = require('../models/purchase');
@@ -37,11 +38,11 @@ var url = 'mongodb://localhost:27017/hackathon';
 //SOCKET SETUP
 
 
-var Message = mongoose.model('Message',{
-	to : String,
-	form : String,
-	message : String
-  })
+// var Message = mongoose.model('Message',{
+// 	to : String,
+// 	form : String,
+// 	message : String
+//   })
 
 
 
@@ -178,6 +179,18 @@ router.get('/messages', (req, res) => {
 	var vendor = req.params.vendor
 	console.log("VENDOR ",vendoridmessage);
 	Message.find({form: req.user._id,to:vendoridmessage},(err, messages)=> {
+	  res.send(messages);
+	})
+})
+
+router.get('/messagesvendor', (req, res) => {
+	Message.distinct('to' ,(err, response)=> {
+		//res.send(messages);
+		console.log(response);
+	  })
+
+	console.log(req.user._id);
+	Message.find({ $or: [ {to: req.user._id  }, {form: req.user._id  } ] },(err, messages)=> {
 	  res.send(messages);
 	})
 })
@@ -1577,9 +1590,8 @@ router.get('/category-mobile/:slug', function (req, res, next) {
 });
 
 router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	cart = new cart({
+	
+	 kart = new cart({
 		price: req.body.price,
 		adult: req.body.adult,
 		children: req.body.children,
@@ -1590,15 +1602,15 @@ router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 		user_id: req.body.userid,
 		id: req.body.productId,
 	});
-	console.log("cart1556: " + cart);
-	cart.save(function (err) {
+	console.log("cart1592: " + cart);
+	kart.save(function (err) {
 		if (err) {
 			console.log('error', 'Error: ' + err.message);
-			console.log("cart1560: " + cart);
+			console.log("cart1596: " + cart);
 			return res.redirect('/');
 		}
 		// res.flash('thanks for your feedback');
-		console.log("cart1563: " + cart);
+		console.log("cart1600: " + cart);
 		return res.redirect('/shopping-cart');
 	});
 });
@@ -1943,53 +1955,30 @@ router.get('/reduce-qty-mobile/:id/', function (req, res, next) {
 router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
 	var slug3 = req.params.slug3;
 	qryFilter = { "user_id": req.user._id };
-	qryFilter1 = { "productid": req._id };
-	// Product.find(qryFilter, function (err, product) {
-	// 	if (err || product === 'undefined' || product == null) {
-	// 		var errorMsg = req.flash('error', 'unable to find product');
-	// 		return res.redirect('/');
-	// 	}
-	// 	if (!product) {
-	// 		req.flash('error', 'Product is not found.');
-	// 		res.redirect('/');
-	// 	}
+
+	
 	var user = req.user._id;
 	console.log(user);
-	cart.find(qryFilter1, function (err, cart) {
-		console.log(cart);
-		Product.find(qryFilter, function (err, product) {
-
-
-			console.log(cart);
-			event = new Event({
-				namespace: 'products',
-				person: {
-					id: req.user._id,
-					first_name: req.user.first_name,
-					last_name: req.user.last_name,
-					email: req.user.email,
-				},
-				action: 'view',
-				thing: {
-					type: "product",
-					id: product._id,
-					name: product.name,
-					category: product.category,
-					Product_Group: product.Product_Group
-				}
-			});
-			event.save(function (err, eventId) {
-				if (err) {
-					return -1;
-				}
-
-				res.send(cart);
-			});
-		});
-	});
+	cart.find(qryFilter,function (err, cart) {
+			console.log("cart"+cart);
+	var usercart = cart;
+});	
+		res.render('shop/shopping-cart', {
+			layout: 'eshop/blank',
+			usercart:usercart,
+			
+		  
+		}).forEach({ $lookup:
+			 { 
+				 from: "product",
+				  localField: "_id",
+				   foreignField: "_id", 
+				   as: "details"
+				 } 
+});
 });
 
-// Mobile Shopping cart
+// Mobile Shoppng cart
 router.get('/shopping-cart-mobile', isLoggedIn, function (req, res, next) {
 	if (res.locals.needsAddress || req.user.addr1 === 'undefined' || req.user.addr1 == null) {
 		res.send({
@@ -2078,8 +2067,6 @@ router.post('/update_shipping-mobile', isLoggedIn, function (req, res, next) {
 		user: req.user,
 		status: true
 	});
-
-
 });
 
 router.get('/checkout', isLoggedIn, function (req, res, next) {
@@ -2126,9 +2113,6 @@ router.get('/checkout-mobile', isLoggedIn, function (req, res, next) {
 
 	var cart = new cart(req.session.cart);
 	//meanlogger.log('shopping-cart', 'Viewed checkout', req.user);
-
-
-
 	res.send({
 		products: cart.generateArray(),
 		totalPrice: cart.totalPrice.toFixed(2),
@@ -2141,8 +2125,6 @@ router.get('/checkout-mobile', isLoggedIn, function (req, res, next) {
 		errorMsg: errorMsg,
 		noErrorMsg: !errorMsg
 	});
-
-
 });
 
 
@@ -2321,11 +2303,8 @@ router.post('/checkout-mobile', function (req, res, next) {
 	var shipping_zip = req.body.shipping_zip;
 	var shipping_flag = req.body.shipping_flag;
 	var shipping_flags = req.body.shipping_flags;
-
 	var cart = new cart(req.session.cart);
 	if (shipping_flag && process.env.enableShipping) {
-
-
 		res.send({
 			message: "Enter correct address",
 			status: false
@@ -2529,11 +2508,6 @@ router.post('/checkout-mobile', function (req, res, next) {
 		}
 	});
 });
-
-
-
-
-
 
 router.post('/create', function (req, res, next) {
 	// reference: https://github.com/paypal/PayPal-node-SDK/search?p=2&q=tax&utf8=%E2%9C%93
@@ -3851,15 +3825,7 @@ router.get('/product/:slug3', function (req, res, next) {
 	var slug3 = req.params.slug3;
 	qryFilter = { "_id": slug3 };
 	qryFilter1 = { "productid": slug3 };
-	// Product.find(qryFilter, function (err, product) {
-	// 	if (err || product === 'undefined' || product == null) {
-	// 		var errorMsg = req.flash('error', 'unable to find product');
-	// 		return res.redirect('/');
-	// 	}
-	// 	if (!product) {
-	// 		req.flash('error', 'Product is not found.');
-	// 		res.redirect('/');
-	// 	}
+	
 	var user = req.user._id;
 	
 	console.log(user);

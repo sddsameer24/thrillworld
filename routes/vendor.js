@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Cart = require('../models/cart');
 var Category = require('../models/category');
+var Message = require('../models/chatmessage');
 var Configuration = require('../models/configuration');
 var Product = require('../models/product');
 var User = require('../models/user');
@@ -92,6 +93,13 @@ router.get('/', isAdmin, function (req, res, next) {
             return res.error('err');
         }
     });
+    var custresponse_store;
+    Message.distinct('form' ,(err, custresponse)=> {
+        //res.send(messages);
+        custresponse_store=custresponse;
+		console.log(custresponse);
+      })
+      
     Order.find({}, function (err, docs) {
         meanlogger.log("check", "Viewed", req.user);
         Product.find(function (err, products) {
@@ -114,7 +122,9 @@ router.get('/', isAdmin, function (req, res, next) {
                 noMessage: !successMsg,
                 totalSales: tot,
                 orders: docs,
-                noErrors: 1
+                noErrors: 1,
+                user: req.user,
+                custresponse_store:custresponse_store
             });
         });
     });
