@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var cart = require('../models/cart');
-// var cart1 =require('../models/cartl');
 var review = require('../models/reviews');
 var nodemailer = require('nodemailer');
 var Category = require('../models/category');
@@ -34,6 +33,8 @@ var meanlogger = require('../local_modules/meanlogger');
 var MongoClient = require('mongodb').MongoClient
 var url = 'mongodb://localhost:27017/hackathon';
 // Use connect method to connect to the Server
+
+ObjectID = require('mongodb').ObjectID;
 
 //SOCKET SETUP
 
@@ -173,37 +174,37 @@ router.get('/shop-mobile', function (req, res, next) {
 // 	  res.send(messages);
 // 	})
 //   })
-  
-  
+
+
 router.get('/messages', (req, res) => {
 	var vendor = req.params.vendor
-	console.log("VENDOR ",vendoridmessage);
-	Message.find({form: req.user._id,to:vendoridmessage},(err, messages)=> {
-	  res.send(messages);
+	console.log("VENDOR ", vendoridmessage);
+	Message.find({ form: req.user._id, to: vendoridmessage }, (err, messages) => {
+		res.send(messages);
 	})
 })
 
 router.get('/messagesvendor', (req, res) => {
-	Message.distinct('to' ,(err, response)=> {
+	Message.distinct('to', (err, response) => {
 		//res.send(messages);
 		console.log(response);
-	  })
+	})
 
 	console.log(req.user._id);
-	Message.find({ $or: [ {to: req.user._id  }, {form: req.user._id  } ] },(err, messages)=> {
-	  res.send(messages);
+	Message.find({ $or: [{ to: req.user._id }, { form: req.user._id }] }, (err, messages) => {
+		res.send(messages);
 	})
 })
 
 router.post('/messages', (req, res) => {
 	var message = new Message(req.body);
-	message.save((err) =>{
-	  if(err)
-		sendStatus(500);
-	  //io.emit('message', req.body);
-	  res.sendStatus(200);
+	message.save((err) => {
+		if (err)
+			sendStatus(500);
+		//io.emit('message', req.body);
+		res.sendStatus(200);
 	})
-  })
+})
 
 
 /* GET home page. */
@@ -1590,30 +1591,78 @@ router.get('/category-mobile/:slug', function (req, res, next) {
 });
 
 router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
-	
-	 kart = new cart({
-		price: req.body.price,
-		adult: req.body.adult,
-		children: req.body.children,
-		kids: req.body.kids,
-		arrival: req.body.arrival,
-		departure: req.body.depart,
-		totalprice: req.body.subtotal,
-		user_id: req.body.userid,
-		id: req.body.productId,
-	});
-	console.log("cart1592: " + cart);
-	kart.save(function (err) {
-		if (err) {
-			console.log('error', 'Error: ' + err.message);
-			console.log("cart1596: " + cart);
-			return res.redirect('/');
-		}
-		// res.flash('thanks for your feedback');
-		console.log("cart1600: " + cart);
-		return res.redirect('/shopping-cart');
-	});
+	var theId = new ObjectId(req.user._id);
+	User.findOneAndUpdate({
+		_id: theId
+	}, {
+			$addToSet: {
+				"productId": req.body.productId
+			}
+		}, {
+			safe: true,
+			upsert: false
+		}, function (err, product) {
+			event = new Event({
+				namespace: 'products',
+				person: {
+					id: req.user._id,
+					first_name: req.user.first_name,
+					last_name: req.user.last_name,
+					email: req.user.email,
+				},
+				action: 'addtocart',
+				thing: {
+					type: "product",
+					id: product._id,
+					name: product.name,
+					category: product.category,
+					Product_Group: product.Product_Group
+				}
+			});
+			event.save(function (err, eventId) {
+				if (err) {
+					//////console.log("Error: " + err.message);
+					return -1;
+				}
+			})
+		});
+	res.redirect('/shopping-cart');
 });
+
+	// var theId = new ObjectId(req.user._id);
+	// User.findOneAndUpdate({
+	// 	_id: theId
+	// }, {
+	// 		$addToSet: {
+	// 			"productId": req.body.productId
+	// 		}
+	// 	}, {
+	// 		safe: true,
+	// 		upsert: false
+	// 	},
+// 	kart = new cart({
+// 		price: req.body.price,
+// 		adult: req.body.adult,
+// 		children: req.body.children,
+// 		kids: req.body.kids,
+// 		arrival: req.body.arrival,
+// 		departure: req.body.depart,
+// 		totalprice: req.body.subtotal,
+// 		user_id: req.body.userid,
+// 		id: req.body.productId,
+// 	});
+// 	console.log("cart1592: " + cart);
+// 	kart.save(function (err) {
+// 		if (err) {
+// 			console.log('error', 'Error: ' + err.message);
+// 			console.log("cart1596: " + cart);
+// 			return res.redirect('/');
+// 		}
+// 		// res.flash('thanks for your feedback');
+// 		console.log("cart1600: " + cart);
+// 		return res.redirect('/shopping-cart');
+//  	);
+//  });
 
 // 	var errors = req.validationErrors();
 // 	if (errors) {
@@ -1947,36 +1996,29 @@ router.get('/reduce-qty-mobile/:id/', function (req, res, next) {
 			message: "Success",
 			status: true
 		});
-
-
 	});
 });
 
 router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
-	var slug3 = req.params.slug3;
-	qryFilter = { "user_id": req.user._id };
-
-	
-	var user = req.user._id;
-	console.log(user);
-	cart.find(qryFilter,function (err, cart) {
-			console.log("cart"+cart);
-	var usercart = cart;
-});	
+	qryFilter = { "_id": req.user._id };
+	User.find(qryFilter, function (err, user) {
+		console.log(user);
+		// var productcart = [];
+        // // console.log("cart:"+cart);
+		// for (i = 0; i < cart.length; i++) {
+		// 	// console.log(cart[i].id);
+		// 	Product.find({ "_id": cart[i].id }, function (err, product) {
+		// 		productcart = product;		
+		// 	// console.log('Documents: ' + productcart);
+		// 	});
+		// }
 		res.render('shop/shopping-cart', {
 			layout: 'eshop/blank',
-			usercart:usercart,
-			
-		  
-		}).forEach({ $lookup:
-			 { 
-				 from: "product",
-				  localField: "_id",
-				   foreignField: "_id", 
-				   as: "details"
-				 } 
+			user: user,
+		});
+	});
 });
-});
+
 
 // Mobile Shoppng cart
 router.get('/shopping-cart-mobile', isLoggedIn, function (req, res, next) {
@@ -3825,9 +3867,9 @@ router.get('/product/:slug3', function (req, res, next) {
 	var slug3 = req.params.slug3;
 	qryFilter = { "_id": slug3 };
 	qryFilter1 = { "productid": slug3 };
-	
+
 	var user = req.user._id;
-	
+
 	console.log(user);
 	Product.find(qryFilter, function (err, product) {
 		review.find(qryFilter1, function (err, reviews) {
@@ -3854,8 +3896,8 @@ router.get('/product/:slug3', function (req, res, next) {
 					return -1;
 				}
 				recommendations.GetRecommendations(product, function (err, recommendations) {
-					 vendoridmessage = product[0].vendor_id;
-					 console.log("vendoridmessage",vendoridmessage);
+					vendoridmessage = product[0].vendor_id;
+					console.log("vendoridmessage", vendoridmessage);
 					if (err) {
 						req.flash('error', "An error has occurred - " + err.message);
 						return res.redirect('/');
@@ -3867,7 +3909,7 @@ router.get('/product/:slug3', function (req, res, next) {
 						user: user,
 						reviews: reviews,
 						product: product,
-						customer:req.user,
+						customer: req.user,
 
 					});
 				});

@@ -73,6 +73,7 @@ var userSchema = new Schema({
 		type: Date, default: Date.now()
 	},
 	likes: [String],
+	productId: [String],
 	purchased: [{
 		code: String,
 		purchased: {
