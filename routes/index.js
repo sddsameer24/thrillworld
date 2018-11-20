@@ -1831,9 +1831,8 @@ router.post('/add-to-cart-mobile', isLoggedIn, function (req, res, next) {
 			}
 			wishlist.push(order);
 		}
-
+		
 		if (added) {
-
 			res.send({
 				message: "error",
 				status: false
@@ -2002,24 +2001,37 @@ router.get('/reduce-qty-mobile/:id/', function (req, res, next) {
 router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
 	qryFilter = { "_id": req.user._id };
 	User.find(qryFilter, function (err, user) {
-		console.log(user);
-		// var productcart = [];
-        // // console.log("cart:"+cart);
-		// for (i = 0; i < cart.length; i++) {
-		// 	// console.log(cart[i].id);
-		// 	Product.find({ "_id": cart[i].id }, function (err, product) {
-		// 		productcart = product;		
-		// 	// console.log('Documents: ' + productcart);
-		// 	});
-		// }
+		console.log(req.user.productId.length);
+		var promises = [];
+		var productcart = [];
+		for(i=0;i<req.user.productId.length;i++)
+		{
+			promises.push(Promise.resolve(Product.find({ "_id": req.user.productId[i] }).lean().exec().then(function (product) {
+				productcart.push(product);  
+				console.log(i+"."+product);    
+		  })));
+		}	
+		Promise.all(promises).then(function() {	
 		res.render('shop/shopping-cart', {
 			layout: 'eshop/blank',
 			user: user,
-		});
+			productcart:productcart,
+		});					
+	});
 	});
 });
 
+router.post('/delete-product', function (req, res, next) {
+    successMsg = req.flash('success')[0];
+    errorMsg = req.flash('error')[0];
+    var order_id = req.body._id;
 
+	// User.update(
+	// 	{ _id: id },
+	// 	{ $pull:  { productId:  } } 
+	//   );
+   
+})
 // Mobile Shoppng cart
 router.get('/shopping-cart-mobile', isLoggedIn, function (req, res, next) {
 	if (res.locals.needsAddress || req.user.addr1 === 'undefined' || req.user.addr1 == null) {
@@ -2111,32 +2123,24 @@ router.post('/update_shipping-mobile', isLoggedIn, function (req, res, next) {
 	});
 });
 
-router.get('/checkout', isLoggedIn, function (req, res, next) {
-
+router.get('/checkout/:slug3', isLoggedIn, function (req, res, next) {
+	console.log("checkout");
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-
-	if (!req.session.cart) {
-		return res.redirect('/shopping-cart');
-	}
-	var shipping_flag = req.body.shipping_flag;
-
-	var cart = new cart(req.session.cart);
+	var slug3 = req.params.slug3;
+	qryFilter = { "_id": slug3 };
+	console.log("checkout");
 	meanlogger.log('shopping-cart', 'Viewed checkout', req.user);
-
-	res.render('shop/checkout', {
+	Product.find(qryFilter, function (err, product) {
+		if (err) {
+			req.flash('error', "An error has occurred - " + err.message);
+			return res.redirect('/');
+		}
+		res.render('shop/checkout', {
 		layout: 'eshop/blank',
-		products: cart.generateArray(),
-		totalPrice: cart.totalPrice.toFixed(2),
-		user: req.user,
-		shipping_flag: shipping_flag,
-		enableShipping: process.env.enableShipping,
-		enableTax: process.env.enableTax,
-		successMsg: successMsg,
-		noMessage: !successMsg,
-		errorMsg: errorMsg,
-		noErrorMsg: !errorMsg
+		product: product,
 	});
+});
 });
 
 // Checkout Mobile
@@ -2551,129 +2555,315 @@ router.post('/checkout-mobile', function (req, res, next) {
 	});
 });
 
-router.post('/create', function (req, res, next) {
-	// reference: https://github.com/paypal/PayPal-node-SDK/search?p=2&q=tax&utf8=%E2%9C%93
-	var method = req.body.method;
-	var telephone = req.body.telephone;
-	var email = req.body.email;
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	var first_name = req.body.first_name;
-	var last_name = req.body.last_name;
-	var amount = parseFloat(req.body.amount / 100);
-	var shippingtotal = parseFloat(req.body.shippingtotal / 100);
-	var subtotal = parseFloat(req.body.subtotal / 100);
-	var taxAmount = parseFloat(req.body.totalTax / 100);
-	req.check("email", "Enter a valid email address.");
-	req.check("telephone", "Enter a valid telephone number.");
-	var errors = req.validationErrors();
-	if (errors) {
-		returnObject = {
-			errorMsg: errors,
-			noErrorMsg: false,
-			noMessage: true
-		};
-		req.flash('error', 'Invalid contact or shipping information.  Please ensure that you have an email and telephone number.');
-		return res.redirect('/checkout');
-	}
-	if (!req.session.cart) {
-		return res.redirect('/shopping-cart');
-	}
-
-
-	var cart = new cart(req.session.cart);
-	products = cart.generateArray();
-	tax = taxCalc.calculateTaxReturn(products, req.user._id);
-	var create_payment = {
-		"intent": "sale",
-		"payer": {
-			"payment_method": "instamojo"
+router.post('/payment', function (req, res, next) {
+	var orders = [];
+	
+		order = {
+			productId: req.body.productId,
+			product_name: req.body.pname,
+			product_price: (req.body.price)*30/100,
+			product_qty: req.body.adult,
+			paidBy: 'instamojo',
+			ticket_name: req.user.first_name,
+			ticket_email: req.user.email,
+			// option: option,
+			// category: products[i].item.category,
+			// code: products[i].item.code,
+			// vendor_id: products[i].item.vendor_id,
+			// date: date
+		}
+		console.log(order);
+		orders.push(order);
+	
+	// order comnfirmation mail sending  ..........................................
+	const output = `
+		<p>Booking Confirmation</p>
+		<h3>Details</h3>
+		<ul>  
+		  <li>Name: ${req.user.first_name}</li>		 
+		  <li>Email: ${res.locals.fromEmail}</li>
+		  <li>Phone: ${req.user.telephone}</li>
+		</ul>
+		<p>Our executive will get in touch with you</p>
+	  `;
+	let transporter = nodemailer.createTransport({
+		host: 'mail.zo-online.com',
+		port: 587,
+		secure: false, // true for 465, false for other ports
+		auth: {
+			user: 'admin@zo-online.com', // generated ethereal user
+			pass: '22watch22@DS'  // generated ethereal password
 		},
-		"transactions": [{
-			"amount": {
-				"currency": "Rupees",
-				"total": String(amount.toFixed(2)),
-				"details": {
-					"subtotal": String(subtotal.toFixed(2)),
-					"tax": String(taxAmount.toFixed(2)),
-					"shipping": String(shippingtotal.toFixed(2)),
-					"handling_fee": "0.00",
-					"shipping_discount": "0.00"
-				}
-			},
-			"description": "Purchase",
-			"item_list": {
-				"items": []
-			}
-		}]
+		tls: {
+			rejectUnauthorized: false
+		}
+	});
+
+	// setup email data with unicode symbols
+	let mailOptions = {
+		from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+		replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+		to: req.user.email, // list of receivers
+		subject: 'booking', // Subject line
+		text: 'Hello world?', // plain text body
+		html: output // html body
 	};
+
+	// send mail with defined transport object
+	transporter.sendMail(mailOptions, (error, info) => {
+		if (error) {
+
+			console.log("ERROR2616" + error);
+			return
+			//////console.log(error);
+		}
+
+
+		//console.log("INFo" + info);
+		//console.log('Message sent: %s', info.messageId);
+		//console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+		req.flash('success', "SENT MAIL, KINDLY CHECK!");
+		//	res.render('contact', { msg: 'Email has been sent' });
+	});
+	// end of order comnfirmation mail sending  ..........................................
+	// order comnfirmation sms sending  ..........................................
+	var number = req.user.telephone;
+	//console.log(number);
+	// const text = req.body.text;
+	const text = "Booking successfull Thank You, Thrillworld";
+	//console.log("NUMBRER" + number);
+	//console.log("NUMBRER" + number[0] + number[1]);
+	//console.log("TEXT" + text);
+
+	if (number.length <= 10) {
+		number = "91" + number;
+		//console.log("NEW" + number);
+	}
+	// .......................................{{nexmo commented}}........................................................................................
+
+	// Init Nexmo
+	const nexmo = new Nexmo({
+		apiKey: '38d2edbc',
+		apiSecret: 'grzR4xHCJDGhDqi2'
+	}, { debug: true })
+	nexmo.message.sendSms(
+		'917795565771', number, text, { type: 'unicode' },
+		(err, responseData) => {
+			if (err) {
+				//console.log("SMS" + err);
+			} else {
+				console.dir(responseData);
+				// Get data from response
+				const data = {
+					id: responseData.messages[0]['your booking successful'],
+					number: responseData.messages[0]['number']
+				}
+
+				// Emit to the client
+				//	io.emit('smsStatus', data);
+			}
+		}
+	);
+	// end of order comnfirmation sms sending  ..........................................
+	var total=(req.body.price)*30/100
+	// Create Order Record with a pending status.
+	var order = new Order({
+		user: {
+			id: req.user._id,
+			first_name: req.user.first_name,
+			last_name: req.user.last_name,
+			email: req.user.email,
+			telephone: req.user.telephone
+		},
+		cart: orders,
+		shipping_address: req.body.shipping_addr1,
+		shipping_city: req.body.shipping_city,
+		shipping_state: req.body.shipping_state,
+		shipping_zipcode: req.body.shipping_zipcode,
+		billing_address: req.body.shipping_addr1,
+		billing_city: req.body.shipping_city,
+		billing_state: req.body.shipping_state,
+		billing_zipcode: req.body.shipping_zipcode,
+		paymentId: 1234, // Adding Dummmy payment id
+		checkin:req.body.arrival,
+		checkout:req.body.depart,
+		status: 'pending',
+		total:total 
+	});
+	order.save(function (err, orderdata) {
+		if (err) {
+			console.log("Error: " + err.message)
+			req.flash('error', 'Unable to save order... ' + err.message);
+			res.redirect('/');
+		}
+
+		req.flash('success', "Order Successful!");
+		//console.log("HERE REDIRECT");
+
+		var data = new Insta.PaymentData();
+
+		data.purpose = "Test";            // REQUIRED
+		data.amount = (req.body.price)*30/100;                  // REQUIRED
+		data.currency = 'INR';
+		data.buyer_name = req.user.first_name;
+		data.email = req.user.email;
+		data.phone = req.user.telephone;
+		data.send_sms = 'True';
+		data.send_email = 'True';
+		data.allow_repeated_payments = 'False';
+		data.setRedirectUrl("http://localhost:3000/?orderid="+orderdata.id+"&");
+
+		Insta.createPayment(data, function (error, response) {
+			if (error) {
+				// some error
+				console.log("instamojo ERROR" + error);
+			} else {
+				// Payment redirection link at response.payment_request.longurl
+
+				response = JSON.parse(response);
+
+				////console.log(response.success);
+				console.log("instamojo SUCESS" + response);
+				// console.log(response.payment_request.longurl);
+				console.log("REQUIRED URL"+JSON.stringify(response));
+				console.log(response['payment_request']);
+				//	//console.log(JSON.parse(response['payment_request']));
+				return res.redirect(response.payment_request.longurl);
+
+			}
+		});
+		// return res.redirect('/');
+	})
+
+});
+
+router.post('/create', function (req, res, next) {
+	// // reference: https://github.com/paypal/PayPal-node-SDK/search?p=2&q=tax&utf8=%E2%9C%93
+	// var method = req.body.method;
+	// var telephone = req.body.telephone;
+	// var email = req.body.email;
+	// var productId = req.body.productId
+	// var successMsg = req.flash('success')[0];
+	// var errorMsg = req.flash('error')[0];
+	// var first_name = req.body.first_name;
+	// var last_name = req.body.last_name;
+	// var title = req.body.title;
+	// var code = req.body.code;
+	// var qty = parseFloat(req.body.children)+parseFloat(req.body.kids)+parseFloat(req.body.adult);
+	// var Product_Group = req.body.Product_Group;
+	// var amount = req.body.amount;
+	// var shippingtotal = parseFloat(req.body.shippingtotal / 100);
+	// var subtotal = parseFloat(req.body.subtotal / 100);
+	// var taxAmount = parseFloat(req.body.totalTax / 100);
+	// req.check("email", "Enter a valid email address.");
+	// req.check("telephone", "Enter a valid telephone number.");
+	// var errors = req.validationErrors();
+	// if (errors) {
+	// 	returnObject = {
+	// 		errorMsg: errors,
+	// 		noErrorMsg: false,
+	// 		noMessage: true
+	// 	};
+	// 	req.flash('error', 'Invalid contact or shipping information.  Please ensure that you have an email and telephone number.');
+	// 	return res.redirect('/checkout');
+	// }
+	// if (!req.session.cart) {
+	// 	return res.redirect('/checkout');
+	// }
+
+
+	// var cart = new cart(req.session.cart);
+	// products = cart.generateArray();
+	// tax = taxCalc.calculateTaxReturn(products, req.user._id);
+	// var create_payment = {
+	// 	"intent": "sale",
+	// 	"payer": {
+	// 		"payment_method": "instamojo"
+	// 	},
+	// 	"transactions": [{
+	// 		"amount": {
+	// 			"currency": "Rupees",
+	// 			"total": amount,
+	// 			"details": {
+	// 				"subtotal": String(subtotal.toFixed(2)),
+	// 				"tax": String(taxAmount.toFixed(2)),
+	// 				"shipping": String(shippingtotal.toFixed(2)),
+	// 				"handling_fee": "0.00",
+	// 				"shipping_discount": "0.00"
+	// 			}
+	// 		},
+	// 		"description": "Purchase",
+	// 		"item_list": {
+	// 			"items": []
+	// 		}
+	// 	}]
+	// };
 	var custom = {}
 	var item_list = [];
 	var orders = [];
-	for (var i = 0, len = products.length; i < len; i++) {
-		var extprice = parseFloat(products[i].price / 100);
-		extprice = String((extprice).toFixed(2));
-		intprice = String(parseFloat(products[i].price));
-		qty = Number(products[i].qty);
-		tname = 'ticket_name_' + i;
-		oname = 'option_' + i;
-		var ticket_name = req.body['ticket_name_' + i];
-		var ticket_email = req.body['ticket_email_' + i];
-		var option = req.body['option_' + i];
-		custom[i] = {
-			"ticket_name": ticket_name,
-			"ticket_email": ticket_email,
-			"option": option
-		};
-		item = {
-			"name": products[i].item.title,
-			"price": extprice,
-			"quantity": qty,
-			"currency": "USD",
-			"sku": products[i].item.code
-		}
-		create_payment.transactions[0].item_list.items.push(item)
+	// for (var i = 0, len = products.length; i < len; i++) {
+	// 	var extprice = parseFloat(products[i].price / 100);
+	// 	extprice = String((extprice).toFixed(2));
+	// 	intprice = String(parseFloat(products[i].price));
+	// 	qty = Number(products[i].qty);
+	// 	tname = 'ticket_name_' + i;
+	// 	oname = 'option_' + i;
+	// 	var ticket_name = req.body['ticket_name_' + i];
+	// 	var ticket_email = req.body['ticket_email_' + i];
+	// 	var option = req.body['option_' + i];
+		// custom[i] = {
+		// 	"ticket_name": ticket_name,
+		// 	"ticket_email": ticket_email,
+		// 	"option": option
+		// };
+		// item = {
+		// 	"name": title,
+		// 	"price": amount,
+		// 	"quantity": qty,
+		// 	"currency": "USD",
+		// 	"sku": code
+		// }
+		// create_payment.transactions[0].item_list.items.push(item)
 		order = {
-			productId: products[i].item._id,
-			product_name: products[i].item.title,
-			Product_Group: products[i].item.Product_Group,
-			product_price: intprice,
-			product_price_double: parseFloat(products[i].price / 100),
-			product_qty: qty,
+			productId: req.body.productId,
+			product_name: req.body.pname,
+			product_price: req.body.price,
+			product_qty: req.body.adult,
 			paidBy: 'instamojo',
-			ticket_name: ticket_name,
-			ticket_email: ticket_email,
-			option: option,
-			category: products[i].item.category,
-			code: products[i].item.code,
-			vendor_id: products[i].item.vendor_id,
+			ticket_name: req.user.first_name,
+			ticket_email: req.user.email,
+			// option: option,
+			// category: products[i].item.category,
+			// code: products[i].item.code,
+			// vendor_id: products[i].item.vendor_id,
 			// date: date
 		}
+		console.log(order);
 		orders.push(order);
-	}
-	if (method === 'instamojo') {
-		create_payment.payer.payment_method = 'instamojo';
-		return_url = "http://" + req.headers.host + "/execute";
-		cancel_url = "http://" + req.headers.host + "/cancel";
-		create_payment.redirect_urls = {
-			"return_url": return_url,
-			"cancel_url": cancel_url
-		};
-	} else if (method === 'credit_card') {
-		var funding_instruments = [{
-			"credit_card": {
-				"type": req.body.type.toLowerCase(),
-				"number": req.body.number,
-				"expire_month": req.body.expire_month,
-				"expire_year": req.body.expire_year,
-				"first_name": req.body.first_name,
-				"last_name": req.body.last_name
-			}
-		}];
-		create_payment.payer.payment_method = 'credit_card';
-		create_payment.custom = custom;
-		create_payment.payer.funding_instruments = funding_instruments;
-	}
+	// }
+	// if (method === 'instamojo') {
+	// 	create_payment.payer.payment_method = 'instamojo';
+	// 	return_url = "http://" + req.headers.host + "/execute";
+	// 	cancel_url = "http://" + req.headers.host + "/cancel";
+	// 	create_payment.redirect_urls = {
+	// 		"return_url": return_url,
+	// 		"cancel_url": cancel_url
+	// 	};
+	// } else if (method === 'credit_card') {
+	// 	var funding_instruments = [{
+	// 		"credit_card": {
+	// 			"type": req.body.type.toLowerCase(),
+	// 			"number": req.body.number,
+	// 			"expire_month": req.body.expire_month,
+	// 			"expire_year": req.body.expire_year,
+	// 			"first_name": req.body.first_name,
+	// 			"last_name": req.body.last_name
+	// 		}
+	// 	}];
+	// 	create_payment.payer.payment_method = 'credit_card';
+	// 	create_payment.custom = custom;
+	// 	create_payment.payer.funding_instruments = funding_instruments;
+	// }
 	// order comnfirmation mail sending  ..........................................
 	const output = `
 		<p>Booking Confirmation</p>
@@ -2791,12 +2981,14 @@ router.post('/create', function (req, res, next) {
 		billing_state: req.body.shipping_state,
 		billing_zipcode: req.body.shipping_zipcode,
 		paymentId: 1234, // Adding Dummmy payment id
+		checkin:req.body.arrival,
+		checkout:req.body.depart,
 		status: 'pending',
-		total: parseFloat(cart.grandTotal)
+		total: req.body.price
 	});
 	order.save(function (err, orderdata) {
 		if (err) {
-			//////console.log("Error: " + err.message)
+			console.log("Error: " + err.message)
 			req.flash('error', 'Unable to save order... ' + err.message);
 			res.redirect('/');
 		}
@@ -2807,7 +2999,7 @@ router.post('/create', function (req, res, next) {
 		var data = new Insta.PaymentData();
 
 		data.purpose = "Test";            // REQUIRED
-		data.amount = parseFloat(cart.grandTotal);                  // REQUIRED
+		data.amount = req.body.price;                  // REQUIRED
 		data.currency = 'INR';
 		data.buyer_name = req.user.first_name;
 		data.email = req.user.email;
@@ -2815,22 +3007,22 @@ router.post('/create', function (req, res, next) {
 		data.send_sms = 'True';
 		data.send_email = 'True';
 		data.allow_repeated_payments = 'False';
-		data.setRedirectUrl("http://localhost:3000/?orderid=" + orderdata.id + "&");
+		data.setRedirectUrl("http://localhost:3000/?orderid="+orderdata.id+"&");
 
 		Insta.createPayment(data, function (error, response) {
 			if (error) {
 				// some error
-				//console.log("instamojo ERROR" + error);
+				console.log("instamojo ERROR" + error);
 			} else {
 				// Payment redirection link at response.payment_request.longurl
 
 				response = JSON.parse(response);
 
 				////console.log(response.success);
-				//console.log("instamojo SUCESS" + response);
-				// //console.log(response.payment_request.longurl);
-				////console.log("REQUIRED URL"+JSON.stringify(response));
-				//	//console.log(response['payment_request']);
+				console.log("instamojo SUCESS" + response);
+				// console.log(response.payment_request.longurl);
+				console.log("REQUIRED URL"+JSON.stringify(response));
+				console.log(response['payment_request']);
 				//	//console.log(JSON.parse(response['payment_request']));
 				return res.redirect(response.payment_request.longurl);
 

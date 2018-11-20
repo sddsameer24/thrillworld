@@ -63,8 +63,8 @@ var orderSchema = new Schema({
 		required: false
 	},
 	checkin: {
-		type: Date,
-		default: Date.now
+		type: String,
+		required: false
 	},
 	adult: {
 		type: String,
@@ -79,8 +79,8 @@ var orderSchema = new Schema({
 		required: false
 	},
 	checkout: {
-		type: Date,
-		default: Date.now
+		type: String,
+		required: false
 	},
 	paymentId: {
 		type: String,

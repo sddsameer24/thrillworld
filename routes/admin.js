@@ -122,6 +122,19 @@ router.get('/', isAdmin, function (req, res, next) {
     });
 });
 
+router.get('/availability', function (req, res, next) {
+    errorMsg = req.flash('error')[0];
+    successMsg = req.flash('success')[0];
+  
+    Order.find({}, function (err, docs) {
+        console.log(docs);
+        res.render('admin/availability', {
+            layout: 'admin-page.hbs',
+            docs:docs
+        });
+    });
+})
+
 router.get('/orders:filter?', isAdmin, function (req, res, next) {
     var filter = req.query.filter;
     meanlogger.log("check", "Viewed orders", req.user);

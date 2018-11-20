@@ -1,366 +1,715 @@
-<script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/0.9.0rc1/jspdf.min.js"></script>
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-md-12">
-			<ol class="breadcrumb">
-				<li>
-					<a href="/">Home</a>
-				</li>
-				<li>
-					<a href="shopping-cart">Shopping Cart</a>
-				</li>
-				<li class="active">Checkout</li>
-			</ol>
-			<div id="charge-error" class="alert alert-danger {{#if noErrorMsg}}hidden{{/if}}">
-				{{errorMsg}}
-			</div>
-			<div id="charge-success" class="alert alert-success {{#if noMessage}}hidden{{/if}}">
-				{{successMsg}}
-			</div>
-			{{#if products}}
+<div class="product">
+    <input type="hidden" id="one" name="one" value="{{this.user}}" /> {{#each product}}
+    <div class="container">
+        <div class="card">
+            <h2 class="p-0 m-0" style="text-align:center" ; id="product-title">{{this.name}}</h2>
+            <p> </p>
+            <p></p>
+            <p> </p>
+            <p></p>
+            <div class="card-body row">
+                <div class="col-sm-12 col-md-6" id="image-container">
+                    <div id="main-img">
+                        <main class="primary" style="background-image:url({{this.imagePath}})" class="mx-auto"></main>
+                    </div>
+                    <div class="container-fluid">
+                        <div class="row mx-auto" id="thumbnail-container">
+                            <a href="#" class="thumbnail selected" data-big="{{this.imagePathg1}}">
+                                <div class="thumb" style="background-image:url({{this.imagePathg1}}); background-size:cover;">
 
-			<div class="row">
-				<div class="col-lg-12 col-md-12">
-					<h1>Provide Purchaser Details</h1>
-					<div class="panel-body">
-						<div class="table-responsive">
-							<form action='/create' METHOD='post' encType="multipart/form-data">
-								<div class="panel-body">
-									<div class="form-group">
-										<label class="control-label">First Name</label>
-										<label class="control-label">Last Name</label>
-										<div class="inputGroupContainer">
-											<div class="input-group">
-												<span class="input-group-addon">
-													<i class="glyphicon glyphicon-user"></i>
-												</span>
-												<input name="first_name" placeholder="First Name" class="form-control" value="{{user.first_name}}" type="text">
-												<span class="input-group-addon">
-													<i class="glyphicon glyphicon-user"></i>
-												</span>
-												<input name="last_name" placeholder="Last Name" class="form-control" value="{{user.last_name}}" type="text">
-											</div>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="control-label">E-Mail</label>
-										<div class="inputGroupContainer">
-											<div class="input-group">
-												<input name="email" value="{{user.email}}" type="hidden">
+                                </div>
+                            </a>
+                            <a href="#" class="thumbnail" data-big="{{this.imagePathg2}}">
+                                <div class="thumb" style="background-image:url({{this.imagePathg2}}); background-size:cover;">
+                                </div>
+                            </a>
+                            <a href="#" class="thumbnail" data-big="{{this.imagePathg3}}">
+                                <div class="thumb" style="background-image:url({{this.imagePathg3}}); background-size:cover;">
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <span id="favorite-button" class="btn">
+                        <div class="text-left">
+                            {{#if ../../isLoggedIn}}
+                            <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
+                                <i class="fa fa-heart"></i> {{ this.likes.length }}</a>
+                            {{else}}
+                            <i class="fa fa-heart"></i> {{ this.likes.length }} {{/if}}
+                            <script>
+                                $(document).ready(function () {
+                                    $('[data-toggle="tooltip"]').tooltip();
+                                });
+                            </script>
+                        </div>
+                    </span>
+                </div>
 
-												<span class="input-group-addon">
-													<i class="glyphicon glyphicon-envelope"></i>
-												</span>
-												{{#if user.email}}
-												<input disabled name="email" placeholder="E-Mail Address" class="form-control" value="{{user.email}}" type="text"> {{else }}
-												<input name="email" placeholder="E-Mail Address" class="form-control" value="{{user.email}}" type="text" required> {{/if}}
-											</div>
-										</div>
-									</div>
-									<!-- Text input-->
-									<div class="form-group">
-										<label class="control-label">Phone #</label>
-										<div class="inputGroupContainer">
-											<div class="input-group">
-												<span class="input-group-addon">
-													<i class="glyphicon glyphicon-earphone"></i>
-												</span>
-												{{#if user.telephone}}
-												<input name="telephone" placeholder="(845) 555-1212" class="form-control" value="{{user.telephone}}" type="text"> {{else}}
-												<input name="telephone" placeholder="(845) 555-1212" class="form-control" value="{{user.telephone}}" type="text" required> {{/if}}
-											</div>
-										</div>
-									</div>
-									{{#if ../enableShipping}}
-									<div class="form-group">
-										<li class="list-group-item">
-											<label for='shipping_flag'>Ship Items?</label>
-											<div class="material-switch pull-right">
-												No
-												<input id="shipping_flag" name="shipping_flag" {{#if shipping_flag }} checked="checked" {{/if}} type="checkbox"
-												/>
-												<label for="shipping_flag" class="label-success"></label> Yes
-											</div>
-										</li>
-									</div>
-									<div class="form-group">
-										<span class="col-md-12 help-block" ng-show="shipping_name.$invalid || shipping_city.$invalid"> Shipping details are required.</span>
-										<h3>Shipping Address</h3>
-										<div class="form-group">
-											<label class="control-label">Address</label>
-											<div class="inputGroupContainer">
-												<div class="input-group">
-													<span class="input-group-addon">
-														<i class="glyphicon glyphicon-home"></i>
-													</span>
-													<input ng-model="shipping_addr1" name="shipping_addr1" placeholder="Address1" class="form-control" value="{{shipping_addr1}}"
-													 type="text" required>
-												</div>
-											</div>
-										</div>
-										<!-- Text input-->
-										<div class="form-group">
-											<label class="control-label">City</label>
-											<div class="inputGroupContainer">
-												<div class="input-group">
-													<span class="input-group-addon">
-														<i class="glyphicon glyphicon-home"></i>
-													</span>
-													<input ng-model="shipping_city" name="shipping_city" placeholder="city" class="form-control" value="{{shipping_city}}" type="text"
-													 required>
-												</div>
-											</div>
-										</div>
-										<!-- Text input-->
-										<div class="form-group">
-											<label class="control-label">State</label>
-											<div class="inputGroupContainer">
-												<div class="input-group">
-													<span class="input-group-addon">
-														<i class="glyphicon glyphicon-home"></i>
-													</span>
-													<input ng-model="shipping_state" name="shipping_state" placeholder="PA" class="form-control" value="{{shipping_state}}" type="text"
-													 required>
-												</div>
-											</div>
-											<label class="control-label">Zip</label>
-											<div class="inputGroupContainer">
-												<div class="input-group">
-													<span class="input-group-addon">
-														<i class="glyphicon glyphicon-home"></i>
-													</span>
-													<input ng-model="shipping_zip" name="shipping_zip" placeholder="xxxxxx" class="form-control" value="{{shipping_zip}}" type="text"
-													 required>
-												</div>
-											</div>
-										</div>
-										{{/if}}
-									</div>
-									<input type="hidden" name="cmd" value="_cart">
-									<input type="hidden" name="business" value="assistant@sepennaa.org">
-									<input type="hidden" name="currency_code" value="USD">
-									<input type="hidden" name="return" value="http://yourhost.com/complete">
-									<input type="hidden" name="cancel_return" value="http://yourhost.com/cancel">
-									<input type="hidden" name="cn" value="2017 SEPIA ROUNDUP">
-									<input type="hidden" name="no_shipping" value="1">
-									<input type="hidden" name="rm" value="2">
-									<!-- the buyer's browser is redirected to the return url using POST -->
-									<!-- Text input-->
+                <div class="col-sm-12 col-md-6" id="product-information">
 
-								</div>
-								<div id="content">
 
-								
-								<table id="content" class="table table-condensed">
-									<thead>
-										<tr>
-											<td>
-												<strong>ITEM</strong>
-											</td>
-											<td>
-												<strong>QTY</STRONG>
-											</td>
-											<td>
-												<strong>PRICE</strong>
-											</td>
-											<td>
-												<strong>TAXABLE</strong>
-											</td>
-											<td>
-												<strong>TOTAL</strong>
-											</td>
-											<td>&nbsp;</td>
-										</tr>
-									</thead>
-									<tbody>
-										<input type="hidden" name="upload" value="1"/>
-										 {{# each products }}
-										<input type="hidden" name="item_name_{{inc @index }}" value="{{this.item.title}}"/>
-										<input type="hidden" name="item_number_{{inc @index }}" value="{{this.item._id}}"/>
-										<input type="hidden" name="amount_{{inc @index }}" value="{{this.price}}"/>
-										<input type="hidden" name="itemTotal_{{inc @index }}" value="{{this.itemTotal}}"/>
-										<input type="hidden" name="option[{{ @index}}]" value="{{this.option}}"/>
-										<input type="hidden" name="item_name[null]" value="" />
-										<input type="hidden" name="item_name[{{ @index }}]" value="{{this.item.name}}" />
-										<input type="hidden" name="item_title[{{ @index }}]" value="{{this.item.title}}" />
-										<input type="hidden" name="item_id[{{ @index }}]" value="{{this.item._id}}" />
-										<input type="hidden" name="item_ticket_name[{{ @index }}]" value="{{this.ticket_name}}" />
-										<input type="hidden" name="item_ticket_email[{{ @index }}]" value="{{this.ticket_email}}" />
-										<input type="hidden" name="item_amount[{{ @index }}]" value="{{this.price}}" />
-										<input type="hidden" name="item_tax_amount[{{ @index }}]" value="{{this.totalTax}}" />
-										<input type="hidden" name="option_{{@index}}" value="{{this.option}}" />
-										<input type="hidden" name="ticket_name_{{@index}}" value="{{this.ticket_name}}" />
-										<input type="hidden" name="ticket_email_{{@index}}" value="{{this.ticket_email}}" />
-										<tr>
-											<td>{{this.item.title}}</td>
-											<td class="text-right">{{this.qty}}</td>
-											<td class="text-right" text-align="right">${{money this.price}}</td>
-											<td class="text-left">{{this.item.taxable}}</td>
-											<td class="text-right" text-align="right">${{money this.itemTotal}}</td>
-											<td>
-												<div class="btn-group pull-right">
-													<button class="btn btn-primary btn-xs dropdown-toggle pull-right" type="button" data-toggle="dropdown">Action
-														<span class="caret"></span>
-													</button>
-													<ul class="dropdown-menu">
-														<li>
-															<a href="/reduce-qty/{{this.item._id}}">Reduce by 1</a>
-														</li>
-														<li>
-															<a href="/empty-cart">Remove all {{this.item.name}}</a>
-														</li>
-														{{!--
-														<li>
-															<a href="/empty-cart">Remove All</a>
-														</li> --}}
-													</ul>
-												</div>
-											</td>
-										</tr>
-										{{/each}}
-										</tr>
-										<tr>
-											<td>&nbsp;</td>
-											<td>&nbsp;</td>
-											<td>&nbsp;</td>
-											<td>Total: </td>
-											<td class="text-right" text-align="right">Rs{{money subtotal}}</td>
-											<td>&nbsp;</td>
-										</tr>
-										<tr>
-											<td colspan=3>{{taxDesc}}</td>
-											<td>Tax: </td>
-											<td class='text-right' text-align="right">
-												Rs{{money totalTax}}
-											</td>
-											<td>&nbsp;</td>
-										</tr>
-										<tr>
-											<td>&nbsp;</td>
-											<td>&nbsp;</td>
-											<td>&nbsp;</td>
-											<td>Shipping: </td>
-											<td class='text-right' text-align="right">{{money shippingtotal}}</td>
-											<td>&nbsp;</td>
-										</tr>
-										<tr>
-											<td>&nbsp;</td>
-											<td>&nbsp;</td>
-											<td>&nbsp;</td>
-											<td>Total: </td>
-											<td class='text-right' text-align="right">{{money grandtotal}}</td>
-											<td>&nbsp;</td>
-										</tr>
-									</tbody>
-								</table>
-								</div>
-								<li class="list-group-item">
-									<a href="https://instamojo.com/@sdsameer24" rel="im-checkout" data-behaviour="remote" data-style="light" data-text="Checkout"></a>
-									<script src="https://d2xwmjc4uy2hr5.cloudfront.net/im-embed/im-embed.min.js"></script>
-									<div class="text-right">
-										<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg pdf" style="width: 100%;">pay by card</button>
-										<p></p>
-										<p></p>
-										<button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg pdf" style="width: 100%;">pay on arrival</button>
-										<div class="text-left">
-											{{#if ../enableShipping}}
-											<input id='update' name='update' type='submit' value='Update Shipping' class='btn btn-warning text-right'> {{/if}}
-										</div>
-									</div>
-									<input type="hidden" name="amount" value="{{grandtotal}}">
-									<input type="hidden" name="subtotal" value="{{subtotal}}">
-									<input type="hidden" name="totalTax" value="{{totalTax}}">
-									<input type="hidden" name="shippingtotal" value="{{shippingtotal}}">
-									<input type="hidden" name="method" value="paypal">
-								</li>
-							</form>
-						</div>
-					</div>
-				</div>
+                    <span id="product-short">
+                        <small>{{this.description}}</small>
+                    </span>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <span id="old-price" class="text-danger">
+                                <strike></strike>
+                            </span> &nbsp; &nbsp;
+                            <p>Price Per Person : Rs
+                                <span id="ticket_price">{{money this.price}}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <span class="align-middle">
+                        <label for="subscribe-btn">Read all terms and conditions</label>
+                        <input type="checkbox" id="subscribe-btn"> &nbsp;
+                    </span>
+                    <div id="text">
+                        <ul>
+                            <li>policy statement</li>
+                            <li>Confirmation Policy</li>
+                            <li>Cancellation Policy</li>
+                            <li>Refund Policy</li>
+                        </ul>
 
-				{{else}}
-				<div class="row">
-					<div class="col-sm-6 col-md-6 col-md-offset-3 col-sm-offset-3">
-						<h2>No items in Cart</h2>
-					</div>
-				</div>
-				{{/if}} {{#if ../enableShipping}} {{>shipping}} {{/if}}
-				<script type="javascript">
-  $("input[name='update']").hide();
-  $("input[name='shipping_flag']").click(function() {
-  		$("update").data('value')='UPDATE SHIPPING INFO';
-  		$("input[name='checkout']").show(300);
-        if ($(this).is(':checked')) {
-        	if ($("input[name='shipping_addr1]").attr('value')=='') {
-        		$("input[name='checkout']").attr('disabled', true);
-        		var ok = confirm('Please complete shipping information to proceed.');
-        	}
-            $("input[name='shipping_addr1']").attr("disabled", false);
-            $("input[name='shipping_city']").attr('disabled', false);
-            $("input[name='shipping_state']").attr('disabled', false);
-            $("input[name='shipping_zip']").attr('disabled', false);
-            $("input[name='shipping_addr1']").attr('required', true);
-            $("input[name='shipping_city']").attr('required', true);
-            $("input[name='shipping_state']").attr('required', true);
-            $("input[name='shipping_zip']").attr('required', true);
-        } else if ($(this).not(':checked')) {
-        	  		$("input[name='update']").hide(200);
+                    </div>
+                    <form action='/create' method='POST'>
+                        <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
+                        <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
+                        <input type='hidden' class='text-right' name='pname' value='{{this.name}}'>
+                        <input type="hidden" id="two" name="userid" />
+                        <div class="row">
+                            <div class="col-md-6" id="arrival">
+                                <label>Date of arrival</label>
+                                <input type="date" name="arrival"> &nbsp;
+                            </div>
+                            <div class="col-md-6" id="depart">
+                                <label>Date of depart</label>
+                                <input type="date" name="depart"> &nbsp;
+                            </div>
+                        </div>
+                        <script>
+                            function calc() {
+                                var children = 0;
+                                var adults = document.getElementById("adult").value;
+                                var children = document.getElementById("children").value;
+                                var price = document.getElementById("ticket_price").innerHTML;
+                                var noTickets = parseFloat(adults) + parseFloat(children);
+                                var total = parseFloat(price) * noTickets;
+                                if (!isNaN(total))
+                                    document.getElementById("total").innerHTML = total
+                                    document.getElementById("subtotal").value = total
+                                    document.getElementById("subtotal1").value = total
+                            }
+                        </script>
+                        <div class="row">
+                            <div class="col-md-4" id="arrival">
+                                <label>Number of Adult</label>
+                                <input type="number" id="adult" oninput="calc()" name="adult">
+                            </div>
 
-            var ok = confirm('Are you sure you want to remove all data?');
-            if (ok) {
-                var remove = '';
-                $("input[name='shipping_addr1']").attr('value', remove);
-                $("input[name='shipping_city']").attr('value', remove);
-                $("input[name='shipping_state']").attr('value', remove);
-                $("input[name='shipping_zip']").attr('value', remove);
+                            <div class="col-md-4" id="depart">
+                                <label>Number of Children</label>
+                                <input type="number" id="children" oninput="calc()" name="children">
+                            </div>
+                            <div class="col-md-4" id="depart">
+                                <label>Kids below 5</label>
+                                <input type="number" name="kids" data-toggle="tooltip" data-placement="top" title="Its free but we do need count">
+                            </div>
 
-                $("input[name='shipping_addr1']").attr('disabled', true);
-                $("input[name='shipping_city']").attr('disabled', true);
-                $("input[name='shipping_state']").attr('disabled', true);
-                $("input[name='shipping_zip']").attr('disabled', true);
-                $("input[name='shipping_addr1']").attr('required', false);
-                $("input[name='shipping_city']").attr('required', false);
-                $("input[name='shipping_state']").attr('required', false);
-                $("input[name='shipping_zip']").attr('required', false);
+                        </div>
+
+                        <input type='hidden' id="subtotal" name="subtotal">
+                        <h2>
+                            <p>Subtotal :
+                                <b>Rs
+                                    <span id="total" name="subtotal" class="user-location"></span>
+                                </b>
+                            </p>
+                        </h2>
+
+
+                        <p class="text-center">
+                            <input type='submit' value='Pay now' class="btn btn-primary add-to-cart" role="button">
+                        </p>
+                    </form>
+                    <form action='/payment' method='POST'>
+                        <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
+                        <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
+                        <input type='hidden' class='text-right' name='pname' value='{{this.name}}'>
+                        <input type="hidden" id="two" name="userid" />
+                        <input type="hidden" id="adultc" name="adult">
+                        <input type="hidden" id="childrenc" name="children">
+                        <input type="hidden" id="kidsc" name="kids">
+                        <input type="hidden" id="subtotal1" name="subtotal">
+                        <p class="text-center">
+                            <input type='submit' value='Pay on Arrival' class="btn btn-primary add-to-cart" role="button"  data-toggle="tooltip" data-placement="top" title="Yet you will have to pay 30% as advance">
+                        </p>
+                    </form>
+
+                </div>
+                {{!--
+                <input type='submit' href="/add-to-cart" class="btn btn-primary add-to-cart" role="button"> --}}
+            </div>
+        </div>
+
+
+    </div>
+
+
+</div>
+<!-- end container-->
+{{/each}}
+
+
+
+
+</div>
+
+
+
+<style>
+    .scone {
+        border: 0;
+        background-color: $bg-main;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        font-family: $fonts;
+        height: 100%;
+        padding: 2rem 0;
+    }
+
+    .scone__media {
+        padding: 0.875rem 0.875rem 0 0;
+    }
+
+    .imagescone {
+        // same styles as comment avatars
+        min-width: 2.25rem;
+        border-radius: 50%;
+    }
+
+    .scone__title {
+        font-size: 1.25rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .scone__body {
+        font-size: 1.0625rem;
+        line-height: 2rem;
+        color: #343434;
+    }
+
+    .rate {
+        font-size: 1.25rem;
+        color: #262626;
+    }
+
+    .fa-star {
+        color: #F5A623;
+    }
+
+    .fa-star-faded {
+        color: #F1961C;
+        opacity: 0.4;
+    }
+
+    .fa-semi-opacity:before {
+        background: linear-gradient(to right, rgba(245, 166, 35, 1) 50%, rgba(241, 231, 103, 1) 50%, rgba(251, 216, 158, 1) 50%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: initial;
+        /* reset Font Awesome's display:inline-block */
+    }
+
+    .scone__name {
+        font-size: 0.9375rem;
+        font-weight: bold;
+    }
+
+    .scone__date {
+        font-size: 0.8125rem;
+        color: #7492A5;
+    }
+
+    .scone__size {
+        font-size: 1.0625rem;
+        color: #134370;
+    }
+
+    .scone__icing {
+        display: flex;
+        flex: 1;
+    }
+
+    .scone__jam {
+        padding: 0.875rem 0;
+    }
+
+    .scone__cream {
+        padding: 0.875rem;
+        flex: 2;
+    }
+
+
+
+    button:active,
+    #favorite-button:active,
+    .btn:active {
+        transform: translateY(3px);
+        transition: 0.15s;
+    }
+
+    button,
+    input~button,
+    input+button,
+    select,
+    .btn,
+    input[type="checkbox"],
+    label[for=subscribe-btn] {
+        cursor: pointer;
+    }
+
+    .card {
+        background: #fff;
+        width: 100%;
+    }
+
+    .card>#image-container {
+        position: relative;
+    }
+
+    .card #image-container #main-img {
+        height: 300px;
+    }
+
+    .card #image-container main.primary {
+        margin: 0 auto;
+        display: block;
+        width: 60%;
+        height: auto;
+        min-height: 300px;
+        background-size: cover;
+    }
+
+    .card #image-container #thumbnail-container {
+        margin-top: 5px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .card #image-container #thumbnail-container div.thumb {
+        width: 99px;
+        height: 75px;
+        margin: 5px;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        box-sizing: border-box;
+    }
+
+    .card #image-container #thumbnail-container div.thumb:hover {
+        transform: scale(0.9);
+        transition: 0.3s;
+        transition-timing-function: ease-in;
+    }
+
+    .card #image-container span#favorite-button {
+        color: rgba(231, 76, 60, 0.5);
+        font-family: "Font Awesome 5 Free";
+        font-size: 1.5em;
+        content: "\f004";
+        position: absolute;
+        top: 15px;
+        right: 4vw;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        border-radius: 50%;
+        padding-top: 7px;
+        height: 50px;
+        width: 50px;
+        text-align: center;
+        box-shadow: 0px 1px 40px 0px rgba(0, 0, 0, 0.25);
+        ;
+    }
+
+    .card #image-container span#favorite-button:hover,
+    .card #image-container span#favorite-button.active {
+        color: rgba(231, 76, 60, 1);
+        transition-timing-function: ease-in-out;
+        transition: 0.3s;
+    }
+
+    .card #product-information #product-short {
+        text-transform: uppercase;
+        color: #777;
+    }
+
+    .card #product-information label {
+        font-weight: bold;
+        margin-top: 8px;
+        margin-bottom: 0;
+    }
+
+    .card #product-information select {
+        max-width: 18vw;
+    }
+
+
+    .card .nice-number {
+        display: inline-flex;
+        justify-content: stretch;
+    }
+
+    .card .nice-number button {
+        background: #27ae60;
+        color: #fff;
+        width: 3vw;
+        min-width: 35px;
+        border: 0;
+    }
+
+    .card .nice-number input {
+        width: 3.5vw;
+        min-width: 50px;
+        height: 40px;
+        vertical-align: middle;
+        -moz-appearance: textfield;
+        box-sizing: content-box;
+        margin: 0;
+        text-align: center;
+    }
+
+    .card .nice-number+button {
+        background: #27ae60;
+        color: #fff;
+        width: 13vw;
+        border: 0;
+        margin-left: 2px;
+        padding-top: 10.5px;
+        padding-bottom: 11px;
+        transition: 0.35s;
+    }
+
+    .card .nice-number button:hover,
+    .card .nice-number+button:hover {
+        background: #1e8449;
+        transition: 0.25s;
+    }
+
+    .disabled,
+    .thumbnail.selected,
+    .thumbnail.selected:hover {
+        opacity: 0.6;
+        cursor: none;
+    }
+
+    .nice-number input::-webkit-inner-spin-button,
+    .nice-number input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .card .nice-number+button.success {
+        border-radius: 10px;
+        background-color: orange;
+        transition: 0.2s;
+        float: none;
+    }
+
+    /*FOR MOBILE*/
+
+    @media only screen and (max-width:992px) {
+        .card #image-container main.primary {
+            width: 80%;
+            max-height: 300px;
+        }
+    }
+
+    @media only screen and (max-width:767px) {
+        .card #image-container main.primary {
+            width: 65%;
+            max-height: 300px;
+        }
+
+        .card #image-container #thumbnail-container {
+            margin-bottom: 5px;
+        }
+
+        .card #image-container #thumbnail-container div.thumb {
+            width: 25px;
+            height: 25px;
+        }
+
+
+        .card .nice-number button {
+            width: 7vw !important;
+        }
+
+        .card .nice-number+button.add-to-cart {
+            width: 33vw !important;
+            min-width: 50%;
+            float: right;
+        }
+
+        .card #product-information #product-title,
+        .card #product-information #product-short {
+            text-align: center;
+            display: block;
+        }
+
+        div#product-variables {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .card #product-information select {
+            min-width: 100%;
+        }
+    }
+
+    @media only screen and (max-width: 575px) {
+        .card #image-container main.primary {
+            width: 60% !important;
+            max-height: 300px !important;
+        }
+    }
+
+    @media only screen and (max-width:375px) {
+        body~container {
+            padding: 0;
+        }
+
+        .card #image-container main.primary {
+            width: 90% !important;
+            max-height: 150px !important;
+        }
+
+        div#product-variables {
+            max-width: 90% !important;
+            margin: 0 auto;
+        }
+        .card .nice-number {
+            min-width: 100%;
+        }
+
+        .card .nice-number button,
+        .card .nice-number input {
+            width: 33.33% !important;
+            margin-bottom: 5px;
+        }
+
+        .card .nice-number+button.add-to-cart {
+            min-width: 100%;
+        }
+    }
+</style>
+<script>
+    (function ($) {
+        $.fn.niceNumber = function (options) {
+            var settings = $.extend({
+                autoSize: false,
+                autoSizeBuffer: 1,
+                buttonDecrement: '-',
+                buttonIncrement: "+",
+                buttonPosition: 'around'
+            }, options);
+
+            return this.each(function () {
+                var currentInput = this,
+                    $currentInput = $(currentInput),
+                    attrMax = 999,
+                    attrMin = 0;
+
+                // Handle max and min values
+                if (
+                    typeof $currentInput.attr('max') !== typeof undefined
+                    && $currentInput.attr('max') !== false
+                ) {
+                    attrMax = parseFloat($currentInput.attr('max'));
+                }
+
+                if (
+                    typeof $currentInput.attr('min') !== typeof undefined
+                    && $currentInput.attr('min') !== false
+                ) {
+                    attrMin = parseFloat($currentInput.attr('min'));
+                }
+
+                // Fix issue with initial value being < min
+                if (
+                    attrMin
+                    && !currentInput.value
+                ) {
+                    $currentInput.val(attrMin);
+                }
+
+                // Generate container
+                var $inputContainer = $('<div/>', {
+                    class: 'nice-number'
+                })
+                    .insertAfter(currentInput);
+
+                // Generate interval (object so it is passed by reference)
+                var interval = {};
+
+                // Generate buttons
+                var $minusButton = $('<button/>')
+                    .attr('type', 'button')
+                    .html(settings.buttonDecrement)
+                    .on('mousedown mouseup mouseleave', function (event) {
+                        changeInterval(event.type, interval, function () {
+                            if (
+                                attrMin == null
+                                || attrMin < parseFloat(currentInput.value)
+                            ) {
+                                currentInput.value--;
+                            }
+                        });
+
+                        // Trigger the input event here to avoid event spam
+                        if (
+                            event.type == 'mouseup'
+                            || event.type == 'mouseleave'
+                        ) {
+                            $currentInput.trigger('input');
+                        }
+                    });
+
+                var $plusButton = $('<button/>')
+                    .attr('type', 'button')
+                    .html(settings.buttonIncrement)
+                    .on('mousedown mouseup mouseleave', function (event) {
+                        changeInterval(event.type, interval, function () {
+                            if (
+                                attrMax == null
+                                || attrMax > parseFloat(currentInput.value)
+                            ) {
+                                currentInput.value++;
+                            }
+                        });
+
+                        // Trigger the input event here to avoid event spam
+                        if (
+                            event.type == 'mouseup'
+                            || event.type == 'mouseleave'
+                        ) {
+                            $currentInput.trigger('input');
+                        }
+                    });
+
+                // Append elements
+                switch (settings.buttonPosition) {
+                    case 'left':
+                        $minusButton.appendTo($inputContainer);
+                        $plusButton.appendTo($inputContainer);
+                        $currentInput.appendTo($inputContainer);
+                        break;
+                    case 'right':
+                        $currentInput.appendTo($inputContainer);
+                        $minusButton.appendTo($inputContainer);
+                        $plusButton.appendTo($inputContainer);
+                        break;
+                    case 'around':
+                    default:
+                        $minusButton.appendTo($inputContainer);
+                        $currentInput.appendTo($inputContainer);
+                        $plusButton.appendTo($inputContainer);
+                        break;
+                }
+
+                // Nicely size input
+                if (settings.autoSize) {
+                    $currentInput.width(
+                        $currentInput.val().length + settings.autoSizeBuffer + "ch"
+                    );
+                    $currentInput.on('keyup input', function () {
+                        $currentInput.animate({
+                            'width': $currentInput.val().length + settings.autoSizeBuffer + "ch"
+                        }, 200);
+                    });
+                }
+            });
+        };
+
+        function changeInterval(eventType, interval, callback) {
+            if (eventType == "mousedown") {
+                interval.timeout = setTimeout(function () {
+                    interval.actualInterval = setInterval(function () {
+                        callback();
+                    }, 100);
+                }, 200);
+                callback();
+            } else {
+                if (interval.timeout) {
+                    clearTimeout(interval.timeout);
+                }
+                if (interval.actualInterval) {
+                    clearInterval(interval.actualInterval);
+                }
+            }
+        }
+    }(jQuery));
+
+    $('input#add-to-cart-qty').niceNumber();
+
+    $('input#add-to-cart-qty').keydown(function (e) {
+        if (e.keyCode == 190 || e.keyCode == 110 || e.keyCode == 69 || e.keyCode == 189 || e.keyCode == 109) {
+            e.preventDefault();
+        }
+
+        if (isNaN(parseInt(window.getSelection()))) {
+            var code = (e.keyCode >= 96) ? e.keyCode - 48 : e.keyCode;
+            var keyval = parseInt(String.fromCharCode(code));
+
+            if (!isNaN(keyval)) {
+                if ($(this).val() + keyval > parseInt($(this).attr('max'))) {
+                    e.preventDefault();
+                }
             }
         }
     });
-  $("#same_as_billing").on("change", function(){
-    if (this.checked) {
-      $("[name='shipping_name']").val($("[name='billing_name']").val());
-      $("[name='shipping_addr1']").val($("[name='billing_addr1']").val());
-      $("[name='shipping_city']").val($("[name='billing_city']").val());
-      $("[name='shipping_state']").val($("[name='billing_state']").val());
-      $("[name='shipping_zip']").val($("[name='billing_zip']").val());
-    } else {
-      $("[name='shipping_name']").val($("").val());
-      $("[name='shipping_addr1']").val($("").val());
-      $("[name='shipping_city']").val($("").val());
-      $("[name='shipping_state']").val($("").val());
-      $("[name='shipping_zip']").val($("").val());
-    }
-
-  });
-</script>
-
-<script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/0.9.0rc1/jspdf.min.js"></script>
-<script>
-
-var doc = new jsPDF();
-var specialElementHandlers = {
-    '#editor': function (element, renderer) {
-        return true;
-    }
-};
-
-$('.pdf').click(function () {   
-    doc.fromHTML($('#content').html(), 15, 15, {
-        'width': 170,
-            'elementHandlers': specialElementHandlers
+    $('input#add-to-cart-qty').keyup(function (e) {
+        if ($(this).val() != '') {
+            $(this).val(parseInt($(this).val()));
+        }
     });
-    doc.save('Invoice.pdf');
-});
+    // ------------- //
 
+
+    $('#text').hide();
+
+    $('#subscribe-btn').change(function () {
+        // use the :checked selector to find any that are checked
+        if ($("#subscribe-btn").is(':checked')) {
+            $('#text').slideDown();
+        } else {
+            $('#text').slideUp();
+        }
+    });
+
+    /* Images */
+    $('.thumbnail').on('click', function () {
+        var clicked = $(this);
+        var newSelection = clicked.data('big');
+        var $img = $('.primary').css("background-image", "url(" + newSelection + ")");
+        clicked.parent().find('.thumbnail').removeClass('selected');
+        clicked.addClass('selected');
+        $('.primary').empty().append($img.hide().fadeIn(500));
+        return false;
+    });
+
+
+
+
+    $('button.add-to-cart').on('click', function () {
+        var cartBtn = $(this);
+        cartBtn.addClass('success').text("Success!").attr('disabled', true);
+        setTimeout(function () { cartBtn.removeClass('success').addClass('active').text("Add to Cart").attr('disabled', false); }, 1500);
+    });
+
+
+    $('#favorite-button').on('click', function () {
+        $(this).toggleClass('active');
+    })
 </script>
