@@ -1,30 +1,12 @@
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+        <a class="navbar-brand" href="/admin">{{title}}</a>
+        <button style="color:antiquewhite;" type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/admin">{{title}}</a>
-        <ul class="nav navbar-nav navbar-right">
-            <li>
-            </li>
-            {{#if allcats }}
-            <li class="dropdown-btn">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                    <span class="fa fa-caret-down" title="User Menu" aria-hidden="true"></span>&nbsp;Categories
-
-            </li>
-            {{/if}}
-            <li>
-                <a id="shopping-cart" href="/shopping-cart">
-                    <i class="fa fa-shopping-cart" aria-hidden="true"></i>&nbsp;Shopping Cart {{#if session.cart.totalQty }}
-                    <span class="badge btn-success">{{ session.cart.totalQty }}</span>
-                    {{/if}}
-                </a>
-            </li>
-        </ul>
+        </button>   
     </div>
     <!-- Top Menu Items -->
     <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
@@ -47,7 +29,7 @@
                     <i class="fa fa-fw fa-table"></i>Availability</a>
             </li>
             <li>
-                <a href="/admin/products">
+                <a href="/admin/messages">
                     <i class="fa fa-commenting"></i>Messages</a>
             </li>
             <li>

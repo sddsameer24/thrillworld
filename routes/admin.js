@@ -90,33 +90,44 @@ router.get('/', isAdmin, function (req, res, next) {
         }
     });
     var custresponse_store;
-    Message.distinct('form' ,(err, custresponse)=> {
+    Message.distinct('form', (err, custresponse) => {
         //res.send(messages);
-        custresponse_store=custresponse;
-		console.log(custresponse);
-      })
-    Order.find({}, function (err, docs) {
-        meanlogger.log("check", "Viewed", req.user);
-        Product.find(function (err, products) {
-            productChunks = [];
-            chunkSize = 5;
-            for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
-                productChunks.push(docs.slice(i, i + chunkSize))
-            }
-
-            res.render('admin/dashboard', {
-                layout: 'admin-page.hbs',
-                products: productChunks,
-                errorMsg: errorMsg,
-                successMsg: successMsg,
-                noErrorMsg: !errorMsg,
-                noMessage: !successMsg,
-                totalSales: tot,
-                orders: docs,
-                noErrors: 1,
-                user: req.user,
-               
-                custresponse_store:custresponse_store
+        custresponse_store = custresponse;
+        // console.log(custresponse);
+    })
+    var today = new Date();
+    var currDay = today.getDate();
+    var currMonth = today.getMonth() + 1;
+    var currYear = today.getFullYear();
+    // console.log(currYear + "-" + currMonth + "-" + currDay);
+    var date = (currYear + "-" + currMonth + "-" + currDay);
+    qryFilter = { "checkin": date };
+    qryFilter1 = { "checkout": date };
+    qryFilter2 = { "created": { $gte: moment(date) } };
+    Order.find(qryFilter, function (err, docs) {
+        var bookings = docs.length;
+        Order.find(qryFilter1, function (err, docs1) {
+            var checkouts = docs1.length;
+            Order.find(qryFilter2, function (err, docs3) {
+                var bookingsno = docs3.length;
+                res.render('admin/dashboard', {
+                    layout: 'admin-page.hbs',
+                    errorMsg: errorMsg,
+                    successMsg: successMsg,
+                    noErrorMsg: !errorMsg,
+                    noMessage: !successMsg,
+                    totalSales: tot,
+                    docs: docs,
+                    docs1: docs1,
+                    docs3:docs3,
+                    bookingsno:bookingsno,
+                    noErrors: 1,
+                    date: date,
+                    user: req.user,
+                    bookings: bookings,
+                    checkouts: checkouts,
+                    custresponse_store: custresponse_store
+                });
             });
         });
     });
@@ -125,12 +136,24 @@ router.get('/', isAdmin, function (req, res, next) {
 router.get('/availability', function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
-  
+
     Order.find({}, function (err, docs) {
         console.log(docs);
         res.render('admin/availability', {
             layout: 'admin-page.hbs',
-            docs:docs
+            docs: docs
+        });
+    });
+})
+router.get('/messages', function (req, res, next) {
+    errorMsg = req.flash('error')[0];
+    successMsg = req.flash('success')[0];
+
+    Order.find({}, function (err, docs) {
+        console.log(docs);
+        res.render('admin/messages', {
+            layout: 'admin-page.hbs',
+            docs: docs
         });
     });
 })
@@ -199,24 +222,6 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
     })
 });
 
-// router.post('/order', function (req, res, next) {
-//     //////console.log(req.files);
-//     successMsg = req.flash('success')[0];
-//     errorMsg = req.flash('error')[0];
-//     var order_id = req.body._id;
-//     var query = { '_id': order_id };
-
-//     // Order = new Order({
-//     // note = req.body.note,
-//     // receiver = req.body.receiver,
-//     // })
-//     Order.save(function (err) {
-//         if (err) {
-//             res.send(500, 'Error deleting order.');
-//         }
-//         return res.redirect('/admin/orders');
-//     })
-// })
 router.post('/delete-order', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
@@ -1219,7 +1224,7 @@ router.get('/dashboard', isAdmin, function (req, res, next) {
             stats: stats,
             isLoggedIn: req.isAuthenticated(),
             successMsg: successMsg,
-            
+
         });
     });
 });

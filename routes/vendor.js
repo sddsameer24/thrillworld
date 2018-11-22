@@ -58,6 +58,21 @@ router.get('/stores', function (req, res, next) {
         });
     });
 })
+// ..........................................messages...........................................................
+router.get('/messages', function (req, res, next) {
+    errorMsg = req.flash('error')[0];
+
+    Message.distinct('form', (err, custresponse) => {
+        //res.send(messages);
+        custresponse_store = custresponse;
+        // console.log(custresponse);
+  
+    res.render('vendor/messages', {
+        layout: 'vendor-page.hbs',
+        custresponse_store : custresponse_store,
+    })
+    });
+})
 /* Get Relations for graph map */
 router.get('/relations', function (req, res, next) {
     errorMsg = req.flash('error')[0];
@@ -89,46 +104,93 @@ router.get('/', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     var tot = totalSales(function (err, next) {
         if (err) {
-            //console.log(err.message);
+            //////console.log(err.message);
             return res.error('err');
         }
     });
     var custresponse_store;
-    Message.distinct('form' ,(err, custresponse)=> {
-        //res.send(messages);
-        custresponse_store=custresponse;
-		console.log(custresponse);
-      })
-      
-    Order.find({}, function (err, docs) {
-        meanlogger.log("check", "Viewed", req.user);
-        Product.find(function (err, products) {
-            productChunks = [];
-            chunkSize = 5;
-            for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
-                productChunks.push(docs.slice(i, i + chunkSize))
-            }
-            // res.render('shop/index', {
-            // 	title: 'MEAN Store',
-            // 	products: productChunks,
-            // 	user: user
-            //   	});
-            res.render('vendor/Activity', {
+  
+    var today = new Date();
+    var currDay = today.getDate();
+    var currMonth = today.getMonth() + 1;
+    var currYear = today.getFullYear();
+    // console.log(currYear + "-" + currMonth + "-" + currDay);
+    var date = (currYear + "-" + currMonth + "-" + currDay);
+    qryFilter = { "checkin": date };
+    qryFilter1 = { "checkout": date };
+    qryFilter2 = { "created": { $gte: moment(date) } };
+    Order.find(qryFilter, function (err, docs) {
+        var bookings = docs.length;
+        Order.find(qryFilter1, function (err, docs1) {
+            var checkouts = docs1.length;
+            Order.find(qryFilter2, function (err, docs3) {
+                var bookingsno = docs3.length;
+                res.render('vendor/Activity', {
                 layout: 'vendor-page.hbs',
-                products: productChunks,
-                errorMsg: errorMsg,
-                successMsg: successMsg,
-                noErrorMsg: !errorMsg,
-                noMessage: !successMsg,
-                totalSales: tot,
-                orders: docs,
-                noErrors: 1,
-                user: req.user,
-                custresponse_store:custresponse_store
+                    errorMsg: errorMsg,
+                    successMsg: successMsg,
+                    noErrorMsg: !errorMsg,
+                    noMessage: !successMsg,
+                    totalSales: tot,
+                    docs: docs,
+                    docs1: docs1,
+                    docs3:docs3,
+                    bookingsno:bookingsno,
+                    noErrors: 1,
+                    date: date,
+                    user: req.user,
+                    bookings: bookings,
+                    checkouts: checkouts,
+                    custresponse_store: custresponse_store
+                });
             });
         });
     });
 });
+//     errorMsg = req.flash('error')[0];
+//     successMsg = req.flash('success')[0];
+//     var tot = totalSales(function (err, next) {
+//         if (err) {
+//             //console.log(err.message);
+//             return res.error('err');
+//         }
+//     });
+//     var custresponse_store;
+//     Message.distinct('form' ,(err, custresponse)=> {
+//         //res.send(messages);
+//         custresponse_store=custresponse;
+// 		console.log(custresponse);
+//       })
+      
+//     Order.find({}, function (err, docs) {
+//         meanlogger.log("check", "Viewed", req.user);
+//         Product.find(function (err, products) {
+//             productChunks = [];
+//             chunkSize = 5;
+//             for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
+//                 productChunks.push(docs.slice(i, i + chunkSize))
+//             }
+//             // res.render('shop/index', {
+//             // 	title: 'MEAN Store',
+//             // 	products: productChunks,
+//             // 	user: user
+//             //   	});
+//             res.render('vendor/Activity', {
+//                 layout: 'vendor-page.hbs',
+//                 products: productChunks,
+//                 errorMsg: errorMsg,
+//                 successMsg: successMsg,
+//                 noErrorMsg: !errorMsg,
+//                 noMessage: !successMsg,
+//                 totalSales: tot,
+//                 orders: docs,
+//                 noErrors: 1,
+//                 user: req.user,
+//                 custresponse_store:custresponse_store
+//             });
+//         });
+//     });
+// });
 
 router.get('/orders:filter?', isAdmin, function (req, res, next) {
     var filter = req.query.filter;

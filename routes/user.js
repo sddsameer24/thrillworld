@@ -288,14 +288,16 @@ router.post('/forgot', function (req, res, next) {
 			});
 		},
 		function (token, done) {
+			console.log('account with that email.');
 			User.findOne({
 				email: req.body.email
 			}, function (err, user) {
 				if (!user) {
 					req.flash('error', 'No account with that email address exists.');
-					////console.log('no account with that email.');
+					console.log('no account with that email.');
 					return res.redirect('/user/forgot');
 				}
+				console.log("token:"+token);
 				user.resetPasswordToken = token;
 				user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
@@ -303,25 +305,33 @@ router.post('/forgot', function (req, res, next) {
 					if (err) {
 						req.flash('error', 'An error occurred.');
 					}
-					////console.log("Saved User: " + JSON.stringify(user));
+					console.log("Saved User: " + JSON.stringify(user));
 					done(err, token, user);
 				});
 			});
 		},
 		function (token, user, done) {
+			console.log("mailing: ");
+			// var transporter = nodemailer.createTransport({
+			// 	service: 'Gmail',
+			// 	auth: {
+			// 	  user: 'sdsameer24@gmail.com',
+			// 	  pass: '22watch22'
+			// 	}
+			//   });
 			let transporter = nodemailer.createTransport({
 				host: 'mail.zo-online.com',
 				port: 587,
 				secure: false, // true for 465, false for other ports
 				auth: {
 					user: 'admin@zo-online.com', // generated ethereal user
-					pass: '22watch22@DS'  // generated ethereal password
+					pass: 'PI,FX%EsZ$EQ'  // generated ethereal password
 				},
 				tls: {
 					rejectUnauthorized: false
 				}
 			});
-
+			console.log("mailingtransporter: ");
 			// setup email data with unicode symbols
 			let mailOptions = {
 				from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
@@ -333,21 +343,21 @@ router.post('/forgot', function (req, res, next) {
 					'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
 					'If you did not request this, please ignore this email and your password will remain unchanged.\n'
 			};
-
+			console.log("mailingtransporteroptions: "+mailOptions);
 			// send mail with defined transport object
 			transporter.sendMail(mailOptions, (error, info) => {
 				if (error) {
 
-					//console.log("ERROR" + error);
+					console.log("ERRORsending" + error);
 					return //////console.log(error);
 				}
 
 
 				//console.log("INFo" + info);
 				//console.log('Message sent: %s', info.messageId);
-				//console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+				console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 				req.flash('success', "SENT MAIL, KINDLY CHECK!");
-				//	res.render('contact', { msg: 'Email has been sent' });
+				// res.render('contact', { msg: 'Email has been sent' });
 			});
 			// end of order comnfirmation mail sending  ..........................................
 		}
@@ -358,6 +368,7 @@ router.post('/forgot', function (req, res, next) {
 		}
 		res.redirect('/user/forgot');
 	});
+	res.redirect('/');
 });
 
 // Mobile Forgot
@@ -479,7 +490,7 @@ router.post('/forgot-mobile', function (req, res, next) {
 
 			// setup email data with unicode symbols
 			let mailOptions = {
-				from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				from: '"Thrillworld Password reset" <admin@zo-online.com>', // sender address
 				replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
 				to: user.email, // list of receivers
 				subject: 'Password Reset',
@@ -534,12 +545,13 @@ router.post('/forgot-mobile', function (req, res, next) {
 router.get('/reset/:token', function (req, res) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
+	console.log("reset module");
 	User.findOne({
 		resetPasswordToken: req.params.token,
 		resetPasswordExpires: {
 			$gt: Date.now()
 		}
-	}, function (err, user) {
+	}, function (err,user) {
 		
 		//console.log("Found User: " + JSON.stringify(user));
 		res.render('user/reset', {
@@ -599,7 +611,7 @@ router.post('/reset/:token', function (req, res) {
 				if (err) {
 					////console.log("Error: " + err.message);
 				}
-				//console.log("User: " + JSON.stringify(user));
+				console.log("User: " + JSON.stringify(user));
 				// if (!user) {
 				// 	errorMsg = req.flash('error', 'Password reset token is invalid or has expired.');
 				// 	return res.redirect('back');
@@ -609,45 +621,68 @@ router.post('/reset/:token', function (req, res) {
 				user.resetPasswordExpires = undefined;
 
 				user.save(function (err) {
+					console.log("save user");
 					req.logIn(user, function (err) {
 						done(err, user);
+						console.log(user);
 					});
 				});
 			});
 		},
 		function (user, done) {
-			var transporter = nodemailer.createTransport({
+			console.log("done"+user);
+			let transporter = nodemailer.createTransport({
 				host: 'mail.zo-online.com',
 				port: 587,
 				secure: false, // true for 465, false for other ports
 				auth: {
 					user: 'admin@zo-online.com', // generated ethereal user
-					pass: '22watch22@DS'  // generated ethereal password
+					pass: 'PI,FX%EsZ$EQ'  // generated ethereal password
 				},
 				tls: {
 					rejectUnauthorized: false
 				}
 			});
-
-			var mailOptions = {
-				to: user.email,
-				from: 'passwordreset@demo.com',
+			console.log("mailingtransporter: ");
+			// setup email data with unicode symbols
+			let mailOptions = {
+				from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				to: user.email, // list of receivers
 				subject: 'Your password has been changed',
 				text: 'Hello,\n\n' +
-					'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+				'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
 			};
-			transporter.sendMail(mailOptions, function (err) {
-				req.flash('success', 'Success! Your password has been changed.');
-				res.redirect('/');
-				done(err);
+			// var mailOptions = {
+			// 	to: user.email,
+			// 	from: 'passwordreset@demo.com',
+			// 	subject: 'Your password has been changed',
+			// 	text: 'Hello,\n\n' +
+			// 		'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+			// };
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+
+					console.log("ERRORsending" + error);
+					return //////console.log(error);
+				}
+
+
+				//console.log("INFo" + info);
+				//console.log('Message sent: %s', info.messageId);
+				console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+				req.flash('success', "SENT MAIL, KINDLY CHECK!");
+				// res.render('contact', { msg: 'Email has been sent' });
 			});
 		}
 	], function (err) {
 		if (err) {
 			req.flash('error', 'Unknown Error during reset.')
-			res.redirect('user/reset');
+			
 		}
+		res.redirect('/user/forgot');
 	});
+	res.redirect('/');
 });
 
 // Mobile Post 

@@ -1,101 +1,221 @@
-<h3 style="text-align:center;">Daily feeds</h3>
-<p id="demo"></p>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+<h3 class="text-primary text-center">
+    Reports
+</h3>
+<div class "row">
+    <div class="col-sm-6 text-center">
+        <label class="label label-success">Area Chart</label>
+        <div id="area-chart"></div>
+    </div>
+    <div class="col-sm-6 text-center">
+        <label class="label label-success">Line Chart</label>
+        <div id="line-chart"></div>
+    </div>
 
-<div class="container">
-    <br>
-    <div class="jumbotron">
-        <h1 class="display-4">Send Message</h1>
-        <br>
+</div>
+<style>
+    #area-chart,
+    #line-chart,
+    
+    #pie-chart {
+        min-height: 250px;
+    }
+</style>
+<script>
+    var data = [
+        { y: '2014', a: 50, b: 90 },
+        { y: '2015', a: 65, b: 75 },
+        { y: '2016', a: 50, b: 50 },
+        { y: '2017', a: 75, b: 60 },
+        { y: '2018', a: 80, b: 65 },
+        { y: '2019', a: 90, b: 70 },
+        { y: '2020', a: 100, b: 75 },
+        { y: '2021', a: 115, b: 75 },
+        { y: '2022', a: 120, b: 85 },
+        { y: '2023', a: 145, b: 85 },
+        { y: '2024', a: 160, b: 95 }
+    ],
+        config = {
+            data: data,
+            xkey: 'y',
+            ykeys: ['a', 'b'],
+            labels: ['Total Income', 'Total Outcome'],
+            fillOpacity: 0.6,
+            hideHover: 'auto',
+            behaveLikeLine: true,
+            resize: true,
+            pointFillColors: ['#ffffff'],
+            pointStrokeColors: ['black'],
+            lineColors: ['gray', 'red']
+        };
+    config.element = 'area-chart';
+    Morris.Area(config);
+    config.element = 'line-chart';
+    Morris.Line(config);
+    config.element = 'bar-chart';
+    Morris.Bar(config);
+    config.element = 'stacked';
+    config.stacked = true;
+    Morris.Bar(config);
+    Morris.Donut({
+        element: 'pie-chart',
+        data: [
+            { label: "Friends", value: 30 },
+            { label: "Allies", value: 15 },
+            { label: "Enemies", value: 45 },
+            { label: "Neutral", value: 10 }
+        ]
+    });
+</script> {{!-- ............................................................................................................ --}}
+<div class="row">
+    <div class="todatsarrival col-md-6">
+        <h1>Daily Reports:({{this.date}})</h1>
+        <div class="row container-fluid">
+            <div class="col-md-6">
+                <h3>Arrivals:{{this.bookings}}</h3>
+            </div>
+            <div class="col-md-6">
+                <h3>Checkouts:{{this.checkouts}}</h3>
+            </div>
+        </div>
 
-       To <select  class='form-control' name='to'>
-        {{#each custresponse_store}} 
-        TO<option  id="tomsg" class="form-control" value="{{this}}">{{this}}</option>
+        {{#each docs}}
+        <div class="jumbotron">
+
+            <div class="row card container btn-holder" type="button">
+                <div class="col-md-6">
+                    <p>Event Name: {{#each this.cart }}
+                        <span>{{product_name}}</span>{{/each}}</p>
+                </div>
+                <div class="col-md-6">
+                    <p>Number of Visitors: {{#each this.cart }}
+                        <span>{{product_qty}}</span>{{/each}}</p>
+                </div>
+            </div>
+            <div class="row card container btn-holder" type="button">
+                <div class="col-md-6">
+                    <p>Amount Paid: {{#each this.cart }}
+                        <span>{{product_price}}</span>{{/each}}</p>
+                </div>
+                <div class="col-md-6">
+                    <!-- Trigger the modal with a button -->
+                    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">User Details</button>
+
+                    <!-- Modal -->
+                    <div id="myModal" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+
+                            <!-- Modal content-->
+                            <div class="modal-content">
+
+
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Mr {{this.user.first_name}} {{this.user.last_name}}</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>
+                                        <span class="glyphicon glyphicon-phone">-</span>{{this.user.telephone}}</p>
+                                    <p>
+                                        <span class="glyphicon glyphicon-envelope">-</span>{{this.user.email}}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </div>
+
         {{/each}}
-       </select>
-        FORM<input id="formmsg" class="form-control" value="{{ user._id }}" readonly>
-        <br>
-        <textarea id="message" class="form-control" placeholder="Your Message Here"></textarea>
-        <br>
-        <button id="send" class="btn btn-success">Send</button>
-    </div>
-    <div id="messages">
+
+
 
     </div>
+    <div class="todatsbooking col-md-6">
+        <h1>Bookings today:({{this.date}})</h1>
+        <div class="row container-fluid">
+
+            <div class="col-md-6">
+                <h3>No of bookings:{{this.bookingsno}}</h3>
+            </div>
+            <div class="col-md-6">
+
+            </div>
+        </div>
+
+        {{#each docs3}}
+        <div class="jumbotron">
+
+            <div class="row card container btn-holder" type="button">
+                <div class="col-md-6">
+                    <p>Event Name: {{#each this.cart }}
+                        <span>{{product_name}}</span>{{/each}}</p>
+                </div>
+                <div class="col-md-6">
+                    <p>Number of Visitors: {{#each this.cart }}
+                        <span>{{product_qty}}</span>{{/each}}</p>
+                </div>
+            </div>
+            <div class="row card container btn-holder" type="button">
+                <div class="col-md-6">
+                    <p>Amount Paid: {{#each this.cart }}
+                        <span>{{product_price}}</span>{{/each}}</p>
+                </div>
+                <div class="col-md-6">
+                    <!-- Trigger the modal with a button -->
+                    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">User Details</button>
+
+                    <!-- Modal -->
+                    <div id="myModal" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+
+                            <!-- Modal content-->
+                            <div class="modal-content">
+
+
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Mr {{this.user.first_name}} {{this.user.last_name}}</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>
+                                        <span class="glyphicon glyphicon-phone">-</span>{{this.user.telephone}}</p>
+                                    <p>
+                                        <span class="glyphicon glyphicon-envelope">-</span>{{this.user.email}}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </div>
+
+        {{/each}}
+
+
+
+    </div>
 </div>
-
-
-	 <script src="/socket.io/socket.io.js"></script>
-<script>
-   var socket = io();
-    $(() => {
-        $("#send").click(()=>{
-            sendMessage({to: $("#tomsg").val(),form: $("#formmsg").val(), message: $("#message").val()});
-        })
-
-        getMessages()
-    })
-
-    socket.on('message', addMessages)
-
-    function addMessages(message){
-        $("#messages").append(`<h4> TO: ${message.to} <br/>FORM: ${message.form} </h4> <p> ${message.message} </p>`)
-    }
-
-    function getMessages(){
-     var formmsg=document.getElementById("formmsg").value;  
-     console.log("Form ID "+formmsg);
-
-      $.get('http://localhost:3000/messagesvendor', (data) => {
-        //console.log("Admin Side Console"+data);
-        data.forEach(addMessages);
-      })
-    }
-
-    function sendMessage(message){
-      $.post('http://localhost:3000/messages', message)
-    }
-</script>
-
-
-<script>
-    var d = new Date();
-    document.getElementById("demo").innerHTML = d;
-</script>
- <marquee direction = "up">
-<div class="container">
-{{#each orders }}
-{{#each this.cart}}
-<p>Event:{{this.product_name}}</p>
-
-
-<div class="row">
-<div class="col-md-6">
-Arrivals:{{this.product_qty}}
-</div>
-<div class="col-md-6">
-Departures:{{this.product_qty}}
-</div>
-<div class="row">
-    <div class="col-md-6">
-Amount paid:{{this.product_price}}
-</div>
-<div class="col-md-6">
-code:{{this.code}}
-</div>
-
-</div>
-</div>
-  {{/each}}
-<div class="row">
-    <div class="col-md-6">
-Payment Status:{{this.status}}
-</div>
-<div class="col-md-6">
-Payment Id:{{this.paymentId}}
-</div>
-
-</div>
-{{/each}}
-</div>
-
- </marquee>
