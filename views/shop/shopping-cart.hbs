@@ -1,8 +1,12 @@
 <div id="wrap">
     <div id="cart_layout_1">
       <h1>Shopping Cart</h1>
-      {{# each productcart}}
-      {{# each this}}
+      {{#each user}}
+       <input type='hidden' id='one' name='user' value='{{this._id}}'>
+     {{#if this.product}} 
+  
+      {{#each product}} 
+      
       <div class="cart_info">
         <div class="product">
           <img src="{{this.imagePath}}"/>
@@ -24,20 +28,37 @@
             </div>
           </div>
           <div class="remove">
+            <form action='/empty-cart' method='POST'>
+                       <input type='hidden' id='two' name='user'>
+                        <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
+                        
             <div class="center">
-              <span class="hidden">Remove</span><i class="fa fa-times-circle fa-4" href=""></i>
+             <button  onclick="myFunction()" type="submit"><span class="hidden">Remove</span><i class="fa fa-times-circle fa-4"></i></button> 
             </div>
+            </form>
           </div>
+          
                       <a class="button11" href="/checkout/{{this._id}}">Checkout</a>
         </div>
       
          
 
       </div>
-   {{/each}}
+      {{/each}}
+      {{else}}
+      <div style="margin-top:100px;">
+         <h3>No Events in the cart</h3>
+    </div>
+     
+      {{/if}}
+ 
 
 {{/each}}
-        
+<script>
+       function myFunction() {
+    document.getElementById("two").value = document.getElementById("one").value;
+}
+        </script>
      <style>
          img{
   max-width:100%;

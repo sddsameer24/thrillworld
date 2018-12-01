@@ -327,7 +327,9 @@
 !function() {
   var data = [
    {{#each docs }}
-   {  eventName: {{#each this.cart }}'{{product_name}}'{{/each}}+'-' +'{{this.user.first_name}}', calendar: 'Work', color: 'orange', date: '2018-11-28' },
+ 
+   {  eventName: {{#each this.cart }}'{{product_name}}'{{/each}}+'-' +'{{this.user.first_name}}', calendar: 'Arrivals', color: 'orange', date: '{{this.checkin}}' },
+  {  eventName: {{#each this.cart }}'{{product_name}}'{{/each}}+'-' +'{{this.user.first_name}}', calendar: 'Departure', color: 'green', date: '{{this.checkout}}' },
    {{/each}} 
      ];
 

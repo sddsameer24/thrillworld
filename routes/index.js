@@ -212,7 +212,7 @@ router.get('/', function (req, res, next) {
 	var orderid = req.param('orderid');
 	var payment_id = req.param('payment_id');
 	var payment_request_id = req.param('payment_request_id');
-
+  
 	//console.log(orderid + "    " + payment_id + "    " + payment_request_id);
 
 	if (payment_id && payment_request_id) {
@@ -265,18 +265,6 @@ router.get('/', function (req, res, next) {
 	};
 	Product.aggregate(
 		[
-			// [{
-			// 	$group: {
-			// 		_id: "$category",
-			// 		count: {
-			// 			$sum: 1
-			// 		}
-			// 	}
-			// }, {
-			// 	$sort: {
-			// 		order: 1
-			// 	}
-			// },
 			{ $group: { _id: "$category", count: { $sum: 1 } } },
 			{ $lookup: { from: "categories", localField: "_id", foreignField: "slug", as: "details" } },
 
@@ -324,26 +312,7 @@ router.get('/', function (req, res, next) {
 					}
 				}
 			}
-			// Product.find(categCondition, function(err, docs) {
-
-			// Product.aggregate([
-			// 	categCondition,
-			// 	{
-			// 		"$sample": {
-			// 			size: 40
-			// 		}
-			// 	}
-			// ]
-			// MongoClient.connect(url, function(err, db) {
-
-			// 	var cursor = db.collection('category').find();
-
-			// 	cursor.each(function(err, doc) {
-
-			// 		//console.log(doc);
-
-			// 	});
-			// });
+		
 
 			Product.find({
 				"$and": [{
@@ -378,7 +347,6 @@ router.get('/', function (req, res, next) {
 						// console.log("Product: " + JSON.stringify(featured));
 
 						if (err || featured === 'undefined' || featured == null) {
-							// replace with err handling
 							var errorMsg = req.flash('error', 'unable to find product');
 							return res.redirect('/');
 						}
@@ -420,6 +388,7 @@ router.get('/', function (req, res, next) {
 		});
 });
 router.get('/hostsignup', function (req, res, next) {
+	
 	var messages = req.flash('error');
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -435,28 +404,9 @@ router.get('/hostsignup', function (req, res, next) {
 });
 
 
-router.post('/hostsignup', passport.authenticate('local.signup', {
-	successRedirect: '/vendor',
-	failureRedirect: '/hostsignup',
-	failureFlash: true
-}), function (req, res, next) {
-	meanlogger.log("auth", "signup attempt", req.user);
-	req.session.first_name = req.body.first_name;
-	req.session.last_name = req.body.last_name;
-	req.session.addr1 = req.body.addr1;
-	req.session.city = req.body.city;
-	req.session.state = req.body.state;
-	req.session.email = req.body.email;
-	req.session.telephone = req.body.telephone;
-	req.session.zipcode = req.body.zipcode;
-	req.session.role = req.body.role;
-
-	//console.log("REGI host");
-	if (req.body.email || req.body.password || req.body.first_name || req.body.last_name || req.body.addr1 || req.body.city || req.body.addr2 || req.body.state || req.body.zipcode || req.body.telephone) {
-		var newUser = new User();
-		//console.log("REGI host AGAIN");
+router.post('/hostreg',function (req, res, next) {
+	var newUser = new User();	
 		newUser.email = req.body.email;
-		// newUser.password = newUser.encryptPassword(password);
 		newUser.password = req.body.password;
 		newUser.role = req.body.role;
 		newUser.first_name = req.body.first_name;
@@ -467,157 +417,80 @@ router.post('/hostsignup', passport.authenticate('local.signup', {
 		newUser.state = req.body.state;
 		newUser.zipcode = req.body.zipcode;
 		newUser.telephone = req.body.telephone;
-		newUser.role = 'vendor';
-		newUser.save(function (err, result) {
+		newUser.role = "vendor";
+		newUser.save(function (err, newUser) {
+			console.log(" REGISTER HIT");
 			if (err) {
+				console.log("error REGISTER HIT");
 				res.redirect('/hostsignup');
 				////console.log('User unsuccessfully registered');
 			}
 			//console.log('User successfully registered');
-			//console.log(newUser);
+			console.log(newUser);
 			req.flash('success', 'User successfully registered check your mail for vendor access.');
-			res.redirect('/vendor');
+			res.redirect('/user/signin');
 		});
-	} else {
-		res.send({
-			message: "Error",
-			status: false
-		});
-	}
 });
 
 
-// Mobile hostsignup
-router.post('/hostsignup-mobile', function (req, res, next) {
-	console.log("SIGNUP HIT");
+// // Mobile hostsignup
+// router.post('/hostsignup-mobile', function (req, res, next) {
+// 	console.log("SIGNUP HIT");
 
-	req.session.first_name = req.body.first_name;
-	req.session.last_name = req.body.last_name;
-	req.session.addr1 = req.body.addr1;
-	req.session.city = req.body.city;
-	req.session.state = req.body.state;
-	req.session.email = req.body.email;
-	req.session.telephone = req.body.telephone;
-	req.session.zipcode = req.body.zipcode;
-	req.session.role = req.body.role;
+// 	req.session.first_name = req.body.first_name;
+// 	req.session.last_name = req.body.last_name;
+// 	req.session.addr1 = req.body.addr1;
+// 	req.session.city = req.body.city;
+// 	req.session.state = req.body.state;
+// 	req.session.email = req.body.email;
+// 	req.session.telephone = req.body.telephone;
+// 	req.session.zipcode = req.body.zipcode;
+// 	req.session.role = req.body.role;
 
-	//console.log("REGI host");
-	if (req.body.email && req.body.password && req.body.first_name && req.body.last_name && req.body.addr1 && req.body.city && req.body.addr2 && req.body.state && req.body.zipcode && req.body.telephone) {
-		var newUser = new User();
-		//console.log("REGI host AGAIN");
-		newUser.email = req.body.email;
-		// newUser.password = newUser.encryptPassword(password);
-		newUser.password = req.body.password;
-		newUser.role = req.body.role;
-		newUser.first_name = req.body.first_name;
-		newUser.last_name = req.body.last_name;
-		newUser.addr1 = req.body.addr1;
-		newUser.addr2 = req.body.addr2;
-		newUser.city = req.body.city;
-		newUser.state = req.body.state;
-		newUser.zipcode = req.body.zipcode;
-		newUser.telephone = req.body.telephone;
-		newUser.role = 'vendor';
-		newUser.save(function (err, result) {
-			if (err) {
-				res.send({
-					message: "Error",
-					status: false
-				});
+// 	//console.log("REGI host");
+// 	if (req.body.email && req.body.password && req.body.first_name && req.body.last_name && req.body.addr1 && req.body.city && req.body.addr2 && req.body.state && req.body.zipcode && req.body.telephone) {
+// 		var newUser = new User();
+// 		console.log("REGI host AGAIN");
+// 		newUser.email = req.body.email;
+// 		// newUser.password = newUser.encryptPassword(password);
+// 		newUser.password = req.body.password;
+// 		newUser.role = req.body.role;
+// 		newUser.first_name = req.body.first_name;
+// 		newUser.last_name = req.body.last_name;
+// 		newUser.addr1 = req.body.addr1;
+// 		newUser.addr2 = req.body.addr2;
+// 		newUser.city = req.body.city;
+// 		newUser.state = req.body.state;
+// 		newUser.zipcode = req.body.zipcode;
+// 		newUser.telephone = req.body.telephone;
+// 		newUser.role = 'vendor';
+// 		newUser.save(function (err, result) {
+// 			if (err) {
+// 				res.send({
+// 					message: "Error",
+// 					status: false
+// 				});
 
-				//res.redirect('/hostsignup');
-				////console.log('User unsuccessfully registered');
-			}
-			res.send({
-				message: "User successfully registered",
-				status: true
-			});
-			//console.log('User successfully registered');
-			//console.log(newUser);
-			//req.flash('success', 'User successfully registered check your mail for vendor access.');
-			//res.redirect('/vendor');
-		});
-	} else {
-		res.send({
-			message: "Error",
-			status: false
-		});
-	}
-});
+// 				//res.redirect('/hostsignup');
+// 				//console.log('User unsuccessfully registered');
+// 			}
+// 			res.send({
+// 				message: "User successfully registered",
+// 				status: true
+// 			});
+// 			console.log('User successfully registered');
+// 			console.log(newUser);
+// 			req.flash('success', 'User successfully registered check your mail for vendor access.');
+// 			res.redirect('/vendor');
+// 		});
+// 	} else {
+// 		res.send({
+// 			message: "Error",
+// 			status: false
+// 		});
+// 	}
+// });
 
-/* Get sale items */
-// router.get('/sale', function (req, res, next) {
-
-// 	var successMsg = req.flash('success')[0];
-// 	var errorMsg = req.flash('error')[0];
-// 	var navcats = req.app.get('navcats');
-// 	var navgroups = req.app.get('navgroups');
-
-// //console.log("Local navcats " + res.locals.navcats);
--
-	// var tutorial = req.params.tutorial;
-	// 	if (tutorial == 1) {
-	// 		req.session.tutorial = true;
-	// 	} else {
-	// 		req.session.tutorial = false;
-	// 	}
-	// 	Product.aggregate(
-	// 		[{
-	// 			$match: {
-	// 				"$sale_attributes.sale": true
-	// 			}
-	// 		}, {
-	// 			$group: {
-	// 				_id: "$Product_Group",
-	// 				count: {
-	// 					$sum: 1
-	// 				}
-	// 			}
-	// 		}, {
-	// 			$sort: {
-	// 				_id: 1
-	// 			}
-	// 		}],
-	// 		function (err, Product_Group) {
-	// 			if (frontPageCategory) {
-	// 				categCondition = {
-	// 					category: frontPageCategory
-	// 				};
-	// 			} else {
-	// 				categCondition = {};
-	// 			}
-	// 			Product.Product.find(categCondition, function (err, docs) {
-	// 				productChunks = [];
-	// 				productJSON = [];
-	// 				chunkSize = 4;
-	// 				for (var i = (4 - chunkSize); i < docs.length; i += chunkSize) {
-	// 					productChunks.push(docs.slice(i, i + chunkSize));
-	// 				}
-	// 				res.render('shop/eshop', {
-	// 					layout: 'eshop/eshop',
-	// 					title: title,
-	// 					navcats: req.app.get('navcats'),
-	// 					navgroups: req.app.get('navgroups'),
-	// 					salegroups: req.app.get('salegroups'),
-	// 					showRecommendations: eval(res.locals.showRecommendations),
-	// 					keywords: Config.keywords,
-	// 					products: productChunks,
-	// 					recommended: docs,
-	// 					Product_Group: Product_Group,
-	// 					user: req.user,
-	// 					navcats: navcats,
-	// 					errorMsg: errorMsg,
-	// 					noErrorMsg: !errorMsg,
-	// 					successMsg: successMsg,
-	// 					viewDocuments: viewDocuments,
-	// 					tutorial: tutorial,
-	// 					noMessage: !successMsg,
-	// 					viewTour: viewTour,
-	// 					isLoggedIn: req.isAuthenticated()
-	// 				});
-	// 			});
-	// 		});
-	// });
 
 
 	/* Mobile Get sale items */
@@ -1275,11 +1148,7 @@ router.get('/category-mobile/', function (req, res, next) {
 										productChunks.push(products.slice(i, i + chunkSize))
 									};
 								}
-
 								res.send(category);
-
-
-
 							});
 						});
 					});
@@ -1554,20 +1423,9 @@ router.get('/category-mobile/:slug', function (req, res, next) {
 						]
 					}
 					Product.find(categCondition, function (err, products) {
-						// Product.aggregate([
-						// 	// $match: {
-						// 	//     $and: [{
-						// 	//         $or: [{
-						// 	//             'category': new RegExp(category.slug, 'i')
-						// 	//         }, {
-						// 	//             'category': new RegExp(category.name, 'i')
-						// 	//         }]
-						// 	//     }, srch]
-						// 	// }
-						// 	categCondition
-						// ], function(err, products) {
+						
 						if (err || !products || products === 'undefined') {
-							//////console.log("Error: " + err.message);
+						
 							req.flash('error', 'Problem finding products');
 							res.send({
 								message: "Error",
@@ -1592,11 +1450,21 @@ router.get('/category-mobile/:slug', function (req, res, next) {
 
 router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 	var theId = new ObjectId(req.user._id);
+	console.log("productId:"+req.body.productId+","+"name:"+req.body.name+"price:"+req.body.price);
 	User.findOneAndUpdate({
 		_id: theId
 	}, {
+			// $addToSet: {
+			// 	"productId": req.body.productId
+			// }
 			$addToSet: {
-				"productId": req.body.productId
+				'product': {
+					"productId": req.body.productId,
+					"name":req.body.name,
+					"price":req.body.price,
+					"imagePath":req.body.imagePath
+
+				}
 			}
 		}, {
 			safe: true,
@@ -1894,8 +1762,6 @@ router.get('/add-to-cart-mobile/:id/', function (req, res, next) {
 	Product.findById(productId, function (err, product) {
 		if (err) {
 			// replace with err handling
-
-
 			res.send({
 				message: "Some error occurred",
 				status: false
@@ -1922,19 +1788,43 @@ router.get('/add-to-cart-mobile/:id/', function (req, res, next) {
 	});
 });
 
-router.get('/empty-cart', isLoggedIn, function (req, res, next) {
-	var cart = new cart({});
-	cart.empty();
-	req.session.cart = cart;
-	meanlogger.log('trash', 'Emptied cart', req.user);
 
-	res.redirect('/');
+router.post('/empty-cart', isLoggedIn, function (req, res, next) {
+    console.log('user' + req.body.user + ',product' + req.body.productId);
+    const slug = mongoose.Types.ObjectId(req.body.productId);
+    const user = req.body.user;
+    User.findOne({ _id: user }, function (err, model) {
+        model.product.pull(slug);
+        model.save(function (err, model) {
+          console.log(slug);
+          meanlogger.log('trash', 'Emptied cart', req.user);
+          res.redirect('/shopping-cart');
+        });
+    });
 });
+// router.post('/empty-cart', isLoggedIn, function (req, res, next) {
+// 	console.log("user"+req.body.user +",product" +req.body.productId);
+// 	slug=req.body.productId;
+// 	user=req.body.user;
+	
+// 	// User.update( {_id: user}, { $pull: {productId:slug}
+// 	// }, function(err, model){})
+// 	User.update(
+//         {_id: user},
+//         { $pull: {last_name:'slug'} },
+//         { multi: true }
+// 	)
+// 	// User.update({_id: user}, {$pull : {"last_name":'ds'}},{ multi: true })
+// 	  console.log(slug);
+// 	meanlogger.log('trash', 'Emptied cart', req.user);
+
+// 	res.redirect('/shopping-cart');
+// });
 
 // mobile on empty cart 
 router.get('/empty-cart-mobile', isLoggedIn, function (req, res, next) {
 	var cart = new cart({});
-	cart.empty();
+	cart.remove();
 	req.session.cart = cart;
 
 	res.send({
@@ -1998,27 +1888,63 @@ router.get('/reduce-qty-mobile/:id/', function (req, res, next) {
 	});
 });
 
+// router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
+// 	qryFilter = { "_id": req.user._id };
+// 	User.find(qryFilter, function (err, user) {
+// 		// console.log(req.user.productId.length);
+// 		var promises = [];
+// 		var productcart = [];
+// 		for(i=0;i<req.user.product.length;i++)
+// 		{
+// 			promises.push(Promise.resolve(Product.find({ "_id": req.user.product[i] }).lean().exec().then(function (product) {
+// 				productcart.push(product);  
+// 				// console.log(i+"."+product);    
+// 		  })));
+// 		}	
+// 		Promise.all(promises).then(function() {	
+// 		res.render('shop/shopping-cart', {
+// 			layout: 'eshop/blank',
+// 			user: user,
+// 			productcart:productcart,
+// 		});					
+// 	});
+// 	});
+// });
+
+// router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
+// 	qryFilter = { "_id": req.user._id };
+// 	User.find(qryFilter, function (err, user) {
+// 		// console.log(req.user.productId.length);
+// 		var promises = [];
+// 		var productcart = [];
+// 		for(i=0;i<req.user.product.length;i++)
+// 		{
+// 			promises.push(Promise.resolve(Product.find({ "_id": req.user.product[i] }).lean().exec().then(function (product) {
+// 				productcart.push(product);  
+// 				// console.log(i+"."+product);    
+// 		  })));
+// 		}	
+// 		Promise.all(promises).then(function() {	
+// 		res.render('shop/shopping-cart', {
+// 			layout: 'eshop/blank',
+// 			user: user,
+// 			productcart:productcart,
+// 		});					
+// 	});
+// 	});
+// });
 router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
 	qryFilter = { "_id": req.user._id };
 	User.find(qryFilter, function (err, user) {
-		console.log(req.user.productId.length);
-		var promises = [];
-		var productcart = [];
-		for(i=0;i<req.user.productId.length;i++)
-		{
-			promises.push(Promise.resolve(Product.find({ "_id": req.user.productId[i] }).lean().exec().then(function (product) {
-				productcart.push(product);  
-				console.log(i+"."+product);    
-		  })));
-		}	
-		Promise.all(promises).then(function() {	
+		console.log(req.user._id);
+		
 		res.render('shop/shopping-cart', {
 			layout: 'eshop/blank',
 			user: user,
-			productcart:productcart,
+			
 		});					
 	});
-	});
+
 });
 
 router.post('/delete-product', function (req, res, next) {
@@ -2132,6 +2058,7 @@ router.get('/checkout/:slug3', isLoggedIn, function (req, res, next) {
 	console.log("checkout");
 	meanlogger.log('shopping-cart', 'Viewed checkout', req.user);
 	Product.find(qryFilter, function (err, product) {
+		console.log(product);
 		if (err) {
 			req.flash('error', "An error has occurred - " + err.message);
 			return res.redirect('/');
@@ -2829,6 +2756,7 @@ router.post('/create', function (req, res, next) {
 			product_name: req.body.pname,
 			product_price: req.body.price,
 			product_qty: req.body.adult,
+			vendor_id:req.body.vendor_id,
 			paidBy: 'instamojo',
 			ticket_name: req.user.first_name,
 			ticket_email: req.user.email,
@@ -2963,6 +2891,7 @@ router.post('/create', function (req, res, next) {
 
 	// STORE THE ORDER DATA TO DB
 	// Create Order Record with a pending status.
+	console.log(req.body.arrival);
 	var order = new Order({
 		user: {
 			id: req.user._id,
@@ -3592,8 +3521,6 @@ router.post('/reviews', isLoggedIn, function (req, res, next) {
 		// res.flash('thanks for your feedback');
 		//console.log("product: " + product);
 		return res.redirect('/');
-
-
 	});
 });
 
@@ -4059,13 +3986,11 @@ router.get('/product/:slug3', function (req, res, next) {
 	var slug3 = req.params.slug3;
 	qryFilter = { "_id": slug3 };
 	qryFilter1 = { "productid": slug3 };
-
 	var user = req.user._id;
-
 	console.log(user);
 	Product.find(qryFilter, function (err, product) {
 		review.find(qryFilter1, function (err, reviews) {
-			// console.log(reviews);
+			console.log(reviews);
 			event = new Event({
 				namespace: 'products',
 				person: {
@@ -4102,6 +4027,59 @@ router.get('/product/:slug3', function (req, res, next) {
 						reviews: reviews,
 						product: product,
 						customer: req.user,
+
+					});
+				});
+			});
+		});
+	});
+});
+
+router.get('/product1/:slug3', function (req, res, next) {
+	var slug3 = req.params.slug3;
+	qryFilter = { "_id": slug3 };
+	qryFilter1 = { "productid": slug3 };
+	var user = 'Guest';
+	console.log(user);
+	Product.find(qryFilter, function (err, product) {
+		reviews.find(qryFilter1, function (err, reviews) {
+			// console.log(reviews);
+			event = new Event({
+				namespace: 'products',
+				person: {
+					id: 'Guest',
+					first_name: 'guest',
+					last_name: 'guest',
+					email: 'guest',
+				},
+				action: 'view',
+				thing: {
+					type: "product",
+					id: product._id,
+					name: product.name,
+					category: product.category,
+					Product_Group: product.Product_Group
+				}
+			});
+			event.save(function (err, eventId) {
+				if (err) {
+					return -1;
+				}
+				recommendations.GetRecommendations(product, function (err, recommendations) {
+					vendoridmessage = product[0].vendor_id;
+					console.log("vendoridmessage", vendoridmessage);
+					if (err) {
+						req.flash('error', "An error has occurred - " + err.message);
+						return res.redirect('/');
+					}
+					res.render('shop/product', {
+						layout: 'eshop/blank',
+						recommendations: recommendations,
+						// username: username,
+						user: user,
+						reviews: reviews,
+						product: product,
+						customer: 'guest',
 
 					});
 				});

@@ -4,13 +4,16 @@
             {{# each products }}
             <div class="col-md-3">
                 {{# each this}}
-
                 <div class="thumbnail">
                     <div class="product_wrapper">
                         <div class="panel-body">
                             <div class="vertical-center thumbnail-image-container">
                                 <span id="ex1" class="zoom" style="position: relative; overflow: hidden;">
-                                    <a href='/product/{{this._id}}'>
+                                    {{#if ../../isLoggedIn}}
+                                    <a href="/product/{{this._id}}">
+                                        {{else}}
+                                        <a href="/product1/{{this._id}}"></a>
+                                        {{/if}}
                                         <img class="zoomImg img-responsive" src="{{ this.imagePath }}" alt="..."> {{!--
                                         <script>$('a.img').zoom({ magnify: 4, url: '{{this.imagePath}}' });</script> --}}
                                     </a>
@@ -18,7 +21,11 @@
                             </div>
                             <div class="text-left">
                                 <h3 class="product-title product-title-home top-pad-10">
+                                    {{#if ../../isLoggedIn}}
                                     <a href='/product/{{this._id}}'>{{this.code}} - {{this.title}}</a>
+                                    {{else}}
+                                    <a href='/product1/{{this._id}}'>{{this.code}} - {{this.title}}</a>
+                                    {{/if}}
                                 </h3>
                             </div>
                             <div class="text-right">
@@ -36,10 +43,15 @@
                             <h4 class="product-description">
                                 {{this.description}}
                             </h4>
+                            {{#if ../../isLoggedIn}}
                             <a href='./product/{{this._id}}'>
-                           <button href='./product/{{this._id}}' value='View' class="btn btn-primary add-to-cart">View more</button>
+                                <button href='./product/{{this._id}}' value='View' class="btn btn-primary add-to-cart">View more</button>
                             </a>
-                           
+                            {{else}}
+                            <a href='./product1/{{this._id}}'>
+                                <button href='./product1/{{this._id}}' value='View' class="btn btn-primary add-to-cart">View more</button>
+                            </a>
+                            {{/if}}
                         </div>
 
                         <!-- panelbody-->

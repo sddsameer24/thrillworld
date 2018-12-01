@@ -792,7 +792,7 @@ router.post('/signup', passport.authenticate('local.signup', {
 	failureRedirect: '/user/signup',
 	failureFlash: true
 }), function (req, res, next) {
-	alert("signup");
+	console.log("signup");
 	meanlogger.log("auth", "signup attempt", req.user);
 	req.session.first_name = req.body.first_name;
 	req.session.last_name = req.body.last_name;
@@ -811,50 +811,7 @@ router.post('/signup', passport.authenticate('local.signup', {
 		res.redirect('/user/profile');
 	}
 });
-//......................................host signup...................................
-// router.get('/hostsignup', function (req, res, next) {
-// 	var messages = req.flash('error');
-// 	var successMsg = req.flash('success')[0];
-// 	var errorMsg = req.flash('error')[0];
-// 	res.render('user/hostsignup', {
-// 		layout: 'eshop/blank',
-// 		//csrfToken: req.csrfToken(),
-// 		"successMsg": successMsg,
-// 		"noMessage": !successMsg,
-// 		"message": messages,
-// 		"errorMsg": messages[0],
-// 		"noErrorMsg": !messages,
-// 	});
-// });
-// router.post('/hostsignup', passport.authenticate('local.signup', {
-	
-// 	successRedirect: '/vendor',
-// 	failureRedirect: '/hostsignup',
-// 	failureFlash: true
-// }), function (req, res, next) {
-// 	//alert("vendor signup");
-// 	//console.log("hostsignup"+req.session);
-// 	//meanlogger.log("auth", "signup attempt", req.user);
-// 	req.session.first_name = req.body.first_name;
-// 	req.session.last_name = req.body.last_name;
-// 	req.session.addr1 = req.body.addr1;
-// 	req.session.city = req.body.city;
-// 	req.session.state = req.body.state;
-// 	req.session.email = req.body.email;
-// 	req.session.telephone = req.body.telephone;
-// 	req.session.zipcode = req.body.zipcode;
-// 	req.session.role = req.body.role;
 
-// 	// if (req.session.oldUrl) {
-// 	// 	var oldUrl = req.session.oldUrl
-// 	// 	req.session.oldUrl = null;
-// 	// 	res.redirect(oldUrl);
-// 	// } else {
-// 	// 	res.redirect('/vendor');
-// 	// }
-// });
-	
-//.....................................host signup....................................
 // Mobile register 
 router.post('/register', function (req, res, next) {
 
@@ -870,6 +827,7 @@ router.post('/register', function (req, res, next) {
 	//console.log("REGISTER HIT");
 	if(req.body.email || req.body.password || req.body.first_name || req.body.last_name || req.body.addr1 || req.body.city ||  req.body.addr2 ||  req.body.state ||req.body.zipcode || req.body.telephone ){
 		var newUser = new User();
+		console.log("old REGISTER HIT");
 		newUser.email = req.body.email;
 		// newUser.password = newUser.encryptPassword(password);
 		newUser.password = req.body.password;
@@ -883,6 +841,7 @@ router.post('/register', function (req, res, next) {
 		newUser.telephone = req.body.telephone;
 		newUser.role = 'visitor';
 		newUser.save(function (err, result) {
+			console.log("old REGISTER HIT");
 			if (err) {
 				res.send({
 					message:  "Error",

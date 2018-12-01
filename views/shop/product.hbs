@@ -76,10 +76,10 @@
                     </div>
                     <form action='/add-to-cart' method='POST'>
                         <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
-
-                        <h3 class="product-price text-center">
+                        <input type='hidden' id='id' name='imagePath' value='{{ this.imagePath }}'>
+                         <input type='hidden' name='name' value='{{this.name}}'>
                             <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
-                        </h3>
+                      
 
                         <input type="hidden" id="two" name="userid" />
                         <div class="row">

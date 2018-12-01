@@ -23,7 +23,7 @@
                         <div class="thumbnail">
                             <div class="product_wrapper">
                                 <div class="panel-body">
-                                   <div class="vertical-center thumbnail-image-container">
+                                    <div class="vertical-center thumbnail-image-container">
                                         <span id="ex1" class="zoom" style="position: relative; overflow: hidden;">
                                             <a href='/product/{{this._id}}'>
                                                 <img class="zoomImg img-responsive" src="{{ this.imagePath }}" alt="...">
@@ -31,16 +31,22 @@
                                             </a>
                                         </span>
                                     </div>
-                                   
+
                                     <div class="text-left">
+
+
                                         <h3 class="product-title product-title-home top-pad-10">
+                                            {{#if ../../isLoggedIn}}
                                             <a href='/product/{{this._id}}'>{{this.code}} - {{this.title}}</a>
+                                            {{else}}
+                                            <a href='/product1/{{this._id}}'>{{this.code}} - {{this.title}}</a>
+                                            {{/if}}
                                         </h3>
                                     </div>
                                     <div class="text-right">
                                         {{#if ../../isLoggedIn}}
                                         <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
-                                          <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
+                                            <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
                                         {{else}}
                                         <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }} {{/if}}
                                         <script>
@@ -48,61 +54,67 @@
                                                 $('[data-toggle="tooltip"]').tooltip();
                                             });
                                         </script>
-                                   
+
                                     </div>
-                                 
+
                                     <h4 class="product-description">
                                         {{this.description}}
                                     </h4>
-                                  
-                                        <a class="text-center btn-primary" href='/product/{{this._id}}'>
-                                            <button type='submit' href='/product/{{this._id}}' value='Add to Cart' class="btn btn-primary add-to-cart" role="button">View</button>
-                                        </a>
-                                 
-                                   
-                          <p>you are</p> <p id="demo"></p><p>KM away</p>
-                            <!-- product wrapper -->
+                                    {{#if ../../isLoggedIn}}
+                                    <a class="text-center btn-primary" href='/product/{{this._id}}'>
+                                        <button type='submit' href='/product/{{this._id}}' value='Add to Cart' class="btn btn-primary add-to-cart" role="button">View</button>
+                                    </a>
+                                    {{else}}
+                                    <a class="text-center btn-primary" href='/product1/{{this._id}}'>
+                                        <button type='submit' href='/product1/{{this._id}}' value='Add to Cart' class="btn btn-primary add-to-cart" role="button">View</button>
+                                    </a>
+                                    {{/if}}
+
+                                    <p>you are</p>
+                                    <p id="demo"></p>
+                                    <p>KM away</p>
+                                    <!-- product wrapper -->
+                                </div>
+                            </div>
+                            <!-- thumbnail -->
+                            <script>
+
+                                var x = document.getElementById("demo");
+                                var distance
+                                myFunction();
+
+                                function myFunction() {
+
+                                    if (navigator.geolocation) {
+                                        navigator.geolocation.getCurrentPosition(showPosition);
+                                    } else {
+                                        x.innerHTML = "Geolocation is not supported by this browser.";
+                                    }
+                                }
+
+                                function showPosition(position) {
+
+                                    Latitude = position.coords.latitude;
+
+                                    Longitude = position.coords.longitude;
+                                    lat2 = this.Latitude;
+                                    lon2 = this.Longitude;
+                                    var loc1 = new google.maps.LatLng(Latitude, Longitude);
+                                    var loc2 = new google.maps.LatLng(lat2, lon2);
+
+                                    //console.log(google.maps.geometry.spherical.computeDistanceBetween(loc1,loc2));
+                                    distance = google.maps.geometry.spherical.computeDistanceBetween(loc1, loc2)
+
+                                    x.innerHTML = distance
+                                }
+
+
+
+                            </script>
+
                         </div>
-                        </div>
-                        <!-- thumbnail -->
-                        <script>
-                           
-var x = document.getElementById("demo");
- var distance
- myFunction();
-
-function myFunction() {
-   
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-    } else { 
-        x.innerHTML = "Geolocation is not supported by this browser.";
-    }
-}
-
-function showPosition(position) {
-    
-    Latitude=position.coords.latitude;
-     
-    Longitude=position.coords.longitude;
-    lat2=this.Latitude;
-    lon2=this.Longitude;
-   var loc1 = new google.maps.LatLng(Latitude, Longitude);
-   var loc2 = new google.maps.LatLng(lat2,lon2);
-
-   //console.log(google.maps.geometry.spherical.computeDistanceBetween(loc1,loc2));
-    distance = google.maps.geometry.spherical.computeDistanceBetween(loc1,loc2)
-    
-    x.innerHTML = distance
-}
- 
-
-
-</script>
-
+                        <!-- col md-3 -->
                     </div>
-                    <!-- col md-3 -->
-                      </div>
                     {{/each}}
                     <!--each this -->
                 </div>
@@ -110,5 +122,3 @@ function showPosition(position) {
                 <!-- each products -->
             </div>
         </div>
-
-

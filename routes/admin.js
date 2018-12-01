@@ -33,23 +33,13 @@ var meanlogger = require('../local_modules/meanlogger');
 router.get('/stores', function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
-    var tot = totalSales(function (err, next) {
-        if (err) {
-            //////console.log(err.message);
-            return res.error('err');
-        }
-    });
-    Store.find({}, function (err, docs) {
+    Product.find(function (err, products) {
+        // console.log(products)
         res.render('admin/stores', {
-            layout: 'admin-map.hbs',
-            stores: docs,
+            layout: 'admin-page.hbs',
+            stores: products,
             errorMsg: errorMsg,
-            successMsg: successMsg,
-            noErrorMsg: !errorMsg,
-            noMessage: !successMsg,
-            totalSales: tot,
             GOOGLE_APIKEY: process.env.GOOGLE_APIKEY,
-            orders: docs,
             noErrors: 1
         });
     });
@@ -913,7 +903,7 @@ router.get('/add-product', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
     var adminPageTitle = "Add Products";
-    var adminPageUrl = "vendor/add-product";
+    var adminPageUrl = "admin/add-product";
 
     var filter = req.query.filter;
     //console.log("Filter " + filter);
@@ -940,7 +930,7 @@ router.get('/add-product', isAdmin, function (req, res, next) {
                     //console.log(error.message);
                     res.send(500, "error fetching products");
                 }
-                res.render('vendor/add-product', {
+                res.render('admin/add-product', {
                     adminPageTitle: adminPageTitle,
                     adminPageUrl: adminPageUrl,
                     layout: 'admin-page.hbs',
@@ -963,7 +953,7 @@ router.get('/add-product', isAdmin, function (req, res, next) {
 });
 
 router.post('/add-product', isAdmin, function (req, res, next) {
-    //////console.log(req.files);
+    console.log(req.files);
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
     var imageFile, imageFile1, imageFile2, imageFile3;
@@ -1020,8 +1010,8 @@ router.post('/add-product', isAdmin, function (req, res, next) {
         imagePathg1: '/images/' + req.user._id + req.body.code + req.body.name + 'g1' + '.png',
         imagePathg2: '/images/' + req.user._id + req.body.code + req.body.name + 'g2' + '.png',
         imagePathg3: '/images/' + req.user._id + req.body.code + req.body.name + 'g3' + '.png',
-
-    })
+    });
+    console.log(product);
     product.save(function (err) {
         if (err) {
             req.flash('error', 'Error: ' + err.message);

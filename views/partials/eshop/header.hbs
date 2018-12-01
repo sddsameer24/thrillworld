@@ -26,14 +26,15 @@
 							</div>
 							{{/if}}
 						</li>
-
+{{#if login}}
 						<li>
 							<a href="/shopping-cart">
 								<i class="fa fa-heart"> Wishlist</i>
-								{{#if session.cart.totalQty }}
-								<span class="badge btn-success">{{ session.cart.totalQty }}</span>
+								{{#if user.product}}
+								<span class="badge btn-success">{{ user.product.length }}</span>
 								{{/if}}</a>
 						</li>
+						{{/if}}
 						{{#if login}}
 						<li>
 							<a href="/user/logout">
@@ -215,7 +216,8 @@
 			</div>
 	</nav>
 
-	{{>search}} {{!--
+	{{>search}}
+	{{!--
 	<div class="row">
 		<div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
 			{{#if isLoggedIn}}
@@ -229,7 +231,8 @@
 			</div>
 			{{/if}}
 		</div>
-	</div> --}}
+	</div>
+	 --}}
 	</div>
 	<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>

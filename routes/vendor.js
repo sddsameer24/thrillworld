@@ -116,9 +116,9 @@ router.get('/', isAdmin, function (req, res, next) {
     var currYear = today.getFullYear();
     // console.log(currYear + "-" + currMonth + "-" + currDay);
     var date = (currYear + "-" + currMonth + "-" + currDay);
-    qryFilter = { "checkin": date };
-    qryFilter1 = { "checkout": date };
-    qryFilter2 = { "created": { $gte: moment(date) } };
+    qryFilter = { "cart.vendor_id": req.user._id.toString() },{ "checkin": date };
+    qryFilter1 = { "cart.vendor_id": req.user._id.toString() },{ "checkout": date };
+    qryFilter2 = { "cart.vendor_id": req.user._id.toString() },{ "created": { $gte: moment(date) } };
     Order.find(qryFilter, function (err, docs) {
         var bookings = docs.length;
         Order.find(qryFilter1, function (err, docs1) {

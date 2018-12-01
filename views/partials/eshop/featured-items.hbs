@@ -9,34 +9,32 @@
                     <a href="{{this.imagePath}}" rel="prettyPhoto" title="{{this.title}}">
                         <img src="{{this.imagePath}}" width="100" alt="{{this.title}}" />
                     </a>
+                      {{#if ../../isLoggedIn}}
                     <a href="/product/{{this._id}}">
+                     {{else}}
+                     <a href="/product1/{{this._id}}"></a>
+                     {{/if}}
                         <p>
                             <h2>{{this.title}}</h2>
                         </p>
                     </a>
                     <p>{{this.description}}</p>
                     <h4>{{this.code}}</h4>
-                
-
                     {{#if ../../isLoggedIn}}
                     <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
                         <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
                     {{else}}
                     <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }} {{/if}}
-
                     <a class="text-center">
+                        {{#if ../../isLoggedIn}}
                         <a href="/product/{{this._id}}" class="btn btn-primary add-to-cart" role="button">View Details</a>
+                        {{else}}
+                         <a href="/product1/{{this._id}}" class="btn btn-primary add-to-cart" role="button">View Details</a>
+                        {{/if}}
                     </a>
-
-
-
                 </div>
-              
-
             </div>
-
         </div>
     </div>
-
 {{/if}} {{/each}} {{/each}} 
 
