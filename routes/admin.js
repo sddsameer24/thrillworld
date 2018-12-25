@@ -1009,6 +1009,7 @@ router.get('/edit-product/:slug3',function (req, res, next) {
     errorMsg = req.flash('error')[0];
     var adminPageTitle = "Approve Events";
     var adminPageUrl = "admin/edit-product";
+    var slug3 = req.params.slug3;
     qryFilter = {Token:slug3};
     Product.find(qryFilter, function(err, products) {
        console.log(products);

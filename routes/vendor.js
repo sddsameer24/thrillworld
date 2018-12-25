@@ -885,7 +885,7 @@ router.post('/add-product', isAdmin, function(req, res, next) {
                 return res.redirect('/vendor/products');
             }
             console.log("product: " + product);
-            return res.redirect('/vendor/products');
+          
             let transporter = nodemailer.createTransport({
 				host: 'mail.zo-online.com',
 				port: 587,
@@ -903,8 +903,8 @@ router.post('/add-product', isAdmin, function(req, res, next) {
 			let mailOptions = {
 				from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
 				replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-				to: "sdsameer24@gmail.com", // list of receivers
-				subject: 'Password Reset',
+				to: 'sdsameer24@gmail.com', // list of receivers
+				subject: 'New Event Added',
 				text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
 					'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
 					'http://' + req.headers.host + '/admin/edit-product/' + token + '\n\n' +
@@ -926,7 +926,8 @@ router.post('/add-product', isAdmin, function(req, res, next) {
 				req.flash('success', "SENT MAIL, KINDLY CHECK!");
 				// res.render('contact', { msg: 'Email has been sent' });
 			});
-			// end of order comnfirmation mail sending
+            // end of order comnfirmation mail sending
+            return res.redirect('/vendor/products');
         });
     });
 });
@@ -941,7 +942,6 @@ router.post('/add-category', isAdmin, function(req, res, next) {
         name: req.body.name,
         slug: req.body.slug,
         layout: req.body.layout
-
     })
     category.save(function(err) {
         if (err) {
