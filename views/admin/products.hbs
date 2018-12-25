@@ -1,13 +1,545 @@
+<style>
+    /*!
+ * Datepicker for Bootstrap v1.5.0 (https://github.com/eternicode/bootstrap-datepicker)
+ *
+ * Copyright 2012 Stefan Petre
+ * Improvements by Andrew Rowls
+ * Licensed under the Apache License v2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+ */
+
+    .datepicker {
+        padding: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        direction: ltr;
+    }
+
+    .datepicker-inline {
+        width: 220px;
+    }
+
+    .datepicker.datepicker-rtl {
+        direction: rtl;
+    }
+
+    .datepicker.datepicker-rtl table tr td span {
+        float: right;
+    }
+
+    .datepicker-dropdown {
+        top: 0;
+        left: 0;
+    }
+
+    .datepicker-dropdown:before {
+        content: '';
+        display: inline-block;
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+        border-bottom: 7px solid #999999;
+        border-top: 0;
+        border-bottom-color: rgba(0, 0, 0, 0.2);
+        position: absolute;
+    }
+
+    .datepicker-dropdown:after {
+        content: '';
+        display: inline-block;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid #ffffff;
+        border-top: 0;
+        position: absolute;
+    }
+
+    .datepicker-dropdown.datepicker-orient-left:before {
+        left: 6px;
+    }
+
+    .datepicker-dropdown.datepicker-orient-left:after {
+        left: 7px;
+    }
+
+    .datepicker-dropdown.datepicker-orient-right:before {
+        right: 6px;
+    }
+
+    .datepicker-dropdown.datepicker-orient-right:after {
+        right: 7px;
+    }
+
+    .datepicker-dropdown.datepicker-orient-bottom:before {
+        top: -7px;
+    }
+
+    .datepicker-dropdown.datepicker-orient-bottom:after {
+        top: -6px;
+    }
+
+    .datepicker-dropdown.datepicker-orient-top:before {
+        bottom: -7px;
+        border-bottom: 0;
+        border-top: 7px solid #999999;
+    }
+
+    .datepicker-dropdown.datepicker-orient-top:after {
+        bottom: -6px;
+        border-bottom: 0;
+        border-top: 6px solid #ffffff;
+    }
+
+    .datepicker>div {
+        display: none;
+    }
+
+    .datepicker table {
+        margin: 0;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .datepicker td,
+    .datepicker th {
+        text-align: center;
+        width: 20px;
+        height: 20px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        border: none;
+    }
+
+    .table-striped .datepicker table tr td,
+    .table-striped .datepicker table tr th {
+        background-color: transparent;
+    }
+
+    .datepicker table tr td.day:hover,
+    .datepicker table tr td.day.focused {
+        background: #eeeeee;
+        cursor: pointer;
+    }
+
+    .datepicker table tr td.old,
+    .datepicker table tr td.new {
+        color: #999999;
+    }
+
+    .datepicker table tr td.disabled,
+    .datepicker table tr td.disabled:hover {
+        background: none;
+        color: #999999;
+        cursor: default;
+    }
+
+    .datepicker table tr td.highlighted {
+        background: #d9edf7;
+        border-radius: 0;
+    }
+
+    .datepicker table tr td.today,
+    .datepicker table tr td.today:hover,
+    .datepicker table tr td.today.disabled,
+    .datepicker table tr td.today.disabled:hover {
+        background-color: #fde19a;
+        background-image: -moz-linear-gradient(to bottom, #fdd49a, #fdf59a);
+        background-image: -ms-linear-gradient(to bottom, #fdd49a, #fdf59a);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fdd49a), to(#fdf59a));
+        background-image: -webkit-linear-gradient(to bottom, #fdd49a, #fdf59a);
+        background-image: -o-linear-gradient(to bottom, #fdd49a, #fdf59a);
+        background-image: linear-gradient(to bottom, #fdd49a, #fdf59a);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fdd49a', endColorstr='#fdf59a', GradientType=0);
+        border-color: #fdf59a #fdf59a #fbed50;
+        border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+        filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+        color: #000;
+    }
+
+    .datepicker table tr td.today:hover,
+    .datepicker table tr td.today:hover:hover,
+    .datepicker table tr td.today.disabled:hover,
+    .datepicker table tr td.today.disabled:hover:hover,
+    .datepicker table tr td.today:active,
+    .datepicker table tr td.today:hover:active,
+    .datepicker table tr td.today.disabled:active,
+    .datepicker table tr td.today.disabled:hover:active,
+    .datepicker table tr td.today.active,
+    .datepicker table tr td.today:hover.active,
+    .datepicker table tr td.today.disabled.active,
+    .datepicker table tr td.today.disabled:hover.active,
+    .datepicker table tr td.today.disabled,
+    .datepicker table tr td.today:hover.disabled,
+    .datepicker table tr td.today.disabled.disabled,
+    .datepicker table tr td.today.disabled:hover.disabled,
+    .datepicker table tr td.today[disabled],
+    .datepicker table tr td.today:hover[disabled],
+    .datepicker table tr td.today.disabled[disabled],
+    .datepicker table tr td.today.disabled:hover[disabled] {
+        background-color: #fdf59a;
+    }
+
+    .datepicker table tr td.today:active,
+    .datepicker table tr td.today:hover:active,
+    .datepicker table tr td.today.disabled:active,
+    .datepicker table tr td.today.disabled:hover:active,
+    .datepicker table tr td.today.active,
+    .datepicker table tr td.today:hover.active,
+    .datepicker table tr td.today.disabled.active,
+    .datepicker table tr td.today.disabled:hover.active {
+        background-color: #fbf069 \9;
+    }
+
+    .datepicker table tr td.today:hover:hover {
+        color: #000;
+    }
+
+    .datepicker table tr td.today.active:hover {
+        color: #fff;
+    }
+
+    .datepicker table tr td.range,
+    .datepicker table tr td.range:hover,
+    .datepicker table tr td.range.disabled,
+    .datepicker table tr td.range.disabled:hover {
+        background: #eeeeee;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        border-radius: 0;
+    }
+
+    .datepicker table tr td.range.today,
+    .datepicker table tr td.range.today:hover,
+    .datepicker table tr td.range.today.disabled,
+    .datepicker table tr td.range.today.disabled:hover {
+        background-color: #f3d17a;
+        background-image: -moz-linear-gradient(to bottom, #f3c17a, #f3e97a);
+        background-image: -ms-linear-gradient(to bottom, #f3c17a, #f3e97a);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f3c17a), to(#f3e97a));
+        background-image: -webkit-linear-gradient(to bottom, #f3c17a, #f3e97a);
+        background-image: -o-linear-gradient(to bottom, #f3c17a, #f3e97a);
+        background-image: linear-gradient(to bottom, #f3c17a, #f3e97a);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f3c17a', endColorstr='#f3e97a', GradientType=0);
+        border-color: #f3e97a #f3e97a #edde34;
+        border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+        filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        border-radius: 0;
+    }
+
+    .datepicker table tr td.range.today:hover,
+    .datepicker table tr td.range.today:hover:hover,
+    .datepicker table tr td.range.today.disabled:hover,
+    .datepicker table tr td.range.today.disabled:hover:hover,
+    .datepicker table tr td.range.today:active,
+    .datepicker table tr td.range.today:hover:active,
+    .datepicker table tr td.range.today.disabled:active,
+    .datepicker table tr td.range.today.disabled:hover:active,
+    .datepicker table tr td.range.today.active,
+    .datepicker table tr td.range.today:hover.active,
+    .datepicker table tr td.range.today.disabled.active,
+    .datepicker table tr td.range.today.disabled:hover.active,
+    .datepicker table tr td.range.today.disabled,
+    .datepicker table tr td.range.today:hover.disabled,
+    .datepicker table tr td.range.today.disabled.disabled,
+    .datepicker table tr td.range.today.disabled:hover.disabled,
+    .datepicker table tr td.range.today[disabled],
+    .datepicker table tr td.range.today:hover[disabled],
+    .datepicker table tr td.range.today.disabled[disabled],
+    .datepicker table tr td.range.today.disabled:hover[disabled] {
+        background-color: #f3e97a;
+    }
+
+    .datepicker table tr td.range.today:active,
+    .datepicker table tr td.range.today:hover:active,
+    .datepicker table tr td.range.today.disabled:active,
+    .datepicker table tr td.range.today.disabled:hover:active,
+    .datepicker table tr td.range.today.active,
+    .datepicker table tr td.range.today:hover.active,
+    .datepicker table tr td.range.today.disabled.active,
+    .datepicker table tr td.range.today.disabled:hover.active {
+        background-color: #efe24b \9;
+    }
+
+    .datepicker table tr td.selected,
+    .datepicker table tr td.selected:hover,
+    .datepicker table tr td.selected.disabled,
+    .datepicker table tr td.selected.disabled:hover {
+        background-color: #9e9e9e;
+        background-image: -moz-linear-gradient(to bottom, #b3b3b3, #808080);
+        background-image: -ms-linear-gradient(to bottom, #b3b3b3, #808080);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#b3b3b3), to(#808080));
+        background-image: -webkit-linear-gradient(to bottom, #b3b3b3, #808080);
+        background-image: -o-linear-gradient(to bottom, #b3b3b3, #808080);
+        background-image: linear-gradient(to bottom, #b3b3b3, #808080);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#b3b3b3', endColorstr='#808080', GradientType=0);
+        border-color: #808080 #808080 #595959;
+        border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+        filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+        color: #fff;
+        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    }
+
+    .datepicker table tr td.selected:hover,
+    .datepicker table tr td.selected:hover:hover,
+    .datepicker table tr td.selected.disabled:hover,
+    .datepicker table tr td.selected.disabled:hover:hover,
+    .datepicker table tr td.selected:active,
+    .datepicker table tr td.selected:hover:active,
+    .datepicker table tr td.selected.disabled:active,
+    .datepicker table tr td.selected.disabled:hover:active,
+    .datepicker table tr td.selected.active,
+    .datepicker table tr td.selected:hover.active,
+    .datepicker table tr td.selected.disabled.active,
+    .datepicker table tr td.selected.disabled:hover.active,
+    .datepicker table tr td.selected.disabled,
+    .datepicker table tr td.selected:hover.disabled,
+    .datepicker table tr td.selected.disabled.disabled,
+    .datepicker table tr td.selected.disabled:hover.disabled,
+    .datepicker table tr td.selected[disabled],
+    .datepicker table tr td.selected:hover[disabled],
+    .datepicker table tr td.selected.disabled[disabled],
+    .datepicker table tr td.selected.disabled:hover[disabled] {
+        background-color: #808080;
+    }
+
+    .datepicker table tr td.selected:active,
+    .datepicker table tr td.selected:hover:active,
+    .datepicker table tr td.selected.disabled:active,
+    .datepicker table tr td.selected.disabled:hover:active,
+    .datepicker table tr td.selected.active,
+    .datepicker table tr td.selected:hover.active,
+    .datepicker table tr td.selected.disabled.active,
+    .datepicker table tr td.selected.disabled:hover.active {
+        background-color: #666666 \9;
+    }
+
+    .datepicker table tr td.active,
+    .datepicker table tr td.active:hover,
+    .datepicker table tr td.active.disabled,
+    .datepicker table tr td.active.disabled:hover {
+        background-color: #006dcc;
+        background-image: -moz-linear-gradient(to bottom, #0088cc, #0044cc);
+        background-image: -ms-linear-gradient(to bottom, #0088cc, #0044cc);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
+        background-image: -webkit-linear-gradient(to bottom, #0088cc, #0044cc);
+        background-image: -o-linear-gradient(to bottom, #0088cc, #0044cc);
+        background-image: linear-gradient(to bottom, #0088cc, #0044cc);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0088cc', endColorstr='#0044cc', GradientType=0);
+        border-color: #0044cc #0044cc #002a80;
+        border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+        filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+        color: #fff;
+        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    }
+
+    .datepicker table tr td.active:hover,
+    .datepicker table tr td.active:hover:hover,
+    .datepicker table tr td.active.disabled:hover,
+    .datepicker table tr td.active.disabled:hover:hover,
+    .datepicker table tr td.active:active,
+    .datepicker table tr td.active:hover:active,
+    .datepicker table tr td.active.disabled:active,
+    .datepicker table tr td.active.disabled:hover:active,
+    .datepicker table tr td.active.active,
+    .datepicker table tr td.active:hover.active,
+    .datepicker table tr td.active.disabled.active,
+    .datepicker table tr td.active.disabled:hover.active,
+    .datepicker table tr td.active.disabled,
+    .datepicker table tr td.active:hover.disabled,
+    .datepicker table tr td.active.disabled.disabled,
+    .datepicker table tr td.active.disabled:hover.disabled,
+    .datepicker table tr td.active[disabled],
+    .datepicker table tr td.active:hover[disabled],
+    .datepicker table tr td.active.disabled[disabled],
+    .datepicker table tr td.active.disabled:hover[disabled] {
+        background-color: #0044cc;
+    }
+
+    .datepicker table tr td.active:active,
+    .datepicker table tr td.active:hover:active,
+    .datepicker table tr td.active.disabled:active,
+    .datepicker table tr td.active.disabled:hover:active,
+    .datepicker table tr td.active.active,
+    .datepicker table tr td.active:hover.active,
+    .datepicker table tr td.active.disabled.active,
+    .datepicker table tr td.active.disabled:hover.active {
+        background-color: #003399 \9;
+    }
+
+    .datepicker table tr td span {
+        display: block;
+        width: 23%;
+        height: 54px;
+        line-height: 54px;
+        float: left;
+        margin: 1%;
+        cursor: pointer;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+    }
+
+    .datepicker table tr td span:hover {
+        background: #eeeeee;
+    }
+
+    .datepicker table tr td span.disabled,
+    .datepicker table tr td span.disabled:hover {
+        background: none;
+        color: #999999;
+        cursor: default;
+    }
+
+    .datepicker table tr td span.active,
+    .datepicker table tr td span.active:hover,
+    .datepicker table tr td span.active.disabled,
+    .datepicker table tr td span.active.disabled:hover {
+        background-color: #006dcc;
+        background-image: -moz-linear-gradient(to bottom, #0088cc, #0044cc);
+        background-image: -ms-linear-gradient(to bottom, #0088cc, #0044cc);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
+        background-image: -webkit-linear-gradient(to bottom, #0088cc, #0044cc);
+        background-image: -o-linear-gradient(to bottom, #0088cc, #0044cc);
+        background-image: linear-gradient(to bottom, #0088cc, #0044cc);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0088cc', endColorstr='#0044cc', GradientType=0);
+        border-color: #0044cc #0044cc #002a80;
+        border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+        filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+        color: #fff;
+        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    }
+
+    .datepicker table tr td span.active:hover,
+    .datepicker table tr td span.active:hover:hover,
+    .datepicker table tr td span.active.disabled:hover,
+    .datepicker table tr td span.active.disabled:hover:hover,
+    .datepicker table tr td span.active:active,
+    .datepicker table tr td span.active:hover:active,
+    .datepicker table tr td span.active.disabled:active,
+    .datepicker table tr td span.active.disabled:hover:active,
+    .datepicker table tr td span.active.active,
+    .datepicker table tr td span.active:hover.active,
+    .datepicker table tr td span.active.disabled.active,
+    .datepicker table tr td span.active.disabled:hover.active,
+    .datepicker table tr td span.active.disabled,
+    .datepicker table tr td span.active:hover.disabled,
+    .datepicker table tr td span.active.disabled.disabled,
+    .datepicker table tr td span.active.disabled:hover.disabled,
+    .datepicker table tr td span.active[disabled],
+    .datepicker table tr td span.active:hover[disabled],
+    .datepicker table tr td span.active.disabled[disabled],
+    .datepicker table tr td span.active.disabled:hover[disabled] {
+        background-color: #0044cc;
+    }
+
+    .datepicker table tr td span.active:active,
+    .datepicker table tr td span.active:hover:active,
+    .datepicker table tr td span.active.disabled:active,
+    .datepicker table tr td span.active.disabled:hover:active,
+    .datepicker table tr td span.active.active,
+    .datepicker table tr td span.active:hover.active,
+    .datepicker table tr td span.active.disabled.active,
+    .datepicker table tr td span.active.disabled:hover.active {
+        background-color: #003399 \9;
+    }
+
+    .datepicker table tr td span.old,
+    .datepicker table tr td span.new {
+        color: #999999;
+    }
+
+    .datepicker .datepicker-switch {
+        width: 145px;
+    }
+
+    .datepicker .datepicker-switch,
+    .datepicker .prev,
+    .datepicker .next,
+    .datepicker tfoot tr th {
+        cursor: pointer;
+    }
+
+    .datepicker .datepicker-switch:hover,
+    .datepicker .prev:hover,
+    .datepicker .next:hover,
+    .datepicker tfoot tr th:hover {
+        background: #eeeeee;
+    }
+
+    .datepicker .cw {
+        font-size: 10px;
+        width: 12px;
+        padding: 0 2px 0 5px;
+        vertical-align: middle;
+    }
+
+    .input-append.date .add-on,
+    .input-prepend.date .add-on {
+        cursor: pointer;
+    }
+
+    .input-append.date .add-on i,
+    .input-prepend.date .add-on i {
+        margin-top: 3px;
+    }
+
+    .input-daterange input {
+        text-align: center;
+    }
+
+    .input-daterange input:first-child {
+        -webkit-border-radius: 3px 0 0 3px;
+        -moz-border-radius: 3px 0 0 3px;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .input-daterange input:last-child {
+        -webkit-border-radius: 0 3px 3px 0;
+        -moz-border-radius: 0 3px 3px 0;
+        border-radius: 0 3px 3px 0;
+    }
+
+    .input-daterange .add-on {
+        display: inline-block;
+        width: auto;
+        min-width: 16px;
+        height: 18px;
+        padding: 4px 5px;
+        font-weight: normal;
+        line-height: 18px;
+        text-align: center;
+        text-shadow: 0 1px 0 #ffffff;
+        vertical-align: middle;
+        background-color: #eeeeee;
+        border: 1px solid #ccc;
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+</style>
+<script>
+    $('.date').datepicker({
+        multidate: true,
+        format: 'dd-mm-yyyy'
+    });
+</script>
+
 <div id="page-wrapper">
     <div class="container-fluid">
         <!-- Page Heading -->
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
         <div class="row">
             <div class="col-lg-12">
-                <ol class="breadcrumb">
+                <ol class="breadcrumb" style="margin-top: 29px;">
                     <li>
                         <i class="fa fa-dashboard"></i>
                         <a href="/admin">Dashboard </a>
@@ -29,407 +561,219 @@
                     </div>
                 </div>
 
-
-
-                
                 <div class="row">
                     <div class="row">
                         <div class="col-md-4 col-md-offset-4">
                             <div class="panel-heading">
                                 <ul class="nav nav-pills">
                                     <li role="presentation" class="{{#if allProducts}} active {{/if}}">
-                                        <a href="/admin/products?filter=allProducts">All Products</a>
+                                        <a href="/admin/products?filter=allProducts">All Events</a>
                                     </li>
                                     <li role="presentation" class="{{#if deletedProducts}} active {{/if}}">
-                                        <a href="/admin/products?filter=deletedProducts">Deleted Products</a>
+                                        <a href="/admin/products?filter=deletedProducts">Featured Events</a>
                                     </li>
                                 </ul>
                             </div>
-
-                        </div>
-                        <div class="panel-body">
-                            <p data-placement="top" class='text-right' data-toggle="tooltip" title="Add New Product ">
-                                <button class="ui right floated btn btn-success btn-lg" data-title="Add" data-toggle="modal" data-target="#add">Add Product
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                </button>
-                            </p>
-                            <!-- Add Dialog -->
-                            <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="add" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                                            </button>
-                                            <h4 class="modal-title custom_align" id="Heading">Add New Product</h4>
-                                        </div>
-                                        <form action='/admin/add-product' METHOD='post' encType="multipart/form-data">
-                                            <div class="modal-body">
-                                                <div class="form-group">
-                                                    <ul class="list-group">
-                                                        <li class="list-group-item">
-                                                            <label for='name'>Name</label>
-                                                            <input class="form-control" name='name' type="text" placeholder="">
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div class="form-group">
-                                                    <ul class="list-group">
-                                                        <li class="list-group-item">
-                                                            <label for='title'>SKU/Code</label>
-                                                            <input class="form-control" name='code' type="text" placeholder="">
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <label for='title'>Title</label>
-                                                            <input class="form-control" name='title' type="text" placeholder="">
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <label for='price'>Price</label>
-                                                            <input class="form-control" name='price' type="text" placeholder="">
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <div class="row">
-
-                                                                <div class="col-md-5">
-                                                                    <label for='Latitude'>Latitude</label>
-                                                                    <input class="form-control" id="lati" name='Latitude' type="text">
-
-                                                                </div>
-                                                                <div class="col-md-5">
-                                                                    <label for='Longitude'>Longitude</label>
-                                                                    <input class="form-control" id="long" name='Longitude' type="text">
-
-                                                                </div>
-
-                                                            <div class="col-md-2">
-                                                                <label for='Auto'>Auto</label>
-                                                                <a type="button" onclick="getLocation()">
-                                                                    <img height="32px" src="../images/Location-Auto-Locate-Current-Location-Geo-512.png"> </a>
-
-                                                            </div>
-                                                            {{!-- position.coords.longitude --}}
-                                                </div>
-                                                </li>
-                                                <script>
-                                                    var x = document.getElementById("lati");
-                                                    var y = document.getElementById("long");
-
-                                                    function getLocation() {
-                                                        if (navigator.geolocation) {
-                                                            navigator.geolocation.getCurrentPosition(showPosition);
-                                                        } else {
-                                                            x.innerHTML = "Geolocation is not supported by this browser.";
-                                                        }
-                                                    }
-
-                                                    function showPosition(position) {
-                                                        x.value = position.coords.latitude;
-                                                        y.value = position.coords.longitude;
-                                                    }
-                                                </script>
-
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <li class="list-group-item">
-                                                            <label for='parking '>parking ?</label>
-                                                            <div class="material-switch pull-right">
-                                                                No
-                                                                <input id="parking " name="parking " type="checkbox" />
-                                                                <label for="parking " class="label-success"></label> Yes
-                                                            </div>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <label for='Pool'>Pool?</label>
-                                                            <div class="material-switch pull-right">
-                                                                No
-                                                                <input id="Pool" name="Pool" type="checkbox" />
-                                                                <label for="Pool" class="label-success"></label> Yes
-                                                            </div>
-                                                        </li>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <li class="list-group-item">
-                                                            <label for='campfire'>campfire?</label>
-                                                            <div class="material-switch pull-right">
-                                                                No
-                                                                <input id="campfire" name="campfire" type="checkbox" />
-                                                                <label for="campfire" class="label-success"></label> Yes
-                                                            </div>
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <label for='Wifi'>Wifi?</label>
-                                                            <div class="material-switch pull-right">
-                                                                No
-                                                                <input id="Wifi" name="Wifi" type="checkbox" />
-                                                                <label for="Wifi" class="label-success"></label> Yes
-                                                            </div>
-                                                        </li>
-                                                    </div>
-
-                                                </div>
-                                                <li class="list-group-item">
-                                                    <label for='description'>Description</label>
-                                                    <textarea rows="2" class="form-control" [(ngModel)]="newProduct.description" name='description' placeholder=""></textarea>
-                                                </li>
-                                                <li class="list-group-item">
-                                                    <label for='category'>Category</label>
-                                                    <select class='form-control' name='category'>
-                                                        {{#each allcats}}
-                                                        <option value="{{this.name}}">{{this.slug}}</option>
-
-                                                        {{/each}}
-                                                    </select>
-                                                </li>
-                                                <li class="list-group-item">
-                                                    <label for='Product_Group'>Product Type</label>
-                                                    <select class='form-control' name='Product_Group'>
-                                                        {{!--
-                                                        <option value="TICKET">Ticket</option>
-                                                        <option value="DONATION">Variable Amount Donation</option> --}}
-                                                        <option value="APPAREL">Featured</option>
-                                                        <option value="SIMPLE">Non Featured</option>
-                                                    </select>
-                                                </li>
-                                                </ul>
-                                            </div>
-                                            <div class="form-group">
-                                                <ul class="list-group">
-                                                    <li class="list-group-item">
-                                                        <label for='imageFile'>Display Image</label>
-                                                        <input type='file' name='imageFile' class='form-control'>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="form-group">
-                                                <ul class="list-group">
-                                                    <li class="list-group-item">
-                                                        <label for='imageFile1'>Gallery1</label>
-                                                        <input type='file' name='imageFile1' class='form-control'>
-
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="form-group">
-                                                <ul class="list-group">
-                                                    <li class="list-group-item">
-                                                        <label for='imageFile2'>Gallery2</label>
-                                                        <input type='file' name='imageFile2' class='form-control'>
-
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="form-group">
-                                                <ul class="list-group">
-                                                    <li class="list-group-item">
-                                                        <label for='imageFile3'>Gallery3</label>
-                                                        <input type='file' name='imageFile3' class='form-control'>
-
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">
-                                            <span class="glyphicon glyphicon-plus"></span> Add</button>
-                                    </div>
-                                    </form>
-                                </div>
-                                <!-- /.modal-content -->
-                            </div>
-                            <!-- /.modal-dialog -->
                         </div>
                         <div class="dataTable_wrapper ">
-                            <table class="table table-striped table-bordered table-hover table-responsive text-nowrap" id="dataTables-example">
-                                <thead>
-                                    <tr class="card-body">
-                                        <th>
-                                            <h2>Product</h2>
-                                        </th>
-                                        <th>
-                                            <h2>Image</h2>
-                                        </th>
-                                        <th>
-                                            <h2>Name</h2>
-                                        </th>
-                                        <th>
-                                            <h2>Title</h2>
-                                        </th>
-                                        <th>
-                                            <h2>Description</h2>
-                                        </th>
-                                        <th>
-                                            <h2>Category</h2>
-                                        </th>
-                                        <th>
-                                            <h2>Price</h2>
-                                        </th>
-                                        <th>
-                                            <h2>Edit</h2>
-                                        </th>
-                                        <th>
-                                            <h2>Delete</h2>
-                                        </th>
-                                        <th>
-                                            <h2>View</h2>
-                                        </th>
-                                    </tr>
-                                </thead>
+                            <table class="table table-responsive" border="0" style="width:100%;border:0px;" id="dataTables-example">
+
                                 <tbody class="card-header card bg-info text-white">
                                     {{#each products }}
                                     <tr class="odd gradeX">
                                         <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
                                         <td>{{this.code}}</td>
                                         <td>
-                                            <img src='{{this.imagePath}}' width=50>
-                                        </td>
-                                        <td>{{this.name}}</td>
-                                        <td>{{this.title}}</td>
-                                        <td>{{this.description}}</td>
-                                        <td>{{this.category}}</td>
-                                        <td class="text-right">Rs{{this.price}}</td>
-                                        <td width=5%>
-                                            <form action="/admin/edit-product" method="POST">
-                                                <p data-placement="top" data-toggle="tooltip" title="Edit">
-                                                    <button class="btn btn-primary btn-xs" data-title="Edit" data-toggle="modal" data-target="#edit_{{this._id}}">
-                                                        <span class="glyphicon glyphicon-pencil"></span>
-                                                    </button>
-                                                </p>
-                                            </form>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <img src='{{this.imagePath}}' width=60%;>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h2>
+                                                        <strong>{{this.name}}</strong>
+                                                    </h2>
+                                                    <p>{{this.description}}</p>
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <div width=5%>
+                                                                <form action='/admin/delete-product' method="POST">
+                                                                    <input type='hidden' name='_id' value='{{this._id}}'>
+                                                                    <p data-placement="top" data-toggle="tooltip" title="Delete">
+                                                                        <button class="btn btn-danger btn-xs" onClick="submit();">
+                                                                            <span class="glyphicon glyphicon-trash"></span>
+                                                                        </button>
+                                                                    </p>
+                                                                </form>
 
-                                            <div class="modal fade" id="edit_{{this._id}}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                                                            </button>
-                                                            <h4 class="modal-title custom_align" id="Heading">Add New Product</h4>
-                                                        </div>
-                                                        <form action='/admin/edit-product' METHOD='post' encType="multipart/form-data">
-                                                            <input type="hidden" name="_id" value="{{this._id}}">
-                                                            <div class="modal-body">
-                                                                <div class="form-group">
-                                                                    <ul class="list-group">
-                                                                        <li class="list-group-item">
-                                                                            <label for='name'>Name</label>
-                                                                            <input class="form-control" value="{{this.name}}" name='name' type="text" placeholder="">
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <ul class="list-group">
-                                                                        <li class="list-group-item">
-                                                                            <label for='title'>SKU/Code</label>
-                                                                            <input class="form-control" name='code' value="{{this.code}}" type="text" placeholder="">
-                                                                        </li>
-                                                                        <li class="list-group-item">
-                                                                            <label for='title'>Title</label>
-                                                                            <input class="form-control" value="{{this.title}}" name='title' type="text" placeholder="">
-                                                                        </li>
-                                                                        <li class="list-group-item">
-                                                                            <label for='price'>Price</label>
-                                                                            <input class="form-control" value="{{this.price}}" name='price' type="text" placeholder="">
-                                                                        </li>
-                                                                        <li class="list-group-item">
-                                                                            <label for='shippable'>Shippable?</label>
-                                                                            <div class="material-switch pull-right">
-                                                                                No
-                                                                                <input id="shippable" name="shippable" type="checkbox" />
-                                                                                <label for="shippable" class="label-success"></label> Yes
-                                                                            </div>
-                                                                        </li>
-                                                                        <li class="list-group-item">
-                                                                            <label for='taxable'>Taxable?</label>
-                                                                            <div class="material-switch pull-right">
-                                                                                No
-                                                                                <input id="taxable" name="taxable" type="checkbox" />
-                                                                                <label for="taxable" class="label-success"></label> Yes
-                                                                            </div>
-                                                                        </li>
-                                                                        <li class="list-group-item">
-                                                                            <label for='description'>Description</label>
-                                                                            <textarea rows="2" class="form-control" name='description' placeholder="">{{this.description}}</textarea>
-                                                                        </li>
-                                                                        <li class="list-group-item">
-                                                                            <label for='category'>Category</label>
-                                                                            <select class='form-control' name='category'>
-                                                                                {{#each ../allcats}}
-                                                                                <option value="{{this.name}}">{{this.slug}}</option>
-                                                                                {{/each}}
-                                                                            </select>
-                                                                        </li>
-                                                                        <li class="list-group-item">
-                                                                            <label for='Product_Group'>Product Type</label>
-                                                                            <select class='form-control' name='Product_Group'>
-                                                                                {{!--
-                                                                                <option value="TICKET" {{#if this.new}}selected{{/if}}>Ticket</option>
-                                                                                <option value="DONATION" {{#if this.isDonation}}selected{{/if}}>Variable Amount Donation</option> --}}
-                                                                                <option value="APPAREL" {{#if this.isApparel}}selected{{/if}}>Featured</option>
-                                                                                <option value="SIMPLE">Non Featured</option>
-                                                                            </select>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <ul class="list-group">
-                                                                        <li class="list-group-item">
-                                                                            <label for='imageFile'>Image</label>
-                                                                            <input type='file' name='imageFile' class='form-control'>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
                                                             </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">
-                                                                    <span class="glyphicon glyphicon-pencil"></span> Update</button>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <p data-placement="top" class='text-left' data-toggle="tooltip" title="Unavailable Dates">
+                                                                <button class="ui right floated btn btn-warning btn-xs" data-title="view" data-toggle="modal" data-target="#view_{{this._id}}">
+                                                                    <span class="glyphicon glyphicon-ban-circle"></span>
+                                                                </button>
+                                                            </p>
+                                                            <div class="modal fade" id="view_{{this._id}}" tabindex="-1" role="dialog" aria-labelledby="add" aria-hidden="true">
+                                                                <div class="modal-dialog">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                                                <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
+                                                                            </button>
+                                                                            <h4 class="modal-title custom_align" id="Heading">Unavailable Dates</h4>
+                                                                        </div>
+                                                                        <div class="container">
+
+                                                                            <input type="text" class="form-control date" placeholder="Pick the multiple dates">
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-xs" style="width: 100%;">
+                                                                                <span class="glyphicon glyphicon-remove"></span>Close</button>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <!-- /.modal-content -->
+                                                                </div>
+                                                                <!-- /.modal-dialog -->
                                                             </div>
-                                                        </form>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div>
+
+                                                                <form action="/admin/edit-product" method="POST">
+                                                                    <p data-placement="top" data-toggle="tooltip" title="Edit">
+                                                                        <button class="btn btn-primary btn-xs" data-title="Edit" data-toggle="modal" data-target="#edit_{{this._id}}">
+                                                                            <span class="glyphicon glyphicon-pencil"></span>
+                                                                        </button>
+                                                                    </p>
+                                                                </form>
+
+                                                                <div class="modal fade" id="edit_{{this._id}}" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
+                                                                    <div class="modal-dialog">
+                                                                        <div class="modal-content">
+                                                                            <div class="modal-header">
+                                                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                                                                </button>
+                                                                                <h4 class="modal-title custom_align" id="Heading">Edit Event</h4>
+                                                                            </div>
+                                                                            <form action='/admin/edit-product' METHOD='post' encType="multipart/form-data">
+                                                                                <input type="hidden" name="_id" value="{{this._id}}">
+                                                                                <div class="modal-body">
+                                                                                    <div class="form-group">
+                                                                                        <ul class="list-group">
+                                                                                            <li class="list-group-item">
+                                                                                                <label for='name'>Name</label>
+                                                                                                <input class="form-control" value="{{this.name}}" name='name' type="text" placeholder="">
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                    <div class="form-group">
+                                                                                        <ul class="list-group">
+                                                                                            <li class="list-group-item">
+                                                                                                <label for='title'>SKU/Code</label>
+                                                                                                <input class="form-control" name='code' value="{{this.code}}" type="text" placeholder="">
+                                                                                            </li>
+                                                                                            <li class="list-group-item">
+                                                                                                <label for='title'>Title</label>
+                                                                                                <input class="form-control" value="{{this.title}}" name='title' type="text" placeholder="">
+                                                                                            </li>
+                                                                                            <li class="list-group-item">
+                                                                                                <label for='price'>Price</label>
+                                                                                                <input class="form-control" value="{{this.price}}" name='price' type="text" placeholder="">
+                                                                                            </li>
+                                                                                            <li class="list-group-item">
+                                                                                                <label for='shippable'>Shippable?</label>
+                                                                                                <div class="material-switch pull-right">
+                                                                                                    No
+                                                                                                    <input id="shippable" name="shippable" type="checkbox" />
+                                                                                                    <label for="shippable" class="label-success"></label> Yes
+                                                                                                </div>
+                                                                                            </li>
+                                                                                            <li class="list-group-item">
+                                                                                                <label for='taxable'>Taxable?</label>
+                                                                                                <div class="material-switch pull-right">
+                                                                                                    No
+                                                                                                    <input id="taxable" name="taxable" type="checkbox" />
+                                                                                                    <label for="taxable" class="label-success"></label> Yes
+                                                                                                </div>
+                                                                                            </li>
+                                                                                            <li class="list-group-item">
+                                                                                                <label for='description'>Description</label>
+                                                                                                <textarea rows="2" class="form-control" name='description' placeholder="">{{this.description}}</textarea>
+                                                                                            </li>
+                                                                                            <li class="list-group-item">
+                                                                                                <label for='category'>Category</label>
+                                                                                                <select class='form-control' name='category'>
+                                                                                                    {{#each ../allcats}}
+                                                                                                    <option value="{{this.name}}">{{this.slug}}</option>
+                                                                                                    {{/each}}
+                                                                                                </select>
+                                                                                            </li>
+                                                                                            <li class="list-group-item">
+                                                                                                <label for='Product_Group'>Product Type</label>
+                                                                                                <select class='form-control' name='Product_Group'>
+                                                                                                    {{!--
+                                                                                                    <option value="TICKET" {{#if this.new}}selected{{/if}}>Ticket</option>
+                                                                                                    <option value="DONATION" {{#if this.isDonation}}selected{{/if}}>Variable Amount Donation</option>
+                                                                                                    --}}
+                                                                                                    <option value="APPAREL" {{#if this.isApparel}}selected{{/if}}>Featured</option>
+                                                                                                    <option value="SIMPLE">Non Featured</option>
+                                                                                                </select>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                    <div class="form-group">
+                                                                                        <ul class="list-group">
+                                                                                            <li class="list-group-item">
+                                                                                                <label for='imageFile'>Image</label>
+                                                                                                <input type='file' name='imageFile' class='form-control'>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="modal-footer">
+                                                                                    <button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-lg" style="width: 100%;">
+                                                                                        <span class="glyphicon glyphicon-pencil"></span> Update</button>
+                                                                                </div>
+                                                                            </form>
+                                                                        </div>
+                                                                        <!-- /.modal-content -->
+                                                                    </div>
+                                                                    <!-- /.modal-dialog -->
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <!-- /.modal-content -->
+
+
+
+
                                                 </div>
-                                                <!-- /.modal-dialog -->
                                             </div>
+
                                         </td>
-                                        <td width=5%>
-                                            <form action='/admin/delete-product' method="POST">
-                                                <input type='hidden' name='_id' value='{{this._id}}'>
-                                                <p data-placement="top" data-toggle="tooltip" title="Delete">
-                                                    <button class="btn btn-danger btn-xs" onClick="submit();">
-                                                        <span class="glyphicon glyphicon-trash"></span>
-                                                    </button>
-                                                </p>
-                                            </form>
-                                        </td>
-                                        <td width=5%>
-                                            <p data-placement="top" class='text-left' data-toggle="tooltip" title="View Product ">
-                                                <button class="ui right floated btn btn-warning btn-xs" data-title="view" data-toggle="modal" data-target="#view_{{this._id}}">
-                                                    <span class="glyphicon glyphicon-eye-open"></span>
-                                                </button>
-                                            </p>
-                                            <div class="modal fade" id="view_{{this._id}}" tabindex="-1" role="dialog" aria-labelledby="add" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                                                            </button>
-                                                            <h4 class="modal-title custom_align" id="Heading">View Product</h4>
-                                                        </div>
-                                                        <div class="pre">
-                                                            <pre><code class="prettyPrint">{{JSON this}}</code></pre>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" onClick="submit();" data-dismiss="modal" class="btn btn-warning btn-xs" style="width: 100%;">
-                                                                <span class="glyphicon glyphicon-remove"></span>Close</button>
-                                                        </div>
-                                                      
-                                                    </div>
-                                                    <!-- /.modal-content -->
-                                                </div>
-                                                <!-- /.modal-dialog -->
+
+                                        <td>
+
+                                            <div>
+                                                <p> {{this.title}}</p>
                                             </div>
+
+
+
                                         </td>
+
+                                        <td>
+                                            <p>{{this.category}}</p>
+
+
+                                        </td>
+                                        <td class="text-right">Rs{{this.price}}</td>
+
                                     </tr>
+
                                     {{/each}}
                                 </tbody>
                             </table>

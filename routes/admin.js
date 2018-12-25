@@ -69,16 +69,116 @@ router.get('/relations', function (req, res, next) {
         noErrors: 1
     });
 })
+
+router.post('/search', function (req, res, next) {
+    var q = req.body.q;
+    var successMsg = req.flash('success')[0];
+    var errorMsg = req.flash('error')[0];
+    Order.aggregate([{
+        $match: {
+            $text: {
+                $search: q
+            }
+        }
+    }, {
+        $sortByCount: "$user"
+    }], function (err, navcats) {
+        if (err) {
+            req.flash('error', 'An error has occurred - ' + err.message);
+            return res.redirect('/');
+        }
+        Order.aggregate(
+            [{
+                $group: {
+                    _id: "$cart",
+                    count: {
+                        $sum: 1
+                    }
+                }
+            }, {
+                $sort: {
+                    _id: 1
+                }
+            }],
+            function (err, cart) {
+                Order.aggregate([{
+                    $match: {
+                        $text: {
+                            $search: q
+                        }
+                    }
+                }, {
+                    $sortByCount: "$cart"
+                }], function (err, cart) {
+                    if (err) {
+                        //////console.log("Error fetching categories");
+                        res.send(1000, 'Error');
+                    }
+                    if (frontPageCategory) {
+                        categCondition = {
+                            category: frontPageCategory
+                        };
+                    } else {
+                        categCondition = {};
+                    }
+                    Order.find({
+                        $text: {
+                            $search: q
+                        }
+                    }, {
+                            score: {
+                                $meta: "textScore"
+                            }
+                        })
+                        .sort({
+                            score: {
+                                $meta: 'textScore'
+                            }
+                        })
+                        .exec(function (err, results) {
+                            // count of all matching objects
+                            if (err) {
+                                req.flash('error', "An error has occurred - " + err.message);
+                                return res.redirect('/');
+                            }
+                            if (!results || !results.length) {
+                                req.flash('error', "No products found for search string.");
+                                return res.redirect('/');
+                            }
+                            productChunks = [];
+                            chunkSize = 4;
+                            for (var i = (4 - chunkSize); i < results.length; i += chunkSize) {
+                                productChunks.push(results.slice(i, i + chunkSize))
+                            }
+                            if (req.user) {
+                                meanlogger.log('search', 'Searched for  ' + q, req.user);
+                            }
+                            res.render('admin/search', {
+                                layout: 'admin-page.hbs',
+                                title: title,
+                                showRecommendations: eval(res.locals.showRecommendations),
+                                keywords: Config.keywords,
+                                products: productChunks,
+                                q: q,
+                                // recommended: docs,
+                                cart: cart,
+                                user: req.user,
+                                errorMsg: errorMsg,
+                                noErrorMsg: !errorMsg,
+                                successMsg: successMsg,
+                                noMessage: !successMsg,
+                                isLoggedIn: req.isAuthenticated()
+                            });
+                        });
+                });
+            });
+    });
+});
 /* GET home page. */
 router.get('/', isAdmin, function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
-    var tot = totalSales(function (err, next) {
-        if (err) {
-            //////console.log(err.message);
-            return res.error('err');
-        }
-    });
+
     var custresponse_store;
     Message.distinct('form', (err, custresponse) => {
         //res.send(messages);
@@ -91,6 +191,7 @@ router.get('/', isAdmin, function (req, res, next) {
     var currYear = today.getFullYear();
     // console.log(currYear + "-" + currMonth + "-" + currDay);
     var date = (currYear + "-" + currMonth + "-" + currDay);
+
     qryFilter = { "checkin": date };
     qryFilter1 = { "checkout": date };
     qryFilter2 = { "created": { $gte: moment(date) } };
@@ -100,17 +201,20 @@ router.get('/', isAdmin, function (req, res, next) {
             var checkouts = docs1.length;
             Order.find(qryFilter2, function (err, docs3) {
                 var bookingsno = docs3.length;
+
+
                 res.render('admin/dashboard', {
                     layout: 'admin-page.hbs',
                     errorMsg: errorMsg,
                     successMsg: successMsg,
                     noErrorMsg: !errorMsg,
                     noMessage: !successMsg,
-                    totalSales: tot,
+                    checkin: bookings,
+                    checkout: checkouts,
                     docs: docs,
                     docs1: docs1,
-                    docs3:docs3,
-                    bookingsno:bookingsno,
+                    docs3: docs3,
+                    bookingsno: bookingsno,
                     noErrors: 1,
                     date: date,
                     user: req.user,
@@ -134,7 +238,8 @@ router.get('/availability', function (req, res, next) {
             docs: docs
         });
     });
-})
+});
+
 router.get('/messages', function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
@@ -174,7 +279,7 @@ router.get('/orders:filter?', isAdmin, function (req, res, next) {
     }
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
-    var adminPageTitle = "Orders";
+    var adminPageTitle = "Bookings";
     var adminPageUrl = "/admin/orders";
 
     Order.find(qryFilter).sort({ "created": -1 }).exec(function (err, orders) {
@@ -858,7 +963,68 @@ router.post('/delete-product', isAdmin, function (req, res, next) {
         product.status = 'deleted';
         return res.redirect('/admin/products');
     })
-})
+});
+router.post('/edit-product', isAdmin, function (req, res, next) {
+    errorMsg = req.flash('error')[0];
+    successMsg = req.flash('success')[0];
+    var imageFile;
+    var updated = {
+        name: req.body.name,
+        title: req.body.title,
+        description: req.body.description,
+        price: req.body.price,
+        Wifi: req.body.Wifi,
+        campfire: req.body.campfire,
+        Pool: req.body.Pool,
+        parking: req.body.parking,
+        category: req.body.category,
+        Product_Group: req.body.Product_Group,
+        taxable: req.body.taxable,
+        shippable: req.body.shippable
+    }
+    if (req.files) {
+        imageFile = req.files.imageFile;
+        imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
+            if (err) {
+                res.status(500).send(err);
+            }
+        })
+        updated.imagePath = '/images/' + req.body.name + '.png'
+
+    }
+    Product.findOneAndUpdate({ _id: req.body._id }, { $set: updated }, function (err, product) {
+        if (err) {
+            //////console.log("Unable to update product - " + err.message);
+            req.flash('error', "Unable to update product - " + err.message);
+            return res.redirect('/admin/products');
+        };
+        //////console.log("Product " + req.body.name + " Updated");
+        req.flash('success', 'Product ' + req.body.name + ' Updated!');
+        return res.redirect('/admin/products');
+    });
+});
+
+router.get('/edit-product/:slug3',function (req, res, next) {
+    successMsg = req.flash('success')[0];
+    errorMsg = req.flash('error')[0];
+    var adminPageTitle = "Approve Events";
+    var adminPageUrl = "admin/edit-product";
+    qryFilter = {Token:slug3};
+    Product.find(qryFilter, function(err, products) {
+       console.log(products);
+                res.render('admin/add-product', {
+                    adminPageTitle: adminPageTitle,
+                    adminPageUrl: adminPageUrl,
+                    layout: 'admin-page.hbs',
+                    noMessage: !successMsg,
+                    noErrorMsg: !errorMsg,
+                    errorMsg: errorMsg,
+                    products: products,
+                    successMsg: successMsg
+                });
+            })
+        });
+ 
 
 router.post('/edit-product', isAdmin, function (req, res, next) {
     errorMsg = req.flash('error')[0];
@@ -902,7 +1068,7 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
 router.get('/add-product', isAdmin, function (req, res, next) {
     successMsg = req.flash('success')[0];
     errorMsg = req.flash('error')[0];
-    var adminPageTitle = "Add Products";
+    var adminPageTitle = "Add Events";
     var adminPageUrl = "admin/add-product";
 
     var filter = req.query.filter;
@@ -992,6 +1158,7 @@ router.post('/add-product', isAdmin, function (req, res, next) {
     product = new Product({
         name: req.body.name,
         code: req.body.code,
+	    adminapproval: "true",
         Wifi: req.body.Wifi,
         campfire: req.body.campfire,
         Pool: req.body.Pool,
@@ -999,7 +1166,7 @@ router.post('/add-product', isAdmin, function (req, res, next) {
         title: req.body.title,
         Duration: req.body.Duration,
         Product_Group: req.body.Product_Group,
-        price: parseFloat((req.body.price * 100).toFixed(2)),
+        price: req.body.price,
         description: req.body.description,
         shippable: req.body.shippable,
         taxable: req.body.taxable,

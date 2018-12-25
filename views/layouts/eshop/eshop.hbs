@@ -1,86 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Meta tags -->
+    <title>{{title}}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="ThrillWorld - An Implementation of Thrillworld ">
     <meta name="author" content="">
-    <title>Thrillworld {{title}}</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- stylesheets -->
     <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
     <link href="/stylesheets/font-awesome.css" rel="stylesheet">
-    <link href="/stylesheets/prettyPhoto.css" rel="stylesheet">
-    <link href="/stylesheets/animate.css" rel="stylesheet">
-    <link href="{{themeurl}}" rel="stylesheet">
-    <link href="/stylesheets/tourist.css" rel="stylesheet">
-    <link href="/stylesheets/responsive.css" rel="stylesheet">
-    <!-- Important Owl stylesheet -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.css">
-
-    <!-- Default Theme -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.theme.css">
-    <!--[if lt IE 9]>
-    <script src="js/html5shiv.js"></script>
-    <script src="js/respond.min.js"></script>
-    <![endif]-->
-    <link href="/images/favicon.ico" type="image/x-icon" />
-    <link rel="shortcut icon" href="/images/favicon.ico" />
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
+     <link href="/stylesheets/main.css" rel="stylesheet">
+	 <script src="/javascripts/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link href="//fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+	<link href="//fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,700i,800,900" rel="stylesheet">  
+	
 </head>
-
 <body>
-    {{>eshop/header}}
+	 {{>eshop/header}}
+	<!-- About us -->
+	<div class="agile-about" id="about">
+		 {{>eshop/featured-items}}
+	</div>
+	<!-- //About us -->
+  <!-- Gallery Property -->
+	<div class="samls-property" id="property">
+		{{>eshop/category}}
+		<div class="clearfix"></div>
+	</div>
+	<!-- //Gallery Property-->
+	<!-- our guides -->
+	<div class="sam-guides" id="agent">
+		<div class="container">
+			<h1 class="text-center">Users Reviews</h1>
+			<div class="guide-grids">
+				<div class="col-md-3 col-sm-6 col-xs-6 guide1">
+					<img src="images/g1.jpg" alt="guide1" class="img-responsive">
+					<h4>Emily Jean</h4>
+					<p class="designation">Senior Agent</p>
+					<p>If you are going to use a passage of Lorem Ipsum, you need to be sure there is embarrassing.</p>
+					<div class="social-wthree-icons bnragile-icons">
+							<ul>
+								<li><a href="#" class="fa fa-facebook icon icon-border facebook"> </a></li>
+								<li><a href="#" class="fa fa-twitter icon icon-border twitter"> </a></li>
+								<li><a href="#" class="fa fa-google-plus icon icon-border googleplus"> </a></li>
+							</ul>
+							<div class="clearfix"> </div>
+						</div>
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-6 guide2">
+					<img src="images/g2.jpg" alt="guide2" class="img-responsive">
+					<h4>Alexandra Anna</h4>
+					<p class="designation">Land Agent</p>
+					<p>If you are going to use a passage of Lorem Ipsum, you need to be sure there is embarrassing.</p>
+					<div class="social-wthree-icons bnragile-icons">
+							<ul>
+								<li><a href="#" class="fa fa-facebook icon icon-border facebook"> </a></li>
+								<li><a href="#" class="fa fa-twitter icon icon-border twitter"> </a></li>
+								<li><a href="#" class="fa fa-google-plus icon icon-border googleplus"> </a></li>
+							</ul>
+							<div class="clearfix"> </div>
+						</div>
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-6 guide3">
+					<img src="images/g3.jpg" alt="guide3" class="img-responsive">
+					<h4>Mark Phillips</h4>
+					<p class="designation">House Agent</p>
+					<p>If you are going to use a passage of Lorem Ipsum, you need to be sure there is embarrassing.</p>
+					<div class="social-wthree-icons bnragile-icons">
+							<ul>
+								<li><a href="#" class="fa fa-facebook icon icon-border facebook"> </a></li>
+								<li><a href="#" class="fa fa-twitter icon icon-border twitter"> </a></li>
+								<li><a href="#" class="fa fa-google-plus icon icon-border googleplus"> </a></li>
+							</ul>
+							<div class="clearfix"> </div>
+						</div>
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-6 guide4">
+					<img src="images/g4.jpg" alt="guide4" class="img-responsive">
+					<h4>Hail Steinfeld</h4>
+					<p class="designation">Loan Agent</p>
+					<p>If you are going to use a passage of Lorem Ipsum, you need to be sure there is embarrassing.</p>
+					<div class="social-wthree-icons bnragile-icons">
+							<ul>
+								<li><a href="#" class="fa fa-facebook icon icon-border facebook"> </a></li>
+								<li><a href="#" class="fa fa-twitter icon icon-border twitter"> </a></li>
+								<li><a href="#" class="fa fa-google-plus icon icon-border googleplus"> </a></li>
+							</ul>
+							<div class="clearfix"> </div>
+						</div>
+				</div>
 
-    <div class="row">
-        {{>eshop/category}} {{!-- {{#each category}} {{this._id}} {{this.count}} {{#each this.details}} {{this.imagePath}} {{/each}}
-        {{/each}} --}}
+			</div>
+			<div class="clearfix"> </div>
+		</div>
+	</div>
+	<!-- //our guides -->
+	<!-- testimonials -->
+	
+	<!-- //testimonials -->
+  <!-- contact -->
+	<div class="samls-contact" id="contact">
+		<h3 class="center">Contact Us</h3>
+		<div class="container">
+			<form action="/" method="get">
+				<div class="form-input">
+					<label>Name <span class="sam-star"> * </span> </label>
+					<input type="text" name="name" placeholder="Your Name" required>
+				</div>
+				<div class="form-input">
+					<label>Email <span class="sam-star"> * </span> </label>
+					<input type="email" name="email" placeholder="Your Email" required>
+				</div>
+				<div class="form-input">
+					<label>Phone <span class="sam-star"> * </span> </label>
+					<input type="text" name="mobile" placeholder="Phone Number" required>
+				</div>
+				<div class="form-textarea">
+					<label>Message <span class="sam-star"> * </span> </label>
+					<textarea name="message" placeholder="Your Message" rows="5" cols="20" required></textarea>
+				</div>
+				<input type="Submit" value="Submit Message">
+			</form>
+			<div class="map">
+				<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d396368.68564402737!2d-94.8559081017095!3d39.09211671179675!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87c0f75eafe99997%3A0x558525e66aaa51a2!2sKansas+City%2C+MO%2C+USA!5e0!3m2!1sen!2sin!4v1509960130500" allowfullscreen></iframe>
+			</div>
+		</div>	
+			<div class="agile-contact1">
+				<div class="container">
+				
+					<div class="address">
+						<div class="add-phone">
+							<span class="fa fa-phone" aria-hidden="true"></span>
+							<p>+952 8745 1245</p>
+							<p>+952 8745 6789</p>
+						</div>
+						<div class="add-email">
+							<span class="fa fa-envelope" aria-hidden="true"></span>
+							<a href="mailto:abcd@yoursite.com">me@thrillworld.com </a>
+							<a href="mailto:abcd@yoursite.com"> service@thrillworld.com </a>
+							
+						</div>
+						<div class="add-area">
+							<span class="fa fa-map-marker" aria-hidden="true"></span>
+							<p>Kamcet</p>
+							<p>Town Hills, Pune</p>
+						</div>
+					</div>
+				
+					
+					<div class="footer-icons">
+						<ul class="icons1">
+							<li><a href="#" class="samls-facebook"><span class="fa fa-facebook" aria-hidden="true"></span></a></li>
+							<li><a href="#" class="samls-twitter"><span class="fa fa-twitter" aria-hidden="true"></span></a></li>
+							<li><a href="#" class="samls-google"><span class="fa fa-google-plus" aria-hidden="true"></span></a></li>
+							<li><a href="#" class="samls-pinterest"><span class="fa fa-pinterest-p" aria-hidden="true"></span></a></li>
+							<li><a href="#" class="samls-dribbble"><span class="fa fa-dribbble" aria-hidden="true"></span></a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+     {{>eshop/footer}}
+ 
+	
+	<script src="js/bootstrap.min.js"></script>
+	
+	
+	<!-- smooth scrolling -->
+	<script src="js/SmoothScroll.min.js"></script>
+	<script type="text/javascript" src="js/move-top.js"></script>
+	<script type="text/javascript" src="js/easing.js"></script>
+	<!-- here stars scrolling icon -->
+	<script type="text/javascript">
+		$(document).ready(function() {
+			/*
+				var defaults = {
+				containerID: 'toTop', // fading element id
+				containerHoverID: 'toTopHover', // fading element hover id
+				scrollSpeed: 1200,
+				easingType: 'linear'
+				};
+			*/
 
-    </div>
-     <div class="row">
-        {{>eshop/featured-items}}
-    </div>
-    <div class="container fetuitm">
-        {{>eshop/Display}}
-    </div>
+			$().UItoTop({ easingType: 'easeOutQuart' });
 
-    <div class="container fetuitm">
-        {{>eshop/recommendation}}
-    </div>
+			});
+	</script>
+	<!-- //here ends scrolling icon -->
+<!-- smooth scrolling -->
 
-  <div>
-        {{>eshop/testimonials}}
-    </div>
-    <div>
-        {{>eshop/service}}
-    </div>
-    <div>
-        {{>eshop/footer}}
-    </div>
+<!-- scrolling script -->
+<script type="text/javascript">
+	jQuery(document).ready(function($) {
+		$(".scroll").click(function(event){
+			event.preventDefault();
+			$('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
+		});
+	});
+</script>
+<!-- //scrolling script -->
 
-
-    </div>
-
-
-
-    <script src="/javascripts/jquery.js"></script>
-    <script src="/javascripts/jquery.scrollUp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/owl-carousel/1.3.3/owl.carousel.min.js"></script>
-    <script src="/javascripts/underscore/underscore.js"></script>
-    <script src="/javascripts/backbone/backbone.js"></script>
-    <script src="/javascripts/bootstrap.min.js"></script>
-    <script src="/javascripts/jquery.prettyPhoto.js"></script>
-    <script src="/javascripts/main.js"></script>
-    <script src="/javascripts/Tourist.js/tourist.js"></script>
-
-
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function () {
-            $("a[rel^='prettyPhoto']").prettyPhoto();
-        });
-    </script>
 </body>
-
 </html>

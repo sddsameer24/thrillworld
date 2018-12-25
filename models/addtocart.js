@@ -1,49 +1,60 @@
-var mongoose = require("mongoose");
+var mongoose = require('mongoose');
+
+const dotenv = require('dotenv');
+const chalk = require('chalk');
+var mongodb = require("mongodb");
+
+dotenv.load({
+	path: '.env.hackathon'
+});
+
+
+
 var Schema = mongoose.Schema;
-var bcrypt = require('bcrypt-nodejs');
-var random = require('mongoose-simple-random');
 
-var userSchema = new Schema({
-	resetPasswordToken: String,
-  	resetPasswordExpires: Date,
-	location: {
-      type: { type: String },
-	  coordinates: [ Number ]
+var addtocartSchema = new Schema({
+	user: {
+		type: Object,
+		required: false
 	},
-	email: {
+	cart: {
+		type: Object,
+		required: false
+	},
+	billing_address: {
 		type: String,
 		required: false
 	},
-	password: {
+	billing_city: {
 		type: String,
 		required: false
 	},
-	first_name: {
+	billing_state: {
 		type: String,
 		required: false
 	},
-	last_name: {
+	billing_zipcode: {
 		type: String,
 		required: false
 	},
-
-	addr1: {
+	shipping_address: {
 		type: String,
 		required: false
 	},
-	addr2: {
+	shipping_city: {
 		type: String,
 		required: false
 	},
-	city: {
+	shipping_state: {
 		type: String,
 		required: false
 	},
-	state: {
+	userid: {
 		type: String,
 		required: false
 	},
-	zipcode: {
+	
+	shipping_zipcode: {
 		type: String,
 		required: false
 	},
@@ -51,94 +62,132 @@ var userSchema = new Schema({
 		type: String,
 		required: false
 	},
-	website: {
+	name: {
 		type: String,
 		required: false
 	},
-	home_group: {
-		type: String
+	checkin: {
+		type: String,
+		required: false
 	},
-	role: {
+	adult: {
+		type: String,
+		required: false
+	},
+	children: {
+		type: String,
+		required: false
+	},
+	kids: {
+		type: String,
+		required: false
+	},
+	checkout: {
+		type: String,
+		required: false
+	},
+	paymentId: {
+		type: String,
+		required: false
+	},
+	status: {
+		type: String,
+		required: false
+	},
+	receipt_status: {
 		type: String,
 		required: false,
-		enum: ['visitor','vendor','admin']
+		default: 'New'
 	},
-	acceptedTOS: {
-		type: Date
+	receiver: {
+		type: String,
+		required: false
+	},
+	total: {
+		type: Number,
+		default: 0
+	},
+	paidBy: {
+		type: String,
+		default: 'Instamojo',
+		enum: ['Paypal', 'Instamojo', 'Cash', 'Check'],
+		required: true
+	},
+	note: {
+		type: String
 	},
 	created: {
-		type: Date, default: Date.now()
-	},
-	lastlogin: {
-		type: Date, default: Date.now()
-	},
-	likes: [String],
-	purchased: [{
-		code: String,
-		purchased: {
-			type: Date, default: Date.now()
+		type: Date,
+		default: Date.now
+	}
+});
+
+/* This method called when an order is saved */
+addtocartSchema.post('save', function (doc) {
+	/* generate recommendations collection */
+	/* Loop through all cart products:
+	   1. Find a purchase record for the product.
+	   2. If found, search the also purchased products array.
+	   2a. if not found add it.
+	   3.
+	   */
+	var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+	dbHost = process.env.MONGODB_URI;
+	var db;
+
+	var MongoClient = mongodb.MongoClient;
+
+	MongoClient.connect(dbHost, function (err, db) {
+		if (err) {
+			////console.log("Error: " + errror.message);
 		}
-	}],
+		var dateObj = new Date();
+		var month = dateObj.getUTCMonth(); //months from 1-12
+		var day = dateObj.getUTCDate();
+		var year = dateObj.getUTCFullYear();
+		var sdoc = {};
+		var monthname = months[month];
+		var setupdate = {
+			$set: {}
+		};
+		var incupdate = {
+			$inc: {}
+		};
+		// incupdate.$inc['months.' + months[month] + '.sales'] = cart.total;
+		incupdate.$inc['ytd'] = doc.cart.total;
+		db.collection('sales', function (err, collection) {
+			if (err) {
+				////console.log('error ' + error.message);
+			}
+			collection.update({
+				year: year
+			},
+				incupdate, {
+					upsert: true
+				},
+				function (err, result) {
+					if (err) {
+						////console.log("Error " + err.message);
+					}
+					////console.log("RESULT: " + JSON.stringify(result));
+				});
+		})
 
-	orders:[{
-        paymentId: String,
-        status: String,
-		productId: {type: Schema.Types.ObjectId, ref: 'Product', required: false},
-        sku: String,
-        name: String,
-        category: String,
-        Product_Group: String,
-        ordered: {
-        	type: Date, default: Date.now()
-        }
-	}],
-	facebook: String,
-	twitter: String,
-	google: String,
-	WordpressId: String,
-	profile: {
-	    name: String,
-	    gender: String,
-	    location: String,
-	    website: String,
-	    picture: String
-	},
-	tokens: Array
+	});
 });
 
-userSchema.pre('save', function(next) {
-  var user = this;
-  var SALT_FACTOR = 5;
-
-  if (!user.isModified('password')) return next();
-
-  bcrypt.genSalt(SALT_FACTOR, function(err, salt) {
-    if (err) return next(err);
-
-    bcrypt.hash(user.password, salt, null, function(err, hash) {
-      if (err) return next(err);
-      user.password = hash;
-      next();
-    });
-  });
-});
-
-userSchema.plugin(random);
-
-userSchema.methods.comparePassword = function(candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-    if (err) return cb(err);
-    cb(null, isMatch);
-  });
+this.createPurchase = function (product, othersArray, cb) {
+	purchase = new Purchase({
+		code: product,
+		alsoPurchased: othersArray
+	});
+	purchase.save(function (err) {
+		if (err) {
+			////console.log('error: ' + err.message);
+		}
+	})
+	return cb();
 };
 
-userSchema.methods.encryptPassword = function(password) {
-	return bcrypt.hashSync(password, bcrypt.genSaltSync(5), null)
-};
-
-userSchema.methods.validPassword = function(password) {
-	return bcrypt.compareSync(password, this.password);
-}
-userSchema.index({ loc : '2dsphere' });
-
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('addtocart', addtocartSchema);

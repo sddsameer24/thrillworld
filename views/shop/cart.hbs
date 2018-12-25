@@ -1,0 +1,25 @@
+<div>
+{{#each cart}}
+
+<input type="hidden" name="userid" value="{{this.user.id}}">
+<input type="hidden" name="first_name" value="{{this.user.first_name}}">
+<input type="hidden" name="last_name" value="{{this.user.last_name}}">
+<input type="hidden" name="email" value="{{this.user.email}}">
+<input type="hidden" name="telephone" value="{{this.user.telephone}}">
+{{#each cart}}
+<input type="hidden" name="productId" value="{{this.productId}}">
+<input type="hidden" name="product_name" value="{{this.product_name}}">
+<input type="hidden" name="product_price" value="{{this.product_price}}">
+<input type="hidden" name="product_qty" value="{{this.product_qty}}">
+<input type="hidden" name="ticket_name" value="{{this.ticket_name}}">
+<input type="hidden" name="ticket_email" value="{{this.ticket_email}}">
+<div class="container">
+<p>Event Name:{{this.product_name}}</p>
+<p>Price per person:{{this.product_price}}</p>
+<p>Number Of Attendees:{{this.product_qty}}</p>
+</div>
+{{/each}}
+<input type="hidden" name="total" value="{{this.total}}">
+{{/each}}
+<h2>Cart total:{{this.total}}</h2>
+</div>

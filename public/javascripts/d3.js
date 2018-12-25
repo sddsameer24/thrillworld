@@ -4266,7 +4266,7 @@ function parseCss(value) {
 
 function parseSvg(value) {
   if (value == null) return identity$2;
-  if (!svgNode) svgNode = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  if (!svgNode) svgNode = document.createElementNS("http://www.sam.org/2000/svg", "g");
   svgNode.setAttribute("transform", value);
   if (!(value = svgNode.transform.baseVal.consolidate())) return identity$2;
   value = value.matrix;
@@ -7106,14 +7106,14 @@ function sequential(interpolator) {
   return linearish(scale);
 }
 
-var xhtml = "http://www.w3.org/1999/xhtml";
+var xhtml = "http://www.sam.org/1999/xhtml";
 
 var namespaces = {
-  svg: "http://www.w3.org/2000/svg",
+  svg: "http://www.sam.org/2000/svg",
   xhtml: xhtml,
-  xlink: "http://www.w3.org/1999/xlink",
-  xml: "http://www.w3.org/XML/1998/namespace",
-  xmlns: "http://www.w3.org/2000/xmlns/"
+  xlink: "http://www.sam.org/1999/xlink",
+  xml: "http://www.sam.org/XML/1998/namespace",
+  xmlns: "http://www.sam.org/2000/xmlns/"
 };
 
 var namespace = function(name) {

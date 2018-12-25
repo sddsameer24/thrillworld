@@ -5,6 +5,7 @@ var csrf = require('csurf');
 var flash = require('connect-flash');
 var passport = require('passport');
 var User = require('../models/user');
+var emailCheck = require('email-check');
 var Payment = require('../models/payment');
 var Order = require('../models/order');
 var Cart = require('../models/cart');
@@ -20,6 +21,7 @@ const chalk = require('chalk');
 var csrfProtection = csrf({
 	cookie: true
 })
+
 router.post('/update-profile', csrfProtection, function (req, res, next) {
 
 	User.update({
@@ -38,41 +40,6 @@ router.post('/update-profile', csrfProtection, function (req, res, next) {
 		});
 });
 
-// Mobile 
-router.post('/update-profile-mobile', function (req, res, next) {
-
-	if(req.body.email){
-		User.update({
-			email: req.body.email
-		}, req.body)
-			.then(function (err, user) {
-				req.user = user;
-				req.flash('success', 'User Updated');
-				// res.redirect('/user/profile');
-				res.send({
-					message:  "Updated Profile",
-					status: true
-				});
-	
-			})
-			.catch(function (err) {
-				////console.log("Error: " + JSON.stringify(err));
-				req.flash('error', 'Problem updating user profile.');
-				res.send({
-					message:  "Some error occurred",
-					status: false
-				});
-	
-			});
-	}else{
-		res.send({
-			message:  "Some error occurred",
-			status: false
-		});
-	}
-
-	
-});
 
 
 
@@ -89,31 +56,6 @@ router.get('/profile', isLoggedIn, csrfProtection, function (req, res, next) {
 		csrfToken: req.csrfToken()
 	});
 });
-
-// Mobile Profile
-router.post('/profile-mobile', function (req, res, next) {
-	console.log("events");
-	var slug3 = req.body._id;
-	qryFilter = { "_id": slug3 };
-	console.log(slug3);
-	// if we have a cart, pass it - otherwise, pass an empty object
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	console.log("events1");
-
-	User.find(qryFilter, function (err, user) {
-		
-		console.log("user: " + JSON.stringify(user));
-{
-			req.flash('success');
-			for (i = 0; i < user.length; i++) {
-				res.send(user[i]);
-			}
-			
-		}
-	});
-});
-
 
 router.get('/orders', isLoggedIn, function (req, res, next) {
 
@@ -155,43 +97,7 @@ router.get('/orders', isLoggedIn, function (req, res, next) {
 });
 
 // Mobile Orders
-
-router.get('/orders-mobile', isLoggedIn, function (req, res, next) {
-
-	// ////console.log(payments);
-	// res.render('user/profile', {layout:'fullpage.hbs',user: req.user, payments: payments,hasPayments:0});
-
-	Order.find({
-		$or: [ {
-			"user.email": req.user.email
-		}]
-	}, null, {
-			sort: {
-				created: -1
-			}
-		}, function (err, orders) {
-			if (err) {
-				res.send({
-					message:  "Some error occurred",
-					status: false
-				});
-			}
-			// var arr = [];
-			// var total = 0;
-			// for (var order in orders) {
-			//     ////console.log("Cart Item: " + orders[order]);
-			//     ////console.log("------------");
-			//     for (var item in orders[order].cart.items) {
-			//         ////console.log("Item " + item);
-			//         ////console.log(orders[order].cart.items[item].item.name);
-			//         total = parseFloat(orders[order].cart.items[item].item.)
-			//     }
-			// }
-			// return arr;
-			res.send(orders);
-		});
-});
-
+// Mobile 
 
 router.get('/logout', isLoggedIn, function (req, res, next) {
 	meanlogger.log("auth", "logged out", req.user);
@@ -204,22 +110,6 @@ router.get('/logout', isLoggedIn, function (req, res, next) {
 		// 			message:  "Logged Out Sucessfully",
 		// 			status: true
 		// 		});
-
-	
-});
-
-// MOBILE LOGOUT
-router.get('/logoutmobile', isLoggedIn, function (req, res, next) {
-	meanlogger.log("auth", "logged out", req.user);
-//console.log("MOBILE HIT");
-	req.session.destroy()
-	req.logout();
-	// res.redirect('/');
-
-		res.status(500).send({
-					message:  "Logged Out Sucessfully",
-					status: true
-				});
 
 	
 });
@@ -241,29 +131,6 @@ router.get('/logout-and-delete', isLoggedIn, function (req, res, next) {
 	req.logout();
 	res.redirect('/');
 });
-
-// Mobile
-router.get('/logout-and-delete-mobile', isLoggedIn, function (req, res, next) {
-	meanlogger.log("auth", "logged out and deleted account", req.user);
-	User.findByIdAndRemove(req.user._id, function (err, result) {
-		if (err) {
-			////console.log("Problem removing user record.");
-			req.flash('error', 'Unable to delete user record.');
-			res.send({
-				message:  "Error ",
-				status: false
-			});
-		}
-		req.flash('success', 'User record deleted and logged out.');
-	})
-	//req.session.destroy()
-	req.logout();
-	res.send({
-		message:  "Logged Out Sucessfully and Deleted",
-		status: true
-	});
-});
-
 router.get('/forgot', function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -370,6 +237,712 @@ router.post('/forgot', function (req, res, next) {
 	});
 	res.redirect('/');
 });
+
+router.get('/reset/:token', function (req, res) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	console.log("reset module");
+	User.findOne({
+		resetPasswordToken: req.params.token,
+		resetPasswordExpires: {
+			$gt: Date.now()
+		}
+	}, function (err,user) {
+		
+		//console.log("Found User: " + JSON.stringify(user));
+		res.render('user/reset', {
+			user: req.user,
+			token: req.params.token,
+			errorMsg: errorMsg,
+			noErrorMsg: !errorMsg,
+			successMsg: successMsg,
+			noMessage: !successMsg,
+		});
+		
+		});
+	});
+router.post('/reset/:token', function (req, res) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	pass = req.body.password;
+	conf = req.body.confirmation;
+	token = req.params.token;	
+	async.waterfall([
+		function (done) {
+			User.findOne({
+				resetPasswordToken: req.params.token,
+				resetPasswordExpires: {
+					$gt: Date.now()
+				}
+			}, function (err, user) {
+				if (err) {
+					////console.log("Error: " + err.message);
+				}
+				console.log("User: " + JSON.stringify(user));
+				// if (!user) {
+				// 	errorMsg = req.flash('error', 'Password reset token is invalid or has expired.');
+				// 	return res.redirect('back');
+				// }
+				user.password = req.body.password;
+				user.resetPasswordToken = undefined;
+				user.resetPasswordExpires = undefined;
+
+				user.save(function (err) {
+					console.log("save user");
+					req.logIn(user, function (err) {
+						done(err, user);
+						console.log(user);
+					});
+				});
+			});
+		},
+		function (user, done) {
+			console.log("done"+user);
+			let transporter = nodemailer.createTransport({
+				host: 'mail.zo-online.com',
+				port: 587,
+				secure: false, // true for 465, false for other ports
+				auth: {
+					user: 'admin@zo-online.com', // generated ethereal user
+					pass: 'PI,FX%EsZ$EQ'  // generated ethereal password
+				},
+				tls: {
+					rejectUnauthorized: false
+				}
+			});
+			console.log("mailingtransporter: ");
+			// setup email data with unicode symbols
+			let mailOptions = {
+				from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				to: user.email, // list of receivers
+				subject: 'Your password has been changed',
+				text: 'Hello,\n\n' +
+				'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+			};
+			// var mailOptions = {
+			// 	to: user.email,
+			// 	from: 'passwordreset@demo.com',
+			// 	subject: 'Your password has been changed',
+			// 	text: 'Hello,\n\n' +
+			// 		'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+			// };
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+
+					console.log("ERRORsending" + error);
+					return //////console.log(error);
+				}
+
+
+				//console.log("INFo" + info);
+				//console.log('Message sent: %s', info.messageId);
+				console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+				req.flash('success', "SENT MAIL, KINDLY CHECK!");
+				// res.render('contact', { msg: 'Email has been sent' });
+			});
+		}
+	], function (err) {
+		if (err) {
+			req.flash('error', 'Unknown Error during reset.')
+			
+		}
+		res.redirect('/user/forgot');
+	});
+	res.redirect('/');
+});
+
+router.use('/', notLoggedIn, function (req, res, next) {
+	next();
+});
+
+router.get('/signup', function (req, res, next) {
+	var messages = req.flash('error');
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	res.render('user/signup', {
+		layout: 'eshop/blank',
+		//csrfToken: req.csrfToken(),
+		"successMsg": successMsg,
+		"noMessage": !successMsg,
+		"message": messages,
+		"errorMsg": messages[0],
+		"noErrorMsg": !messages,
+	});
+});
+
+router.post('/signup', passport.authenticate('local.signup', {
+	successRedirect: '/user/profile',
+	failureRedirect: '/user/signup',
+	failureFlash: true
+}), function (req, res, next) {
+	console.log("signup");
+	meanlogger.log("auth", "signup attempt", req.user);
+	req.session.first_name = req.body.first_name;
+	req.session.last_name = req.body.last_name;
+	req.session.addr1 = req.body.addr1;
+	req.session.city = req.body.city;
+	req.session.state = req.body.state;
+	req.session.email = req.body.email;
+	req.session.telephone = req.body.telephone;
+	req.session.zipcode = req.body.zipcode;
+
+	if (req.session.oldUrl) {
+		var oldUrl = req.session.oldUrl
+		req.session.oldUrl = null;
+		res.redirect(oldUrl);
+	} else {
+		res.redirect('/user/profile');
+	}
+});
+
+router.post('/signin', function (req, res, next) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	if (process.env.FACEBOOK_ID) {
+		var authFacebook = true
+	} else {
+		var authFacebook = false;
+	}
+	if (process.env.GOOGLE_ID) {
+		var authGoogle = true;
+	} else {
+		var authGoogle = false;
+	}
+	req.session.oldUrl = req.get('referer');
+	var messages = req.flash('error');
+	passport.authenticate('local.signin', {
+		session: true
+	},
+		function (err, user, info) {
+			////console.log("trying to log in");
+			if (err) {
+				
+				req.flash('error', 'Internal Server Error');
+				res.redirect('/user/signin');
+
+				res.render('user/signin', {
+					layout: 'eshop/blank',
+					authFacebook: authFacebook,
+					authGoogle: authGoogle,
+					noErrorMessage: !errorMsg,
+					noErrorMsg: !errorMsg,
+					successMsg: successMsg,
+					noMessage: !successMsg
+				});
+				// return res.redirect('/user/signin');
+			}
+			if (!user) {
+				req.flash('error', 'Invalid credentials');
+				////console.log("Error Login - invalid credentials");
+				return res.redirect('/user/signin');
+
+				
+				// res.status(500).send({
+				// 	message:  "Some error occurred while creating the Note.",
+				// 	status: false
+				// });
+
+
+				// return res.render('user/signin', {
+				// 	layout: 'eshop/blank',
+				// 	authFacebook: authFacebook,
+				// 	authGoogle: authGoogle,
+				// 	noErrorMessage: !errorMsg,
+				// 	noErrorMsg: !errorMsg,
+				// 	successMsg: successMsg,
+				// 	noMessage: !successMsg,
+				// })
+			}
+			req.logIn(user, function (err) {
+				if (err) {
+					req.flash('error', 'Invalid credentials');
+					////console.log("Error Login - invalid credentials");
+					return res.redirect('/user/signin');
+
+				// 	res.status(500).send({
+				// 	message:  "Signin incoorect",
+				// 	status: false
+				// });
+
+					// return res.render('user/signin', {
+					// 	layout: 'eshop/blank',
+					// 	authFacebook: authFacebook,
+					// 	authGoogle: authGoogle,
+					// 	noErrorMessage: !errorMsg,
+					// 	noErrorMsg: !errorMsg,
+					// 	successMsg: successMsg,
+					// 	noMessage: !successMsg,
+					// })
+				}
+				req.flash('success', 'Logged In Successfully');
+				// res.send(user);
+				
+			  return res.redirect('/');
+			});
+		})(req, res, next);
+});
+
+router.get('/facebook', passport.authenticate('facebook', {
+	scope: ['email', 'user_location'],
+	failureFlash: true
+}));
+
+// router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/user/signin' }), (req, res) => {
+router.get('/facebook/callback', passport.authenticate('facebook', {
+	failureRedirect: '/'
+}), (req, res) => {
+	res.redirect(req.session.returnTo || '/');
+});
+
+router.get('/twitter', passport.authenticate('twitter'));
+router.get('/twitter/callback', passport.authenticate('twitter', {
+	failureRedirect: '/user/signin'
+}), (req, res) => {
+	res.redirect(req.session.returnTo || '/');
+});
+
+router.get('/google', passport.authenticate('google', {
+	scope: 'profile email'
+}));
+router.get('/google/callback', passport.authenticate('google', {
+	failureRedirect: '/user/signin'
+}), (req, res) => {
+	res.redirect(req.session.returnTo || '/');
+});
+
+module.exports = router;
+
+// Mindspace
+// https://www.youtube.com/watch?v=XVYApTfR6XE
+
+function isLoggedIn(req, res, next) {
+	if (req.isAuthenticated()) {
+		return next();
+	}
+	res.redirect('/');
+}
+
+function notLoggedIn(req, res, next) {
+	if (!req.isAuthenticated()) {
+		return next();
+	}
+	res.redirect('/');
+}
+
+function saveSession(req, res, next) {
+	req.session.first_name = req.body.first_name;
+	return next();
+}
+
+
+router.get('/signin', csrfProtection, function (req, res, next) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	////console.log("Error: " + JSON.stringify(errorMsg));
+	if (process.env.FACEBOOK_ID) {
+		var authFacebook = true
+	} else {
+		var authFacebook = false;
+	}
+	if (process.env.GOOGLE_ID) {
+		var authGoogle = true;
+	} else {
+		var authGoogle = false;
+	}
+	req.session.oldUrl = req.get('referer');
+	var messages = req.flash('error');
+	
+	res.render('user/signin', {
+		layout: 'eshop/blank',
+		// csrfToken: req.csrfToken(),
+		authFacebook: authFacebook,
+		authGoogle: authGoogle,
+		noErrorMessage: !errorMsg,
+		errorMsg: errorMsg,
+		message: messages,
+		first_name: req.session.first_name,
+		last_name: req.session.last_name,
+		addr1: req.session.addr1,
+		city: req.session.city,
+		state: req.session.state,
+		zipcode: req.session.zipcode,
+		telephone: req.session.telephone,
+		email: req.session.email,
+		noErrorMsg: !errorMsg,
+		successMsg: successMsg,
+		noMessage: !successMsg,
+		hasErrors: messages.length > 0
+	});
+});
+
+// router.post('/signin', passport.authenticate('local.signin', {
+//     failureRedirect: '/user/signin',
+//     failureMessage: "Invalid username or password",
+//     failureFlash: true
+// }), function(req, res, next) {
+//     ////console.log("REQ: " + JSON.stringify(req));
+//     meanlogger.log("auth","logged in",req.user);
+//     if (req.session.oldUrl && (req.session.oldUrl != req.url)) {
+//         var oldUrl = req.session.oldUrl
+//         req.session.oldUrl = null;
+//         res.redirect(oldUrl);
+//     } else {
+//         User.findOne({_id: req.user._id}, function(err,user) {
+//             user.lastlogin=Date.now();
+//             user.save(function(err,docs) {
+//                 if (err) {
+//                     ////console.log("Unable to save user.");
+//                 }
+//             })
+//             res.render('user/profile', {
+//                 user: req.user
+//             });
+//         })
+//     }
+// });
+
+router.post('/signin', function (req, res, next) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	if (process.env.FACEBOOK_ID) {
+		var authFacebook = true
+	} else {
+		var authFacebook = false;
+	}
+	if (process.env.GOOGLE_ID) {
+		var authGoogle = true;
+	} else {
+		var authGoogle = false;
+	}
+	req.session.oldUrl = req.get('referer');
+	var messages = req.flash('error');
+	passport.authenticate('local.signin', {
+		session: true
+	},
+		function (err, user, info) {
+			////console.log("trying to log in");
+			if (err) {
+				
+				req.flash('error', 'Internal Server Error');
+				res.redirect('/user/signin');
+
+				res.render('user/signin', {
+					layout: 'eshop/blank',
+					authFacebook: authFacebook,
+					authGoogle: authGoogle,
+					noErrorMessage: !errorMsg,
+					noErrorMsg: !errorMsg,
+					successMsg: successMsg,
+					noMessage: !successMsg
+				});
+				// return res.redirect('/user/signin');
+			}
+			if (!user) {
+				req.flash('error', 'Invalid credentials');
+				////console.log("Error Login - invalid credentials");
+				return res.redirect('/user/signin');
+
+				
+				// res.status(500).send({
+				// 	message:  "Some error occurred while creating the Note.",
+				// 	status: false
+				// });
+
+
+				// return res.render('user/signin', {
+				// 	layout: 'eshop/blank',
+				// 	authFacebook: authFacebook,
+				// 	authGoogle: authGoogle,
+				// 	noErrorMessage: !errorMsg,
+				// 	noErrorMsg: !errorMsg,
+				// 	successMsg: successMsg,
+				// 	noMessage: !successMsg,
+				// })
+			}
+			req.logIn(user, function (err) {
+				if (err) {
+					req.flash('error', 'Invalid credentials');
+					////console.log("Error Login - invalid credentials");
+					return res.redirect('/user/signin');
+
+				// 	res.status(500).send({
+				// 	message:  "Signin incoorect",
+				// 	status: false
+				// });
+
+					// return res.render('user/signin', {
+					// 	layout: 'eshop/blank',
+					// 	authFacebook: authFacebook,
+					// 	authGoogle: authGoogle,
+					// 	noErrorMessage: !errorMsg,
+					// 	noErrorMsg: !errorMsg,
+					// 	successMsg: successMsg,
+					// 	noMessage: !successMsg,
+					// })
+				}
+				req.flash('success', 'Logged In Successfully');
+				// res.send(user);
+				
+			  return res.redirect('/');
+			});
+		})(req, res, next);
+});
+
+router.get('/facebook', passport.authenticate('facebook', {
+	scope: ['email', 'user_location'],
+	failureFlash: true
+}));
+
+// router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/user/signin' }), (req, res) => {
+router.get('/facebook/callback', passport.authenticate('facebook', {
+	failureRedirect: '/'
+}), (req, res) => {
+	res.redirect(req.session.returnTo || '/');
+});
+
+router.get('/twitter', passport.authenticate('twitter'));
+router.get('/twitter/callback', passport.authenticate('twitter', {
+	failureRedirect: '/user/signin'
+}), (req, res) => {
+	res.redirect(req.session.returnTo || '/');
+});
+
+router.get('/google', passport.authenticate('google', {
+	scope: 'profile email'
+}));
+router.get('/google/callback', passport.authenticate('google', {
+	failureRedirect: '/user/signin'
+}), (req, res) => {
+	res.redirect(req.session.returnTo || '/');
+});
+
+module.exports = router;
+
+// Mindspace
+// https://www.youtube.com/watch?v=XVYApTfR6XE
+
+function isLoggedIn(req, res, next) {
+	if (req.isAuthenticated()) {
+		return next();
+	}
+	res.redirect('/');
+}
+
+function notLoggedIn(req, res, next) {
+	if (!req.isAuthenticated()) {
+		return next();
+	}
+	res.redirect('/');
+}
+
+function saveSession(req, res, next) {
+	req.session.first_name = req.body.first_name;
+	return next();
+}
+router.get('/signin', csrfProtection, function (req, res, next) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	////console.log("Error: " + JSON.stringify(errorMsg));
+	if (process.env.FACEBOOK_ID) {
+		var authFacebook = true
+	} else {
+		var authFacebook = false;
+	}
+	if (process.env.GOOGLE_ID) {
+		var authGoogle = true;
+	} else {
+		var authGoogle = false;
+	}
+	req.session.oldUrl = req.get('referer');
+	var messages = req.flash('error');
+	
+	res.render('user/signin', {
+		layout: 'eshop/blank',
+		// csrfToken: req.csrfToken(),
+		authFacebook: authFacebook,
+		authGoogle: authGoogle,
+		noErrorMessage: !errorMsg,
+		errorMsg: errorMsg,
+		message: messages,
+		first_name: req.session.first_name,
+		last_name: req.session.last_name,
+		addr1: req.session.addr1,
+		city: req.session.city,
+		state: req.session.state,
+		zipcode: req.session.zipcode,
+		telephone: req.session.telephone,
+		email: req.session.email,
+		noErrorMsg: !errorMsg,
+		successMsg: successMsg,
+		noMessage: !successMsg,
+		hasErrors: messages.length > 0
+	});
+});
+
+// router.post('/signin', passport.authenticate('local.signin', {
+//     failureRedirect: '/user/signin',
+//     failureMessage: "Invalid username or password",
+//     failureFlash: true
+// }), function(req, res, next) {
+//     ////console.log("REQ: " + JSON.stringify(req));
+//     meanlogger.log("auth","logged in",req.user);
+//     if (req.session.oldUrl && (req.session.oldUrl != req.url)) {
+//         var oldUrl = req.session.oldUrl
+//         req.session.oldUrl = null;
+//         res.redirect(oldUrl);
+//     } else {
+//         User.findOne({_id: req.user._id}, function(err,user) {
+//             user.lastlogin=Date.now();
+//             user.save(function(err,docs) {
+//                 if (err) {
+//                     ////console.log("Unable to save user.");
+//                 }
+//             })
+//             res.render('user/profile', {
+//                 user: req.user
+//             });
+//         })
+//     }
+// });
+
+/* -------------------- MOBILE DEVELOPMENT -------------------- */
+
+router.post('/updateuserdetails', function (req, res, next) {
+
+	if(req.body.email){
+		User.update({
+			email: req.body.email
+		}, req.body)
+			.then(function (err, user) {
+				req.user = user;
+				req.flash('success', 'User Updated');
+				// res.redirect('/user/profile');
+				res.send({
+					message:  "Updated Profile",
+					status: true
+				});
+	
+			})
+			.catch(function (err) {
+				////console.log("Error: " + JSON.stringify(err));
+				req.flash('error', 'Problem updating user profile.');
+				res.send({
+					message:  "Some error occurred",
+					status: false
+				});
+	
+			});
+	}else{
+		res.send({
+			message:  "Some error occurred",
+			status: false
+		});
+	}
+
+	
+});
+
+// Mobile Profile
+router.post('/getuserdetails', function (req, res, next) {
+	console.log("events");
+	var slug3 = req.body._id;
+	qryFilter = { "_id": slug3 };
+	console.log(slug3);
+	// if we have a cart, pass it - otherwise, pass an empty object
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	console.log("events1");
+
+	User.find(qryFilter, function (err, user) {
+		
+		console.log("user: " + JSON.stringify(user));
+{
+			req.flash('success');
+			for (i = 0; i < user.length; i++) {
+				res.send(user[i]);
+			}
+			
+		}
+	});
+});
+
+
+router.get('/mybookings', isLoggedIn, function (req, res, next) {
+
+	// ////console.log(payments);
+	// res.render('user/profile', {layout:'fullpage.hbs',user: req.user, payments: payments,hasPayments:0});
+
+	Order.find({
+		$or: [ {
+			"user.email": req.user.email
+		}]
+	}, null, {
+			sort: {
+				created: -1
+			}
+		}, function (err, orders) {
+			if (err) {
+				res.send({
+					message:  "Some error occurred",
+					status: false
+				});
+			}
+			// var arr = [];
+			// var total = 0;
+			// for (var order in orders) {
+			//     ////console.log("Cart Item: " + orders[order]);
+			//     ////console.log("------------");
+			//     for (var item in orders[order].cart.items) {
+			//         ////console.log("Item " + item);
+			//         ////console.log(orders[order].cart.items[item].item.name);
+			//         total = parseFloat(orders[order].cart.items[item].item.)
+			//     }
+			// }
+			// return arr;
+			res.send(orders);
+		});
+});
+
+
+// MOBILE LOGOUT
+router.get('/logoutmobile', isLoggedIn, function (req, res, next) {
+	meanlogger.log("auth", "logged out", req.user);
+//console.log("MOBILE HIT");
+	req.session.destroy()
+	req.logout();
+	// res.redirect('/');
+
+		res.status(500).send({
+					message:  "Logged Out Sucessfully",
+					status: true
+				});
+
+	
+});
+
+// Mobile
+router.get('/logout-and-delete-mobile', isLoggedIn, function (req, res, next) {
+	meanlogger.log("auth", "logged out and deleted account", req.user);
+	User.findByIdAndRemove(req.user._id, function (err, result) {
+		if (err) {
+			////console.log("Problem removing user record.");
+			req.flash('error', 'Unable to delete user record.');
+			res.send({
+				message:  "Error ",
+				status: false
+			});
+		}
+		req.flash('success', 'User record deleted and logged out.');
+	})
+	//req.session.destroy()
+	req.logout();
+	res.send({
+		message:  "Logged Out Sucessfully and Deleted",
+		status: true
+	});
+});
+
 
 // Mobile Forgot
 router.post('/forgot-mobile', function (req, res, next) {
@@ -542,148 +1115,34 @@ router.post('/forgot-mobile', function (req, res, next) {
 });
 
 
-router.get('/reset/:token', function (req, res) {
+// Mobile Rest token
+router.get('/reset-mobile/:token', function (req, res) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-	console.log("reset module");
 	User.findOne({
 		resetPasswordToken: req.params.token,
 		resetPasswordExpires: {
 			$gt: Date.now()
 		}
-	}, function (err,user) {
+	}, function (err, user) {
+
+		if(err){
+			res.send({
+				message:  "An error occurred.",
+				status: false
+			});
+
+		}else{
+			//console.log("Found User: " + JSON.stringify(user));
 		
-		//console.log("Found User: " + JSON.stringify(user));
-		res.render('user/reset', {
-			user: req.user,
-			token: req.params.token,
-			errorMsg: errorMsg,
-			noErrorMsg: !errorMsg,
-			successMsg: successMsg,
-			noMessage: !successMsg,
-		});
+			res.send(user);	
+		}
+		
+	
 		
 		});
 	});
 
-// Mobile Rest token
-router.get('/reset-mobile/:token', function (req, res) {
-		var successMsg = req.flash('success')[0];
-		var errorMsg = req.flash('error')[0];
-		User.findOne({
-			resetPasswordToken: req.params.token,
-			resetPasswordExpires: {
-				$gt: Date.now()
-			}
-		}, function (err, user) {
-
-			if(err){
-				res.send({
-					message:  "An error occurred.",
-					status: false
-				});
-
-			}else{
-				//console.log("Found User: " + JSON.stringify(user));
-			
-				res.send(user);	
-			}
-			
-		
-			
-			});
-		});
-
-router.post('/reset/:token', function (req, res) {
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	pass = req.body.password;
-	conf = req.body.confirmation;
-	token = req.params.token;	
-	async.waterfall([
-		function (done) {
-			User.findOne({
-				resetPasswordToken: req.params.token,
-				resetPasswordExpires: {
-					$gt: Date.now()
-				}
-			}, function (err, user) {
-				if (err) {
-					////console.log("Error: " + err.message);
-				}
-				console.log("User: " + JSON.stringify(user));
-				// if (!user) {
-				// 	errorMsg = req.flash('error', 'Password reset token is invalid or has expired.');
-				// 	return res.redirect('back');
-				// }
-				user.password = req.body.password;
-				user.resetPasswordToken = undefined;
-				user.resetPasswordExpires = undefined;
-
-				user.save(function (err) {
-					console.log("save user");
-					req.logIn(user, function (err) {
-						done(err, user);
-						console.log(user);
-					});
-				});
-			});
-		},
-		function (user, done) {
-			console.log("done"+user);
-			let transporter = nodemailer.createTransport({
-				host: 'mail.zo-online.com',
-				port: 587,
-				secure: false, // true for 465, false for other ports
-				auth: {
-					user: 'admin@zo-online.com', // generated ethereal user
-					pass: 'PI,FX%EsZ$EQ'  // generated ethereal password
-				},
-				tls: {
-					rejectUnauthorized: false
-				}
-			});
-			console.log("mailingtransporter: ");
-			// setup email data with unicode symbols
-			let mailOptions = {
-				from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-				replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-				to: user.email, // list of receivers
-				subject: 'Your password has been changed',
-				text: 'Hello,\n\n' +
-				'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
-			};
-			// var mailOptions = {
-			// 	to: user.email,
-			// 	from: 'passwordreset@demo.com',
-			// 	subject: 'Your password has been changed',
-			// 	text: 'Hello,\n\n' +
-			// 		'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
-			// };
-			transporter.sendMail(mailOptions, (error, info) => {
-				if (error) {
-
-					console.log("ERRORsending" + error);
-					return //////console.log(error);
-				}
-
-
-				//console.log("INFo" + info);
-				//console.log('Message sent: %s', info.messageId);
-				console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-				req.flash('success', "SENT MAIL, KINDLY CHECK!");
-				// res.render('contact', { msg: 'Email has been sent' });
-			});
-		}
-	], function (err) {
-		if (err) {
-			req.flash('error', 'Unknown Error during reset.')
-			
-		}
-		res.redirect('/user/forgot');
-	});
-	res.redirect('/');
-});
 
 // Mobile Post 
 
@@ -768,52 +1227,9 @@ router.post('/reset-mobile/:token', function (req, res) {
 });
 
 
-router.use('/', notLoggedIn, function (req, res, next) {
-	next();
-});
-
-router.get('/signup', function (req, res, next) {
-	var messages = req.flash('error');
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	res.render('user/signup', {
-		layout: 'eshop/blank',
-		//csrfToken: req.csrfToken(),
-		"successMsg": successMsg,
-		"noMessage": !successMsg,
-		"message": messages,
-		"errorMsg": messages[0],
-		"noErrorMsg": !messages,
-	});
-});
-
-router.post('/signup', passport.authenticate('local.signup', {
-	successRedirect: '/user/profile',
-	failureRedirect: '/user/signup',
-	failureFlash: true
-}), function (req, res, next) {
-	console.log("signup");
-	meanlogger.log("auth", "signup attempt", req.user);
-	req.session.first_name = req.body.first_name;
-	req.session.last_name = req.body.last_name;
-	req.session.addr1 = req.body.addr1;
-	req.session.city = req.body.city;
-	req.session.state = req.body.state;
-	req.session.email = req.body.email;
-	req.session.telephone = req.body.telephone;
-	req.session.zipcode = req.body.zipcode;
-
-	if (req.session.oldUrl) {
-		var oldUrl = req.session.oldUrl
-		req.session.oldUrl = null;
-		res.redirect(oldUrl);
-	} else {
-		res.redirect('/user/profile');
-	}
-});
-
 // Mobile register 
-router.post('/register', function (req, res, next) {
+
+router.post('/register',function (req, res, next) {
 
 	req.session.first_name = req.body.first_name;
 	req.session.last_name = req.body.last_name;
@@ -823,11 +1239,13 @@ router.post('/register', function (req, res, next) {
 	req.session.email = req.body.email;
 	req.session.telephone = req.body.telephone;
 	req.session.zipcode = req.body.zipcode;
-
 	//console.log("REGISTER HIT");
 	if(req.body.email || req.body.password || req.body.first_name || req.body.last_name || req.body.addr1 || req.body.city ||  req.body.addr2 ||  req.body.state ||req.body.zipcode || req.body.telephone ){
+		
 		var newUser = new User();
-		console.log("old REGISTER HIT");
+		
+		console.log("1244 old REGISTER HIT");
+
 		newUser.email = req.body.email;
 		// newUser.password = newUser.encryptPassword(password);
 		newUser.password = req.body.password;
@@ -841,235 +1259,27 @@ router.post('/register', function (req, res, next) {
 		newUser.telephone = req.body.telephone;
 		newUser.role = 'visitor';
 		newUser.save(function (err, result) {
-			console.log("old REGISTER HIT");
-			if (err) {
+			if(!err){
+				req.flash('success', 'User successfully registered.');
 				res.send({
-					message:  "Error",
-					status: false
+					message:  "Customer Registered",
+					status: true
 				});
-			}
-			////console.log('User successfully registered');
-			req.flash('success', 'User successfully registered.');
+			}else
 			res.send({
-				message:  "Customer Registered",
+				message:  "Error"+err,
 				status: true
 			});
 		});
-	}else{
+	}
+
+	else{
 		res.send({
 			message:  "Error",
 			status: false
 		});
 	}
 });
-
-router.get('/signin', csrfProtection, function (req, res, next) {
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	////console.log("Error: " + JSON.stringify(errorMsg));
-	if (process.env.FACEBOOK_ID) {
-		var authFacebook = true
-	} else {
-		var authFacebook = false;
-	}
-	if (process.env.GOOGLE_ID) {
-		var authGoogle = true;
-	} else {
-		var authGoogle = false;
-	}
-	req.session.oldUrl = req.get('referer');
-	var messages = req.flash('error');
-	res.render('user/signin', {
-		layout: 'eshop/blank',
-		// csrfToken: req.csrfToken(),
-		authFacebook: authFacebook,
-		authGoogle: authGoogle,
-		noErrorMessage: !errorMsg,
-		errorMsg: errorMsg,
-		message: messages,
-		first_name: req.session.first_name,
-		last_name: req.session.last_name,
-		addr1: req.session.addr1,
-		city: req.session.city,
-		state: req.session.state,
-		zipcode: req.session.zipcode,
-		telephone: req.session.telephone,
-		email: req.session.email,
-		noErrorMsg: !errorMsg,
-		successMsg: successMsg,
-		noMessage: !successMsg,
-		hasErrors: messages.length > 0
-	});
-});
-
-// router.post('/signin', passport.authenticate('local.signin', {
-//     failureRedirect: '/user/signin',
-//     failureMessage: "Invalid username or password",
-//     failureFlash: true
-// }), function(req, res, next) {
-//     ////console.log("REQ: " + JSON.stringify(req));
-//     meanlogger.log("auth","logged in",req.user);
-//     if (req.session.oldUrl && (req.session.oldUrl != req.url)) {
-//         var oldUrl = req.session.oldUrl
-//         req.session.oldUrl = null;
-//         res.redirect(oldUrl);
-//     } else {
-//         User.findOne({_id: req.user._id}, function(err,user) {
-//             user.lastlogin=Date.now();
-//             user.save(function(err,docs) {
-//                 if (err) {
-//                     ////console.log("Unable to save user.");
-//                 }
-//             })
-//             res.render('user/profile', {
-//                 user: req.user
-//             });
-//         })
-//     }
-// });
-
-router.post('/signin', function (req, res, next) {
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	if (process.env.FACEBOOK_ID) {
-		var authFacebook = true
-	} else {
-		var authFacebook = false;
-	}
-	if (process.env.GOOGLE_ID) {
-		var authGoogle = true;
-	} else {
-		var authGoogle = false;
-	}
-	req.session.oldUrl = req.get('referer');
-	var messages = req.flash('error');
-	passport.authenticate('local.signin', {
-		session: true
-	},
-		function (err, user, info) {
-			////console.log("trying to log in");
-			if (err) {
-				req.flash('error', 'Internal Server Error');
-				////console.log("Error: " + err.message);
-				res.redirect('/user/signin');
-
-				res.render('user/signin', {
-					layout: 'eshop/blank',
-					authFacebook: authFacebook,
-					authGoogle: authGoogle,
-					noErrorMessage: !errorMsg,
-					noErrorMsg: !errorMsg,
-					successMsg: successMsg,
-					noMessage: !successMsg
-				});
-				// return res.redirect('/user/signin');
-			}
-			if (!user) {
-				req.flash('error', 'Invalid credentials');
-				////console.log("Error Login - invalid credentials");
-				return res.redirect('/user/signin');
-
-				
-				// res.status(500).send({
-				// 	message:  "Some error occurred while creating the Note.",
-				// 	status: false
-				// });
-
-
-				// return res.render('user/signin', {
-				// 	layout: 'eshop/blank',
-				// 	authFacebook: authFacebook,
-				// 	authGoogle: authGoogle,
-				// 	noErrorMessage: !errorMsg,
-				// 	noErrorMsg: !errorMsg,
-				// 	successMsg: successMsg,
-				// 	noMessage: !successMsg,
-				// })
-			}
-			req.logIn(user, function (err) {
-				if (err) {
-					req.flash('error', 'Invalid credentials');
-					////console.log("Error Login - invalid credentials");
-					return res.redirect('/user/signin');
-
-				// 	res.status(500).send({
-				// 	message:  "Signin incoorect",
-				// 	status: false
-				// });
-
-					// return res.render('user/signin', {
-					// 	layout: 'eshop/blank',
-					// 	authFacebook: authFacebook,
-					// 	authGoogle: authGoogle,
-					// 	noErrorMessage: !errorMsg,
-					// 	noErrorMsg: !errorMsg,
-					// 	successMsg: successMsg,
-					// 	noMessage: !successMsg,
-					// })
-				}
-				req.flash('success', 'Logged In Successfully');
-				// res.send(user);
-				
-			  return res.redirect('/user/profile');
-			});
-		})(req, res, next);
-});
-
-router.get('/facebook', passport.authenticate('facebook', {
-	scope: ['email', 'user_location'],
-	failureFlash: true
-}));
-
-// router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/user/signin' }), (req, res) => {
-router.get('/facebook/callback', passport.authenticate('facebook', {
-	failureRedirect: '/'
-}), (req, res) => {
-	res.redirect(req.session.returnTo || '/');
-});
-
-router.get('/twitter', passport.authenticate('twitter'));
-router.get('/twitter/callback', passport.authenticate('twitter', {
-	failureRedirect: '/user/signin'
-}), (req, res) => {
-	res.redirect(req.session.returnTo || '/');
-});
-
-router.get('/google', passport.authenticate('google', {
-	scope: 'profile email'
-}));
-router.get('/google/callback', passport.authenticate('google', {
-	failureRedirect: '/user/signin'
-}), (req, res) => {
-	res.redirect(req.session.returnTo || '/');
-});
-
-module.exports = router;
-
-// Mindspace
-// https://www.youtube.com/watch?v=XVYApTfR6XE
-
-function isLoggedIn(req, res, next) {
-	if (req.isAuthenticated()) {
-		return next();
-	}
-	res.redirect('/');
-}
-
-function notLoggedIn(req, res, next) {
-	if (!req.isAuthenticated()) {
-		return next();
-	}
-	res.redirect('/');
-}
-
-function saveSession(req, res, next) {
-	req.session.first_name = req.body.first_name;
-	return next();
-}
-
-
-
-/* -------------------- MOBILE DEVELOPMENT -------------------- */
 
 router.post('/login', function (req, res, next) {
 	var successMsg = req.flash('success')[0];
@@ -1163,10 +1373,3 @@ router.post('/login', function (req, res, next) {
 			});
 		})(req, res, next);
 });
-
-
-
-
-
-
-

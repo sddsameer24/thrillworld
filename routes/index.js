@@ -1,14 +1,16 @@
 var express = require('express');
 var router = express.Router();
+const Invoice = require("nodeice");
 var cart = require('../models/cart');
+var Event=require('../models/events');
 var review = require('../models/reviews');
 var nodemailer = require('nodemailer');
 var Category = require('../models/category');
 var Message = require('../models/chatmessage');
 var Product = require('../models/product');
-var Event = require('../models/events');
 var Purchase = require('../models/purchase');
 var Order = require('../models/order');
+var Acart = require('../models/addtocart');
 var User = require('../models/user');
 var Payment = require('../models/payment');
 var Ticket = require('../models/ticket');
@@ -49,24 +51,16 @@ ObjectID = require('mongodb').ObjectID;
 
 // Instamojo Setup
 var Insta = require('instamojo-nodejs');
-Insta.setKeys("test_a3c5ddaf80ebda935933f83e311", "test_6d44edf82ee5b6627d0e938218d");
-Insta.isSandboxMode(true);
-
-
+Insta.setKeys("2bdd03b508f7f88c1abc9aed27de5aa9", "8eca226c24353bce2feb84db3aaa732c");
+Insta.isSandboxMode(false);
 
 var options = {
 	provider: 'google',
-	// Optional depending on the providers
 	httpAdapter: 'https', // Default
 	apiKey: 'AIzaSyAidN5MszkfMW2VYcES7uoePsX1qQmuG7M', // for Mapquest, OpenCage, Google Premier
 	formatter: null         // 'gpx', 'string', ...
 };
 
-// var geocoder = NodeGeocoder(options);
-// dotenv.load({
-// 	path: '.env.hackathon'
-// });
-// distance.apiKey = 'AIzaSyAidN5MszkfMW2VYcES7uoePsX1qQmuG7M';
 var title = process.env.title;
 
 var fs = require('fs');
@@ -137,36 +131,10 @@ router.get('/shop', function (req, res, next) {
 			products: productChunks,
 			user: req.user,
 		});
-		//console.log(products);
-		// for (var i = 0; i < products.length; i++) {
-		// 	//console.log(products[i].Latitude);
-		// 	var dest = {
-		// 		lat: products[i].Latitude,
-		// 		lon: products[i].Longitude
-		// 	};
-		// 	var userloc = {
-		// 		lat: 12,
-		// 		lon: 13
-		// 	};
-		// 	var destTouserloc = Distance.between(dest, userloc);
-		// 	//console.log('' + destTouserloc.human_readable());
-		// }
+
 	});
 });
 
-// Get Shop Mobile
-router.get('/shop-mobile', function (req, res, next) {
-
-	Product.find(function (err, products) {
-		productChunks = [];
-		chunkSize = 5;
-		for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
-			productChunks.push(products.slice(i, i + chunkSize))
-		}
-
-		res.send(products);
-	});
-});
 
 // SOCKET API
 // router.get('/messages', (req, res) => {
@@ -212,8 +180,7 @@ router.get('/', function (req, res, next) {
 	var orderid = req.param('orderid');
 	var payment_id = req.param('payment_id');
 	var payment_request_id = req.param('payment_request_id');
-  
-	//console.log(orderid + "    " + payment_id + "    " + payment_request_id);
+
 
 	if (payment_id && payment_request_id) {
 		//console.log("TRUE PAYMENT NEED TO GET DATA");
@@ -222,12 +189,10 @@ router.get('/', function (req, res, next) {
 			if (error) {
 				// Some error
 			} else {
-				//console.log(response);
-				// response = JSON.parse(response);
-				//console.log(response.payment_request.status);
+
 
 				if (response.payment_request.status == "Completed") {
-					//console.log("STORE SUCESS");
+
 					Order.update({ _id: orderid },
 						{ "status": "Paid", "paymentId": payment_id }, function (e) {
 							if (e) {
@@ -243,9 +208,7 @@ router.get('/', function (req, res, next) {
 
 
 	} else if (req.session.group) {
-		//////console.log(req);
-		// Required ??
-		//	return res.redirect('/group/SIMPLE?q=');
+
 	}
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -312,7 +275,7 @@ router.get('/', function (req, res, next) {
 					}
 				}
 			}
-		
+
 
 			Product.find({
 				"$and": [{
@@ -388,7 +351,7 @@ router.get('/', function (req, res, next) {
 		});
 });
 router.get('/hostsignup', function (req, res, next) {
-	
+
 	var messages = req.flash('error');
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
@@ -404,32 +367,32 @@ router.get('/hostsignup', function (req, res, next) {
 });
 
 
-router.post('/hostreg',function (req, res, next) {
-	var newUser = new User();	
-		newUser.email = req.body.email;
-		newUser.password = req.body.password;
-		newUser.role = req.body.role;
-		newUser.first_name = req.body.first_name;
-		newUser.last_name = req.body.last_name;
-		newUser.addr1 = req.body.addr1;
-		newUser.addr2 = req.body.addr2;
-		newUser.city = req.body.city;
-		newUser.state = req.body.state;
-		newUser.zipcode = req.body.zipcode;
-		newUser.telephone = req.body.telephone;
-		newUser.role = "vendor";
-		newUser.save(function (err, newUser) {
-			console.log(" REGISTER HIT");
-			if (err) {
-				console.log("error REGISTER HIT");
-				res.redirect('/hostsignup');
-				////console.log('User unsuccessfully registered');
-			}
-			//console.log('User successfully registered');
-			console.log(newUser);
-			req.flash('success', 'User successfully registered check your mail for vendor access.');
-			res.redirect('/user/signin');
-		});
+router.post('/hostreg', function (req, res, next) {
+	var newUser = new User();
+	newUser.email = req.body.email;
+	newUser.password = req.body.password;
+	newUser.role = req.body.role;
+	newUser.first_name = req.body.first_name;
+	newUser.last_name = req.body.last_name;
+	newUser.addr1 = req.body.addr1;
+	newUser.addr2 = req.body.addr2;
+	newUser.city = req.body.city;
+	newUser.state = req.body.state;
+	newUser.zipcode = req.body.zipcode;
+	newUser.telephone = req.body.telephone;
+	newUser.role = "vendor";
+	newUser.save(function (err, newUser) {
+		console.log(" REGISTER HIT");
+		if (err) {
+			console.log("error REGISTER HIT");
+			res.redirect('/hostsignup');
+			////console.log('User unsuccessfully registered');
+		}
+		//console.log('User successfully registered');
+		console.log(newUser);
+		req.flash('success', 'User successfully registered check your mail for vendor access.');
+		res.redirect('/user/signin');
+	});
 });
 
 
@@ -491,80 +454,6 @@ router.post('/hostreg',function (req, res, next) {
 // 	}
 // });
 
-
-
-	/* Mobile Get sale items */
-	router.get('/sale-mobile', function (req, res, next) {
-
-		var successMsg = req.flash('success')[0];
-		var errorMsg = req.flash('error')[0];
-		var navcats = req.app.get('navcats');
-		var navgroups = req.app.get('navgroups');
-
-		// //////console.log("Local navcats " + res.locals.navcats);
-
-		var tutorial = req.params.tutorial;
-		if (tutorial == 1) {
-			req.session.tutorial = true;
-		} else {
-			req.session.tutorial = false;
-		}
-		Product.aggregate(
-			[{
-				$match: {
-					"$sale_attributes.sale": true
-				}
-			}, {
-				$group: {
-					_id: "$Product_Group",
-					count: {
-						$sum: 1
-					}
-				}
-			}, {
-				$sort: {
-					_id: 1
-				}
-			}],
-			function (err, Product_Group) {
-				if (err) {
-					res.send({
-						message: "Error",
-						status: false
-					});
-
-				} else {
-
-					if (frontPageCategory) {
-						categCondition = {
-							category: frontPageCategory
-						};
-					} else {
-						categCondition = {};
-					}
-					Product.Product.find(categCondition, function (err, docs) {
-						if (err) {
-							res.send({
-								message: "Error",
-								status: false
-							});
-
-						} else {
-							productChunks = [];
-							productJSON = [];
-							chunkSize = 4;
-							for (var i = (4 - chunkSize); i < docs.length; i += chunkSize) {
-								productChunks.push(docs.slice(i, i + chunkSize));
-							}
-							res.send(productChunks);
-						}
-
-					});
-
-				}
-
-			});
-	});
 
 
 /* MOBILE GET home page. */
@@ -914,304 +803,6 @@ router.get('/category/', function (req, res, next) {
 	})
 })
 
-// category based on mobile
-router.get('/category-mobile/', function (req, res, next) {
-	var category_slug = req.params.slug;
-	req.session.category = req.params.slug;
-	var q = req.query.q;
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	var url = 'mongodb://localhost:27017/hackathon';
-	navcats = {};
-	navgroups = {};
-	if (req.params.q) {
-		search = {
-			$match: {
-				$and: [{
-					$text: {
-						$search: q
-					}
-				}
-					// { category: new RegEx(category_slug, 'i')}
-				]
-			}
-		}
-	} else {
-		search = {
-			$match: {
-				// category: new RegExp(category_slug, 'i')
-			}
-		}
-	}
-	MongoClient.connect(url, function (err, db) {
-		var collection = db.collection('products');
-		collection.aggregate([{
-			"$match": { category: "Television" }
-		},
-		{ "$unwind": "$Attributes" },
-		{
-			"$facet": {
-				price: [
-					{
-						$bucket: {
-							groupBy: {
-								"$divide": ["$price", 100]
-							},
-							boundaries: [0, 200, 400, 500, 600, 700, 1000, 2000, 5000],
-							default: "Over 5000.00",
-							output: { "count": { $sum: 1 } }
-						}
-					},
-					{
-						"$project": {
-							lowerPriceBound: "$_id",
-							count: 1,
-							_id: 0
-						}
-					}
-				],
-				brands: [
-					{
-						"$sortByCount": "$brand"
-					},
-					{
-						"$project": {
-							brand: "$_id",
-							count: 1,
-							_id: 0
-						}
-					}
-				],
-				ScreenSize: [
-					{
-						"$match": { "Attributes.Name": "ScreenSize" }
-					},
-					{
-						"$sortByCount": "$Attributes.Value"
-					},
-					{
-						"$project": {
-							ScreenSize: "$_id",
-							count: 1,
-							_id: 0
-						}
-					}
-				],
-				resolution: [
-					{
-						"$match": { "Attributes.Name": "Resolution" }
-					},
-					{
-						"$sortByCount": "$Attributes.Value"
-					},
-					{
-						"$project": {
-							resolution: "$_id",
-							count: 1,
-							_id: 0
-						}
-					}
-				],
-				number_of_ports: [
-					{
-						"$match": {
-							"Attributes.Name": "NumberofPorts"
-						}
-					},
-					{
-						"$sortByCount": "$Attributes.Value"
-					},
-					{
-						"$project": {
-							ports: "$_id",
-							count: 1,
-							_id: 0
-						}
-					}
-				]
-			}
-		}
-		], function (err, results) {
-			//////console.log("Product-unwound: " + JSON.stringify(results));
-			//////console.log("Err-unwound: " + JSON.stringify(err));
-			Product.aggregate([{
-				$sortByCount: "$category"
-			}], function (err, allcats) {
-				Product.aggregate([
-					search, {
-						$sortByCount: "$category"
-					}
-				], function (err, navcats) {
-					Category.findOne({
-						// slug: new RegExp(category_slug, 'i')
-						$or: [{
-							'slug': new RegExp(category_slug, 'i')
-						}, {
-							'name': new RegExp(category_slug, 'i')
-						}],
-
-					}, function (err, category) {
-						if (err) {
-							//////console.log("Error finding category " + category_slug);
-
-
-							res.send({
-								message: "Cannot find category",
-								status: false
-							});
-						}
-						if (!category) {
-							//////console.log("Error finding category " + category_slug);
-
-							res.send({
-								message: "Cannot find category",
-								status: false
-							});
-						}
-						Product.aggregate([search, {
-							$sortByCount: "$Product_Group"
-						}], function (err, navgroups) {
-							if (q) {
-								srch = {
-									$text: {
-										search: q
-									}
-								}
-							} else {
-								srch = {}
-							}
-							/* find all products in category selected */
-							categCondition = {
-								$match: {
-									$and: [{
-										$or: [{
-											'category': 'Television'
-										}, {
-											'category': new RegExp(category.name, 'i')
-										}]
-									},
-									{
-										status: {
-											$ne: 'deleted'
-										}
-									},
-									{
-										$or: [{
-											"inventory.onHand": {
-												$gt: 0
-											}
-										}, {
-											"inventory.disableOnZero": false
-										}]
-									}
-									]
-								}
-							}
-							categCondition = {
-								$and: [{
-									$or: [{
-										'category': new RegExp(category.slug, 'i')
-									}, {
-										'category': new RegExp(category.name, 'i')
-									}]
-								},
-								{
-									status: {
-										$ne: 'deleted'
-									}
-								},
-								{
-									$or: [{
-										"inventory.onHand": {
-											$gt: 0
-										}
-									}, {
-										"inventory.disableOnZero": false
-									}]
-								}
-								]
-							}
-							Product.find({ category: "Television" }, function (err, products) {
-								if (err || !products || products === 'undefined') {
-									//////console.log("Error: " + err.message);
-
-
-									res.send({
-										message: "Problem finding products",
-										status: false
-									});
-								}
-								if (category.format != 'table') {
-									productChunks = [];
-									chunkSize = 4;
-									for (var i = (4 - chunkSize); i < products.length; i += chunkSize) {
-										productChunks.push(products.slice(i, i + chunkSize))
-									};
-								}
-								res.send(category);
-							});
-						});
-					});
-				})
-			})
-		})
-	})
-})
-
-// router.get('/frontpage', function (req, res, next) {
-// 	console.log("API hit");
-// 	qryFilter = { "_id": 'High-Altitude' };
-// 	var group_slug = 'High-Altitude';
-// 	req.session.group = req.params.slug; // Save Group for later
-// 	var q = req.query.q;
-// 	var successMsg = req.flash('success')[0];
-// 	var errorMsg = req.flash('error')[0];
-// 	if (group_slug == '' || !group_slug) {
-// 		var group_search = {}
-// 	} else {
-// 		var group_search = {
-// 			category: group_slug
-// 		}
-// 	}
-// 	Product.find(
-// 		group_search,
-// 		function (err, products) {
-// 			if (err) {
-// 				//////console.log("Error finding group " + group_slug);
-// 				req.flash('error', 'Cannot find group');
-// 				return res.redirect('/');
-// 			}
-// 			if (!products) {
-// 				//////console.log("Error finding group " + group_slug);
-// 				req.flash('error', 'Cannot find group');
-// 				return res.redirect('/');
-// 			}
-// 			productChunks = [];
-// 			chunkSize = 4;
-// 			for (var i = (4 - chunkSize); i < products.length; i += chunkSize) {
-// 				productChunks.push(products.slice(i, i + chunkSize))
-// 			};
-// 			products = productChunks;
-// 			res.render('shop/eshop', {
-// 				layout: 'eshop/eshop',
-// 				navcats: req.app.get('navcats'),
-// 				navgroups: req.app.get('navgroups'),
-// 				group: High - Altitude,
-// 				viewDocuments: viewDocuments,
-// 				products: productChunks,
-// 				productChunks: productChunks,
-// 				user: req.user,
-// 				q: q,
-// 				errorMsg: errorMsg,
-// 				noErrorMsg: !errorMsg,
-// 				successMsg: successMsg,
-// 				noMessage: !successMsg,
-// 				isLoggedIn: req.isAuthenticated()
-// 			});
-// 		});
-// });
-
-
 router.get('/frontpage', function (req, res, next) {
 
 	qryFilter = { "Product_Group": 'SIMPLE' };
@@ -1245,6 +836,7 @@ router.get('/frontpage', function (req, res, next) {
 		});
 	});
 });
+
 
 router.get('/category/:slug?', function (req, res, next) {
 	var group_slug = req.params.slug;
@@ -1297,160 +889,10 @@ router.get('/category/:slug?', function (req, res, next) {
 		});
 });
 
-// Mobile Category Slug
-router.get('/category-mobile/:slug', function (req, res, next) {
-	var category_slug = req.params.slug;
-	req.session.category = req.params.slug;
-	var q = req.query.q;
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	if (req.params.q) {
-		search = {
-			$match: {
-				$and: [{
-					$text: {
-						$search: q
-					}
-				}
-					// { category: new RegEx(category_slug, 'i')}
-				]
-			}
-		}
-	} else {
-		search = {
-			$match: {
-				// category: new RegExp(category_slug, 'i')
-			}
-		}
-	}
-	/* Create a list of categories and product counts within CAMERAS (100) */
 
-	Product.aggregate([{
-		$sortByCount: "$category"
-	}], function (err, allcats) {
-		Product.aggregate([
-			search, {
-				$sortByCount: "$category"
-			}
-		], function (err, navcats) {
-			Category.findOne({
-				// slug: new RegExp(category_slug, 'i')
-				$or: [{
-					'slug': new RegExp(category_slug, 'i')
-				}, {
-					'name': new RegExp(category_slug, 'i')
-				}],
-
-			}, function (err, category) {
-				if (err) {
-					//////console.log("Error finding category " + category_slug);
-					req.flash('error', 'Cannot find category');
-					res.send({
-						message: "Error",
-						status: false
-					});
-				}
-				if (!category) {
-					//////console.log("Error finding category " + category_slug);
-					req.flash('error', 'Cannot find category');
-					res.send({
-						message: "Error",
-						status: false
-					});
-				}
-				Product.aggregate([search, {
-					$sortByCount: "$Product_Group"
-				}], function (err, navgroups) {
-					if (q) {
-						srch = {
-							$text: {
-								search: q
-							}
-						}
-					} else {
-						srch = {}
-					}
-					/* find all products in category selected */
-
-					categCondition = {
-						$match: {
-							$and: [{
-								$or: [{
-									'category': new RegExp(category.slug, 'i')
-								}, {
-									'category': new RegExp(category.name, 'i')
-								}]
-							},
-							{
-								status: {
-									$ne: 'deleted'
-								}
-							},
-							{
-								$or: [{
-									"inventory.onHand": {
-										$gt: 0
-									}
-								}, {
-									"inventory.disableOnZero": false
-								}]
-							}
-							]
-						}
-					}
-					categCondition = {
-						$and: [{
-							$or: [{
-								'category': new RegExp(category.slug, 'i')
-							}, {
-								'category': new RegExp(category.name, 'i')
-							}]
-						},
-						{
-							status: {
-								$ne: 'deleted'
-							}
-						},
-						{
-							$or: [{
-								"inventory.onHand": {
-									$gt: 0
-								}
-							}, {
-								"inventory.disableOnZero": false
-							}]
-						}
-						]
-					}
-					Product.find(categCondition, function (err, products) {
-						
-						if (err || !products || products === 'undefined') {
-						
-							req.flash('error', 'Problem finding products');
-							res.send({
-								message: "Error",
-								status: false
-							});
-						}
-						if (category.format != 'table') {
-							productChunks = [];
-							chunkSize = 4;
-							for (var i = (4 - chunkSize); i < products.length; i += chunkSize) {
-								productChunks.push(products.slice(i, i + chunkSize))
-							};
-							// products = productChunks
-						}
-						res.send(category);
-					});
-				});
-			});
-		})
-	})
-});
 
 router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 	var theId = new ObjectId(req.user._id);
-	console.log("productId:"+req.body.productId+","+"name:"+req.body.name+"price:"+req.body.price);
 	User.findOneAndUpdate({
 		_id: theId
 	}, {
@@ -1460,9 +902,9 @@ router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 			$addToSet: {
 				'product': {
 					"productId": req.body.productId,
-					"name":req.body.name,
-					"price":req.body.price,
-					"imagePath":req.body.imagePath
+					"name": req.body.name,
+					"price": req.body.price,
+					"imagePath": req.body.imagePath
 
 				}
 			}
@@ -1478,7 +920,7 @@ router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 					last_name: req.user.last_name,
 					email: req.user.email,
 				},
-				action: 'addtocart',
+				action: 'wishlist',
 				thing: {
 					type: "product",
 					id: product._id,
@@ -1494,345 +936,36 @@ router.post('/add-to-cart', isLoggedIn, function (req, res, next) {
 				}
 			})
 		});
-	res.redirect('/shopping-cart');
+	res.redirect('/wishlist');
 });
 
-	// var theId = new ObjectId(req.user._id);
-	// User.findOneAndUpdate({
-	// 	_id: theId
-	// }, {
-	// 		$addToSet: {
-	// 			"productId": req.body.productId
-	// 		}
-	// 	}, {
-	// 		safe: true,
-	// 		upsert: false
-	// 	},
-// 	kart = new cart({
-// 		price: req.body.price,
-// 		adult: req.body.adult,
-// 		children: req.body.children,
-// 		kids: req.body.kids,
-// 		arrival: req.body.arrival,
-// 		departure: req.body.depart,
-// 		totalprice: req.body.subtotal,
-// 		user_id: req.body.userid,
-// 		id: req.body.productId,
-// 	});
-// 	console.log("cart1592: " + cart);
-// 	kart.save(function (err) {
-// 		if (err) {
-// 			console.log('error', 'Error: ' + err.message);
-// 			console.log("cart1596: " + cart);
-// 			return res.redirect('/');
-// 		}
-// 		// res.flash('thanks for your feedback');
-// 		console.log("cart1600: " + cart);
-// 		return res.redirect('/shopping-cart');
-//  	);
-//  });
-
-// 	var errors = req.validationErrors();
-// 	if (errors) {
-// 		returnObject = {
-// 			errorMsg: errors,
-// 			noErrorMsg: false,
-// 			noMessage: true
-// 		};
-// 		req.flash('error', 'Invalid email address.  Please re-enter.');
-// 		return res.redirect('/shopping-cart');
-// 	}
-
-// 	var option = req.body.option || null;
-// 	// if we have a cart, pass it - otherwise, pass an empty object
-// 	var cart = new cart(req.session.cart ? req.session.cart : {});
-// 	Product.findById(productId, function (err, product) {
-// 		if (err || product === 'undefined' || product == null) {
-// 			// replace with err handling
-// 			var errorMsg = req.flash('error', 'unable to find product');
-// 			return res.redirect('/shopping-cart');
-// 		}
-// 		if (product.Product_Group == 'DONATION') {
-// 			//////console.log("PRICE: " + parseFloat(price * 100));
-// 			theprice = parseFloat(price);
-// 		} else {
-// 			totalprice = product.price;
-// 		}
-// 		added = cart.add(product, product.id, departure, arrival, adult, kids, totalprice, children, option, ticket_name, ticket_email, product.Product_Group, product.taxable, product.shippable, req.user._id);
-// 		console.log(adult);
-
-// 		meanlogger.log('plus', 'Added ' + product.name + ' to cart', req.user);
-
-// 		if (added) {
-// 			req.flash('error', added.message);
-// 			return res.redirect('/shopping-cart');
-// 		} else {
-// 			cart.totalShipping = 0;
-// 			req.session.cart = cart;
-// 			req.flash('success', 'Item successfully added to cart. ');
-// 			if (!req.session.group === null) {
-// 				res.redirect('/group/' + req.session.group);
-// 			} else {
-// 				if (!req.session.category === null) {
-// 					res.redirect('/category/' + req.session.category);
-// 				}
-// 			}
-// 			if (!req.session.category === null) {
-// 				res.redirect('/category/' + req.session.category);
-// 			} else {
-// 				if (!req.session.group === null) {
-// 					res.redirect('/group/' + req.session.group);
-// 				}
-// 			}
-// 			return res.redirect('/shopping-cart');
-// 		}
-// 		// });
-// 	});
-// });
-
-// mobile add to cart
-router.post('/add-to-cart-mobile', isLoggedIn, function (req, res, next) {
-	var ticket_name = req.body.ticket_name || null;
-	var ticket_email = req.body.ticket_email || null;
-	var price = req.body.price || null;
-	var type = req.body.Product_Group || null;
-	/* new product to be added to cart */
-	var productId = req.body.productId || null;
-	/* tickets need to have name and email recorded */
-	if (type == 'TICKET') {
-		res.send({
-			message: "Enter a valid email address.",
-			status: false
-		});
-	}
-
-	if (type == 'DONATION') {
-		if (price >= 1000) {
-			errors = 1;
-
-			res.send({
-				message: "Unable to accept donations greater than $1000.00.",
-				status: false
-			});
-		}
-		if (price < 1 || price == 0) {
-
-			res.send({
-				message: "Unable to process negative donations..",
-				status: false
-			});
-		}
-	}
-	var errors = req.validationErrors();
-	if (errors) {
-		returnObject = {
-			errorMsg: errors,
-			noErrorMsg: false,
-			noMessage: true
-		};
-
-		res.send({
-			message: "Invalid email address.  Please re-enter..",
-			status: false
-		});
-	}
-
-	var option = req.body.option || null;
-	// if we have a cart, pass it - otherwise, pass an empty object
-	var cart = new cart(req.session.cart ? req.session.cart : {});
-	Product.findById(productId, function (err, product) {
-		if (err || product === 'undefined' || product == null) {
-			// replace with err handling
-
-
-			res.send({
-				message: "unable to find product",
-				status: false
-			});
-		}
-		if (product.Product_Group == 'DONATION') {
-			//////console.log("PRICE: " + parseFloat(price * 100));
-			theprice = parseFloat(price);
-		} else {
-			theprice = product.price;
-		}
-		added = cart.add(product, product.id, departure, arrival, adult, kids, totalprice, children, option, ticket_name, ticket_email, product.Product_Group, product.taxable, product.shippable, req.user._id);
-		// cart.totalTax = 0;
-		var wishlist = [];
-		for (var i = 0, len = products.length; i < len; i++) {
-			var extprice = parseFloat(products[i].price / 100);
-			extprice = String((extprice).toFixed(2));
-			intprice = String(parseFloat(products[i].price));
-			qty = (adult + kids + children);
-			tname = 'ticket_name_' + i;
-			oname = 'option_' + i;
-			var ticket_name = req.body['ticket_name_' + i];
-			var ticket_email = req.body['ticket_email_' + i];
-			var option = req.body['option_' + i];
-			custom[i] = {
-				"ticket_name": ticket_name,
-				"ticket_email": ticket_email,
-				"option": option
-			};
-			item = {
-				"name": products[i].item.title,
-				"price": extprice,
-				"quantity": qty,
-				"currency": "USD",
-				"sku": products[i].item.code
-			}
-			wishlist = {
-				productId: products[i].item._id,
-				product_name: products[i].item.title,
-				Product_Group: products[i].item.Product_Group,
-				product_price: intprice,
-				product_price_double: parseFloat(products[i].price / 100),
-				product_qty: qty,
-				paidBy: 'instamojo',
-				ticket_name: ticket_name,
-				ticket_email: ticket_email,
-				option: option,
-				category: products[i].item.category,
-				code: products[i].item.code,
-				vendor_id: products[i].item.vendor_id,
-				// date: date
-			}
-			wishlist.push(order);
-		}
-		
-		if (added) {
-			res.send({
-				message: "error",
-				status: false
-			});
-		} else {
-			cart.totalShipping = 0;
-			req.session.cart = cart;
-			//req.flash('success', 'Item successfully added to cart. ');
-			res.send({
-				message: "Item successfully added to cart.",
-				status: true
-			});
-		}
-		// });
-	});
-});
-
-router.get('/add-to-cart/:id/', function (req, res, next) {
-	var ticket_name = req.body.ticket_name || "";
-	var ticket_email = req.body.ticket_email || "";
-	var option = req.body.option || "";
-	var productId = req.params.id;
-	// if we have a cart, pass it - otherwise, pass an empty object
-	var cart = new cart(req.session.cart ? req.session.cart : {});
-
-	Product.findById(productId, function (err, product) {
-		if (err) {
-			// replace with err handling
-			req.flash('error', err.message);
-			res.redirect('/');
-		}
-		taxCalc.calculateTax(productId, req.user._id, function (err, taxInfo) {
-			if (err) {
-				taxAmount = 0;
-			} else {
-				taxAmount = taxInfo.taxAmount;
-			}
-			cart.add(product, product.id, departure, arrival, adult, kids, totalprice, children, option, ticket_name, ticket_email, product.Product_Group, product.taxable, product.shippable, req.user._id);
-			req.session.cart = cart;
-			meanlogger.log('plus', 'Added ' + product.name + ' to cart', req.user);
-			// store cart in session
-
-			req.flash('success', 'Item Successfully added to cart.' + JSON.stringify(cart));
-			return res.redirect('/shopping-cart');
-		});
-	});
-});
-
-
-// Mobile cart get by product id
-router.get('/add-to-cart-mobile/:id/', function (req, res, next) {
-	var ticket_name = req.body.ticket_name || "";
-	var ticket_email = req.body.ticket_email || "";
-	var option = req.body.option || "";
-	var productId = req.params.id;
-	// if we have a cart, pass it - otherwise, pass an empty object
-	var cart = new cart(req.session.cart ? req.session.cart : {});
-
-	Product.findById(productId, function (err, product) {
-		if (err) {
-			// replace with err handling
-			res.send({
-				message: "Some error occurred",
-				status: false
-			});
-		}
-		taxCalc.calculateTax(productId, req.user._id, function (err, taxInfo) {
-			if (err) {
-				taxAmount = 0;
-			} else {
-				taxAmount = taxInfo.taxAmount;
-			}
-			cart.add(product, product.id, departure, arrival, adult, kids, totalprice, children, option, ticket_name, ticket_email, product.Product_Group, product.taxable, product.shippable, req.user._id);
-			console.log(cart);
-			req.session.cart = cart;
-			//meanlogger.log('plus', 'Added ' + product.name + ' to cart', req.user);
-			// store cart in session
-
-
-			res.send({
-				message: "Item Successfully added to cart.",
-				status: true
-			});
-		});
-	});
-});
-
-
-router.post('/empty-cart', isLoggedIn, function (req, res, next) {
-    console.log('user' + req.body.user + ',product' + req.body.productId);
-    const slug = mongoose.Types.ObjectId(req.body.productId);
-    const user = req.body.user;
-    User.findOne({ _id: user }, function (err, model) {
-        model.product.pull(slug);
-        model.save(function (err, model) {
-          console.log(slug);
-          meanlogger.log('trash', 'Emptied cart', req.user);
-          res.redirect('/shopping-cart');
-        });
-    });
-});
 // router.post('/empty-cart', isLoggedIn, function (req, res, next) {
-// 	console.log("user"+req.body.user +",product" +req.body.productId);
-// 	slug=req.body.productId;
-// 	user=req.body.user;
-	
-// 	// User.update( {_id: user}, { $pull: {productId:slug}
-// 	// }, function(err, model){})
-// 	User.update(
-//         {_id: user},
-//         { $pull: {last_name:'slug'} },
-//         { multi: true }
-// 	)
-// 	// User.update({_id: user}, {$pull : {"last_name":'ds'}},{ multi: true })
-// 	  console.log(slug);
-// 	meanlogger.log('trash', 'Emptied cart', req.user);
+// 	console.log('user' + req.body.user + ',product' + req.body.productId);
+// 	const slug = req.body.productId;
+// 	const user = req.body.user;
+// 	User.findOne({ _id: user }, function (err, model) {
+// 		console.log("model:"+model);
+// 		model.product.pull({ productId: slug });
+// 		model.save(function (err, model) {
 
-// 	res.redirect('/shopping-cart');
+// 			meanlogger.log('trash', 'Emptied cart', req.user);
+// 			res.redirect('/wishlist');
+// 		});
+// 	});
 // });
-
-// mobile on empty cart 
-router.get('/empty-cart-mobile', isLoggedIn, function (req, res, next) {
-	var cart = new cart({});
-	cart.remove();
-	req.session.cart = cart;
-
-	res.send({
-		message: "Emptied cart",
-		status: true
-	});
-
-});
+router.post('/empty-cart', isLoggedIn, function(req, res, next) {
+	console.log("user" + req.body.user + ",product" + req.body.productId);
+	slug = mongoose.Types.ObjectId(req.body.productId);
+	user = req.body.user;
+	User.update({ _id: user }, { $pull: { product: { _id: slug } } }, function(err, model) {
+		if(err){
+			console.log(err);
+		}
+	  console.log("updated"+slug);
+	  meanlogger.log('trash', 'Emptied cart', req.user);
+	  res.redirect('/wishlist');
+	})
+  });
 
 router.get('/reduce-qty/:id/', function (req, res, next) {
 	var productId = req.params.id;
@@ -1845,13 +978,13 @@ router.get('/reduce-qty/:id/', function (req, res, next) {
 		}
 
 		if (!product) {
-			//res.render('shop/shopping-cart',{products: null, errorMsg: "Product not found.",noErrorMsg:0})
+			//res.render('shop/wishlist',{products: null, errorMsg: "Product not found.",noErrorMsg:0})
 			req.flash('error', 'Cannot locate product');
 			return res.redirect('/');
 		}
 		cart.reduce(product, product.id, product.price);
 		req.session.cart = cart; // store cart in session
-		res.redirect('/shopping-cart');
+		res.redirect('/wishlist');
 	});
 });
 
@@ -1871,8 +1004,6 @@ router.get('/reduce-qty-mobile/:id/', function (req, res, next) {
 		}
 
 		if (!product) {
-			//res.render('shop/shopping-cart',{products: null, errorMsg: "Product not found.",noErrorMsg:0})
-			//req.flash('error', 'Cannot locate product');
 			res.send({
 				message: "Cannot locate product",
 				status: false
@@ -1888,78 +1019,34 @@ router.get('/reduce-qty-mobile/:id/', function (req, res, next) {
 	});
 });
 
-// router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
-// 	qryFilter = { "_id": req.user._id };
-// 	User.find(qryFilter, function (err, user) {
-// 		// console.log(req.user.productId.length);
-// 		var promises = [];
-// 		var productcart = [];
-// 		for(i=0;i<req.user.product.length;i++)
-// 		{
-// 			promises.push(Promise.resolve(Product.find({ "_id": req.user.product[i] }).lean().exec().then(function (product) {
-// 				productcart.push(product);  
-// 				// console.log(i+"."+product);    
-// 		  })));
-// 		}	
-// 		Promise.all(promises).then(function() {	
-// 		res.render('shop/shopping-cart', {
-// 			layout: 'eshop/blank',
-// 			user: user,
-// 			productcart:productcart,
-// 		});					
-// 	});
-// 	});
-// });
 
-// router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
-// 	qryFilter = { "_id": req.user._id };
-// 	User.find(qryFilter, function (err, user) {
-// 		// console.log(req.user.productId.length);
-// 		var promises = [];
-// 		var productcart = [];
-// 		for(i=0;i<req.user.product.length;i++)
-// 		{
-// 			promises.push(Promise.resolve(Product.find({ "_id": req.user.product[i] }).lean().exec().then(function (product) {
-// 				productcart.push(product);  
-// 				// console.log(i+"."+product);    
-// 		  })));
-// 		}	
-// 		Promise.all(promises).then(function() {	
-// 		res.render('shop/shopping-cart', {
-// 			layout: 'eshop/blank',
-// 			user: user,
-// 			productcart:productcart,
-// 		});					
-// 	});
-// 	});
-// });
-router.get('/shopping-cart', isLoggedIn, function (req, res, next) {
+router.get('/wishlist', isLoggedIn, function (req, res, next) {
 	qryFilter = { "_id": req.user._id };
 	User.find(qryFilter, function (err, user) {
 		console.log(req.user._id);
-		
-		res.render('shop/shopping-cart', {
+
+		res.render('shop/wishlist', {
 			layout: 'eshop/blank',
 			user: user,
-			
-		});					
+
+		});
 	});
 
 });
 
 router.post('/delete-product', function (req, res, next) {
-    successMsg = req.flash('success')[0];
-    errorMsg = req.flash('error')[0];
-    var order_id = req.body._id;
+	successMsg = req.flash('success')[0];
+	errorMsg = req.flash('error')[0];
+	var order_id = req.body._id;
 
 	// User.update(
 	// 	{ _id: id },
 	// 	{ $pull:  { productId:  } } 
 	//   );
-   
+
 })
 // Mobile Shoppng cart
-router.get('/shopping-cart-mobile', isLoggedIn, function (req, res, next) {
+router.get('/wishlist-mobile', isLoggedIn, function (req, res, next) {
 	if (res.locals.needsAddress || req.user.addr1 === 'undefined' || req.user.addr1 == null) {
 		res.send({
 			message: "Please complete your profile with your address information",
@@ -2010,7 +1097,7 @@ router.get('/shopping-cart-mobile', isLoggedIn, function (req, res, next) {
 
 router.post('/update_shipping', isLoggedIn, function (req, res, next) {
 	if (!req.session.cart) {
-		return res.redirect('/shopping-cart');
+		return res.redirect('/wishlist');
 	}
 	errorMsg = req.flash('error')[0];
 	successMsg = req.flash('success')[0];
@@ -2055,7 +1142,6 @@ router.get('/checkout/:slug3', isLoggedIn, function (req, res, next) {
 	var errorMsg = req.flash('error')[0];
 	var slug3 = req.params.slug3;
 	qryFilter = { "_id": slug3 };
-	console.log("checkout");
 	meanlogger.log('shopping-cart', 'Viewed checkout', req.user);
 	Product.find(qryFilter, function (err, product) {
 		console.log(product);
@@ -2064,13 +1150,67 @@ router.get('/checkout/:slug3', isLoggedIn, function (req, res, next) {
 			return res.redirect('/');
 		}
 		res.render('shop/checkout', {
-		layout: 'eshop/blank',
-		product: product,
+			layout: 'eshop/blank',
+			product: product,
+		});
 	});
 });
+router.post('/addtocart', function (req, res, next) {
+	var cartlist=[];
+	addtocart = {
+		productId: req.body.productId,
+		product_name: req.body.pname,
+		product_price: req.body.price,
+		product_qty: req.body.adult,
+		vendor_id: req.body.vendor_id,
+		ticket_name: req.user.first_name,
+		ticket_email: req.user.email,
+	}
+	console.log(addtocart);
+	cartlist.push(addtocart);
+	console.log("cartlist"+cartlist);
+	var addtocart = new Acart({
+		user: {
+			id: req.user._id,
+			first_name: req.user.first_name,
+			last_name: req.user.last_name,
+			email: req.user.email,
+			telephone: req.user.telephone
+		},
+		cart: cartlist,
+		userid:req.user._id,
+		checkin: req.body.arrival,
+		checkout: req.body.depart,
+		status: 'pending',
+		total: req.body.price
+	});
+	addtocart.save(function (err, orderdata) {
+		if (err) {
+			console.log("1196Error: " + err.message)
+			req.flash('error', 'Unable to Add to cart... ' + err.message);
+			res.redirect('/');
+		}
+		req.flash('success', "Added to Cart!");
+		console.log("success1193");
+		});
+		return res.redirect('/cart');
+});
+router.get('/cart', isLoggedIn, function (req, res, next) {
+	console.log(req.user._id);
+	qryFilter = { "userid": req.user._id };
+	Acart.find(qryFilter, function (err, cart) {
+		console.log("cart1200"+cart.length);
+		for(i=0;i<cart.length;i++)
+		{
+			console.log(cart.ticket_name);
+		}
+		res.render('shop/cart', {
+			layout: 'eshop/blank',
+			cart:cart,
+		});
+	});
 });
 
-// Checkout Mobile
 router.get('/checkout-mobile', isLoggedIn, function (req, res, next) {
 
 	var successMsg = req.flash('success')[0];
@@ -2136,7 +1276,7 @@ router.post('/checkout', function (req, res, next) {
 	if (errors) {
 		if (shipping_flag && process.env.enableShipping) {
 			req.flash('error', 'Invalid shipping information.');
-			return res.redirect('/shopping-cart');
+			return res.redirect('/wishlist');
 		}
 		returnObject = {
 			errorMsg: errors,
@@ -2144,7 +1284,7 @@ router.post('/checkout', function (req, res, next) {
 			noMessage: true
 		};
 		req.flash('error', 'Invalid contact information.  Please ensure that you have an email and telephone number.');
-		return res.redirect('/shopping-cart');
+		return res.redirect('/wishlist');
 	}
 
 	if (telephone || email) {
@@ -2203,7 +1343,7 @@ router.post('/checkout', function (req, res, next) {
 					res.redirect('/');
 				}
 				if (!req.session.cart) {
-					return res.redirect('/shopping-cart');
+					return res.redirect('/wishlist');
 				}
 				var totalTax = results.taxAmount.toFixed(2);
 				var grandtotal = ((parseFloat(subtotal) + parseFloat(totalTax) + parseFloat(shippingtotal))).toFixed(2);
@@ -2260,248 +1400,27 @@ router.post('/checkout', function (req, res, next) {
 });
 
 
-// Mobile Checkout
-router.post('/checkout-mobile', function (req, res, next) {
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	var email = req.body.email;
-	var telephone = req.body.telephone;
-
-	var method = req.body.method;
-	var item_name = req.body.item_name;
-
-	var shipping_addr1 = req.body.shipping_addr1;
-	var shipping_city = req.body.shipping_city;
-	var shipping_state = req.body.shipping_state;
-	var shipping_zip = req.body.shipping_zip;
-	var shipping_flag = req.body.shipping_flag;
-	var shipping_flags = req.body.shipping_flags;
-	var cart = new cart(req.session.cart);
-	if (shipping_flag && process.env.enableShipping) {
-		res.send({
-			message: "Enter correct address",
-			status: false
-		});
-	}
-
-
-
-	res.send({
-		message: "Enter a valid email address and Enter a valid telephone number.",
-		status: false
-	});
-
-	meanlogger.log('shopping-cart', 'Viewed checkout', req.user);
-	var errors = req.validationErrors();
-	if (errors) {
-		if (shipping_flag && process.env.enableShipping) {
-			// req.flash('error', 'Invalid shipping information.');
-			// return res.redirect('/shopping-cart');
-
-			res.send({
-				message: "Invalid shipping information.",
-				status: false
-			});
-		}
-		returnObject = {
-			errorMsg: errors,
-			noErrorMsg: false,
-			noMessage: true
-		};
-		// req.flash('error', 'Invalid contact information.  Please ensure that you have an email and telephone number.');
-		// return res.redirect('/shopping-cart');
-
-		res.send({
-			message: "Invalid contact information.  Please ensure that you have an email and telephone number",
-			status: false
-		});
-	}
-
-	if (telephone || email) {
-		if (!req.user.telephone) {
-			User.findOneAndUpdate({
-				_id: req.user._id
-			}, {
-					$set: {
-						telephone: telephone
-					}
-				}, function (err, user) {
-					if (err) {
-						//////console.log("unable to update user telephone");
-					}
-					req.user.telephone = telephone;
-				});
-		}
-		if (!req.user.email && email) {
-			User.findOneAndUpdate({
-				_id: req.user._id
-			}, {
-					$set: {
-						email: email
-					}
-				}, function (err, user) {
-					if (err) {
-						//////console.log("unable to update user telephone");
-					}
-					req.user.email = email;
-				});
-		}
-	}
-	taxDesc = "";
-	var subtotal = parseFloat(req.body.amount).toFixed(2);
-	var shippingtotal = 0;
-	errorMsg = req.flash('error')[0];
-	successMsg = req.flash('success')[0];
-	products = cart.generateArray();
-	shippingCalc.calculateShipping(products, function (err, result) {
-		if (err) {
-			//////console.log("Unable to calculate shipping " + err);
-			res.send({
-				message: "Some error occurred",
-				status: false
-			});
-		}
-		if (!shipping_flag || shipping_flag == null) {
-			shippingtotal = 0;
-		} else {
-			shippingtotal = result.totalShipping;
-		}
-		if ((shipping_state == taxConfig.ourStateCode) && process.env.enableTax == true) {
-			taxDesc = "PA and Philadelphia Sales Tax Applies";
-			products = cart.generateArray();
-			taxCalc.calculateTaxAll(products, req.user._id, function (err, results) {
-				if (err) {
-					//////console.log(err);
-					res.send({
-						message: "Some error occurred",
-						status: false
-					});
-				}
-				if (!req.session.cart) {
-					res.send({
-						message: "Session Exp",
-						status: false
-					});
-				}
-				var totalTax = results.taxAmount.toFixed(2);
-				var grandtotal = ((parseFloat(subtotal) + parseFloat(totalTax) + parseFloat(shippingtotal))).toFixed(2);
-				var errorMsg = req.flash('error')[0];
-				// res.render('shop/checkout', {
-				// 	user: req.user,
-				// 	layout: 'eshop/blank',
-				// 	shipping_addr1: shipping_addr1,
-				// 	shipping_city: shipping_city,
-				// 	shipping_state: shipping_state,
-				// 	shipping_zip: shipping_zip,
-				// 	shipping_flag: shipping_flag,
-				// 	email: email,
-				// 	telephone: telephone,
-				// 	taxDesc: taxDesc,
-				// 	products: cart.generateArray(),
-				// 	subtotal: subtotal,
-				// 	enableTax: process.env.enableTax,
-				// 	enableShipping: process.env.enableShipping,
-				// 	totalTax: totalTax,
-				// 	shippingtotal: shippingtotal,
-				// 	grandtotal: grandtotal,
-				// 	successMsg: successMsg,
-				// 	noMessage: !successMsg,
-				// 	errorMsg: errorMsg,
-				// 	noErrorMsg: !errorMsg
-				// });
-
-				res.send({
-					shipping_addr1: shipping_addr1,
-					shipping_city: shipping_city,
-					shipping_state: shipping_state,
-					shipping_zip: shipping_zip,
-					shipping_flag: shipping_flag,
-					email: email,
-					telephone: telephone,
-					taxDesc: taxDesc,
-					products: cart.generateArray(),
-					subtotal: subtotal,
-					enableTax: process.env.enableTax,
-					enableShipping: process.env.enableShipping,
-					totalTax: totalTax,
-					shippingtotal: shippingtotal,
-					grandtotal: grandtotal,
-					successMsg: successMsg,
-					noMessage: !successMsg,
-					errorMsg: errorMsg,
-					noErrorMsg: !errorMsg
-				});
-
-
-
-			})
-		} else {
-			var totalTax = 0;
-			var grandtotal = (parseFloat(subtotal) + parseFloat(shippingtotal));
-			// res.render('shop/checkout', {
-			// 	user: req.user,
-			// 	layout: 'eshop/blank',
-			// 	shipping_addr1: shipping_addr1,
-			// 	shipping_city: shipping_city,
-			// 	shipping_state: shipping_state,
-			// 	shipping_zip: shipping_zip,
-			// 	taxDesc: taxDesc,
-			// 	products: cart.generateArray(),
-			// 	subtotal: subtotal,
-			// 	totalTax: totalTax,
-			// 	enableTax: process.env.enableTax,
-			// 	enableShipping: process.env.enableShipping,
-			// 	shippingtotal: shippingtotal,
-			// 	grandtotal: grandtotal,
-			// 	successMsg: successMsg,
-			// 	noMessage: !successMsg,
-			// 	errorMsg: errorMsg,
-			// 	noErrorMsg: !errorMsg
-			// });
-
-
-			res.send({
-				shipping_addr1: shipping_addr1,
-				shipping_city: shipping_city,
-				shipping_state: shipping_state,
-				shipping_zip: shipping_zip,
-				taxDesc: taxDesc,
-				products: cart.generateArray(),
-				subtotal: subtotal,
-				totalTax: totalTax,
-				enableTax: process.env.enableTax,
-				enableShipping: process.env.enableShipping,
-				shippingtotal: shippingtotal,
-				grandtotal: grandtotal,
-				successMsg: successMsg,
-				noMessage: !successMsg,
-				errorMsg: errorMsg,
-				noErrorMsg: !errorMsg
-			});
-		}
-	});
-});
 
 router.post('/payment', function (req, res, next) {
 	var orders = [];
-	
-		order = {
-			productId: req.body.productId,
-			product_name: req.body.pname,
-			product_price: (req.body.price)*30/100,
-			product_qty: req.body.adult,
-			paidBy: 'instamojo',
-			ticket_name: req.user.first_name,
-			ticket_email: req.user.email,
-			// option: option,
-			// category: products[i].item.category,
-			// code: products[i].item.code,
-			// vendor_id: products[i].item.vendor_id,
-			// date: date
-		}
-		console.log(order);
-		orders.push(order);
-	
+
+	order = {
+		productId: req.body.productId,
+		product_name: req.body.pname,
+		product_price: (req.body.price) * 30 / 100,
+		product_qty: req.body.adult,
+		paidBy: 'instamojo',
+		ticket_name: req.user.first_name,
+		ticket_email: req.user.email,
+		// option: option,
+		// category: products[i].item.category,
+		// code: products[i].item.code,
+		// vendor_id: products[i].item.vendor_id,
+		// date: date
+	}
+	console.log(order);
+	orders.push(order);
+
 	// order comnfirmation mail sending  ..........................................
 	const output = `
 		<p>Booking Confirmation</p>
@@ -2591,8 +1510,8 @@ router.post('/payment', function (req, res, next) {
 			}
 		}
 	);
-	// end of order comnfirmation sms sending  ..........................................
-	var total=(req.body.price)*30/100
+
+	var total = (req.body.price) * 30 / 100
 	// Create Order Record with a pending status.
 	var order = new Order({
 		user: {
@@ -2612,10 +1531,10 @@ router.post('/payment', function (req, res, next) {
 		billing_state: req.body.shipping_state,
 		billing_zipcode: req.body.shipping_zipcode,
 		paymentId: 1234, // Adding Dummmy payment id
-		checkin:req.body.arrival,
-		checkout:req.body.depart,
+		checkin: req.body.arrival,
+		checkout: req.body.depart,
 		status: 'pending',
-		total:total 
+		total: total
 	});
 	order.save(function (err, orderdata) {
 		if (err) {
@@ -2630,7 +1549,7 @@ router.post('/payment', function (req, res, next) {
 		var data = new Insta.PaymentData();
 
 		data.purpose = "Test";            // REQUIRED
-		data.amount = (req.body.price)*30/100;                  // REQUIRED
+		data.amount = (req.body.price) * 30 / 100;                  // REQUIRED
 		data.currency = 'INR';
 		data.buyer_name = req.user.first_name;
 		data.email = req.user.email;
@@ -2638,7 +1557,7 @@ router.post('/payment', function (req, res, next) {
 		data.send_sms = 'True';
 		data.send_email = 'True';
 		data.allow_repeated_payments = 'False';
-		data.setRedirectUrl("http://localhost:3000/?orderid="+orderdata.id+"&");
+		data.setRedirectUrl("http://localhost:3000/?orderid=" + orderdata.id + "&");
 
 		Insta.createPayment(data, function (error, response) {
 			if (error) {
@@ -2652,7 +1571,7 @@ router.post('/payment', function (req, res, next) {
 				////console.log(response.success);
 				console.log("instamojo SUCESS" + response);
 				// console.log(response.payment_request.longurl);
-				console.log("REQUIRED URL"+JSON.stringify(response));
+				console.log("REQUIRED URL" + JSON.stringify(response));
 				console.log(response['payment_request']);
 				//	//console.log(JSON.parse(response['payment_request']));
 				return res.redirect(response.payment_request.longurl);
@@ -2665,185 +1584,23 @@ router.post('/payment', function (req, res, next) {
 });
 
 router.post('/create', function (req, res, next) {
-	// // reference: https://github.com/paypal/PayPal-node-SDK/search?p=2&q=tax&utf8=%E2%9C%93
-	// var method = req.body.method;
-	// var telephone = req.body.telephone;
-	// var email = req.body.email;
-	// var productId = req.body.productId
-	// var successMsg = req.flash('success')[0];
-	// var errorMsg = req.flash('error')[0];
-	// var first_name = req.body.first_name;
-	// var last_name = req.body.last_name;
-	// var title = req.body.title;
-	// var code = req.body.code;
-	// var qty = parseFloat(req.body.children)+parseFloat(req.body.kids)+parseFloat(req.body.adult);
-	// var Product_Group = req.body.Product_Group;
-	// var amount = req.body.amount;
-	// var shippingtotal = parseFloat(req.body.shippingtotal / 100);
-	// var subtotal = parseFloat(req.body.subtotal / 100);
-	// var taxAmount = parseFloat(req.body.totalTax / 100);
-	// req.check("email", "Enter a valid email address.");
-	// req.check("telephone", "Enter a valid telephone number.");
-	// var errors = req.validationErrors();
-	// if (errors) {
-	// 	returnObject = {
-	// 		errorMsg: errors,
-	// 		noErrorMsg: false,
-	// 		noMessage: true
-	// 	};
-	// 	req.flash('error', 'Invalid contact or shipping information.  Please ensure that you have an email and telephone number.');
-	// 	return res.redirect('/checkout');
-	// }
-	// if (!req.session.cart) {
-	// 	return res.redirect('/checkout');
-	// }
 
-
-	// var cart = new cart(req.session.cart);
-	// products = cart.generateArray();
-	// tax = taxCalc.calculateTaxReturn(products, req.user._id);
-	// var create_payment = {
-	// 	"intent": "sale",
-	// 	"payer": {
-	// 		"payment_method": "instamojo"
-	// 	},
-	// 	"transactions": [{
-	// 		"amount": {
-	// 			"currency": "Rupees",
-	// 			"total": amount,
-	// 			"details": {
-	// 				"subtotal": String(subtotal.toFixed(2)),
-	// 				"tax": String(taxAmount.toFixed(2)),
-	// 				"shipping": String(shippingtotal.toFixed(2)),
-	// 				"handling_fee": "0.00",
-	// 				"shipping_discount": "0.00"
-	// 			}
-	// 		},
-	// 		"description": "Purchase",
-	// 		"item_list": {
-	// 			"items": []
-	// 		}
-	// 	}]
-	// };
-	var custom = {}
-	var item_list = [];
 	var orders = [];
-	// for (var i = 0, len = products.length; i < len; i++) {
-	// 	var extprice = parseFloat(products[i].price / 100);
-	// 	extprice = String((extprice).toFixed(2));
-	// 	intprice = String(parseFloat(products[i].price));
-	// 	qty = Number(products[i].qty);
-	// 	tname = 'ticket_name_' + i;
-	// 	oname = 'option_' + i;
-	// 	var ticket_name = req.body['ticket_name_' + i];
-	// 	var ticket_email = req.body['ticket_email_' + i];
-	// 	var option = req.body['option_' + i];
-		// custom[i] = {
-		// 	"ticket_name": ticket_name,
-		// 	"ticket_email": ticket_email,
-		// 	"option": option
-		// };
-		// item = {
-		// 	"name": title,
-		// 	"price": amount,
-		// 	"quantity": qty,
-		// 	"currency": "USD",
-		// 	"sku": code
-		// }
-		// create_payment.transactions[0].item_list.items.push(item)
-		order = {
-			productId: req.body.productId,
-			product_name: req.body.pname,
-			product_price: req.body.price,
-			product_qty: req.body.adult,
-			vendor_id:req.body.vendor_id,
-			paidBy: 'instamojo',
-			ticket_name: req.user.first_name,
-			ticket_email: req.user.email,
-			// option: option,
-			// category: products[i].item.category,
-			// code: products[i].item.code,
-			// vendor_id: products[i].item.vendor_id,
-			// date: date
-		}
-		console.log(order);
-		orders.push(order);
-	// }
-	// if (method === 'instamojo') {
-	// 	create_payment.payer.payment_method = 'instamojo';
-	// 	return_url = "http://" + req.headers.host + "/execute";
-	// 	cancel_url = "http://" + req.headers.host + "/cancel";
-	// 	create_payment.redirect_urls = {
-	// 		"return_url": return_url,
-	// 		"cancel_url": cancel_url
-	// 	};
-	// } else if (method === 'credit_card') {
-	// 	var funding_instruments = [{
-	// 		"credit_card": {
-	// 			"type": req.body.type.toLowerCase(),
-	// 			"number": req.body.number,
-	// 			"expire_month": req.body.expire_month,
-	// 			"expire_year": req.body.expire_year,
-	// 			"first_name": req.body.first_name,
-	// 			"last_name": req.body.last_name
-	// 		}
-	// 	}];
-	// 	create_payment.payer.payment_method = 'credit_card';
-	// 	create_payment.custom = custom;
-	// 	create_payment.payer.funding_instruments = funding_instruments;
-	// }
-	// order comnfirmation mail sending  ..........................................
-	const output = `
-		<p>Booking Confirmation</p>
-		<h3>Details</h3>
-		<ul>  
-		  <li>Name: ${req.user.first_name}</li>		 
-		  <li>Email: ${res.locals.fromEmail}</li>
-		  <li>Phone: ${req.user.telephone}</li>
-		</ul>
-		<p>Our executive will get in touch with you</p>
-	  `;
-	let transporter = nodemailer.createTransport({
-		host: 'mail.zo-online.com',
-		port: 587,
-		secure: false, // true for 465, false for other ports
-		auth: {
-			user: 'admin@zo-online.com', // generated ethereal user
-			pass: '22watch22@DS'  // generated ethereal password
-		},
-		tls: {
-			rejectUnauthorized: false
-		}
-	});
 
-	// setup email data with unicode symbols
-	let mailOptions = {
-		from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-		replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-		to: req.user.email, // list of receivers
-		subject: 'booking', // Subject line
-		text: 'Hello world?', // plain text body
-		html: output // html body
-	};
+	order = {
+		productId: req.body.productId,
+		product_name: req.body.pname,
+		product_price: req.body.price,
+		product_qty: req.body.adult,
+		vendor_id: req.body.vendor_id,
+		paidBy: 'instamojo',
+		ticket_name: req.user.first_name,
+		ticket_email: req.user.email,
 
-	// send mail with defined transport object
-	transporter.sendMail(mailOptions, (error, info) => {
-		if (error) {
+	}
+	console.log(order);
+	orders.push(order);
 
-			//console.log("ERROR" + error);
-			return
-			//////console.log(error);
-		}
-
-
-		//console.log("INFo" + info);
-		//console.log('Message sent: %s', info.messageId);
-		//console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-		req.flash('success', "SENT MAIL, KINDLY CHECK!");
-		//	res.render('contact', { msg: 'Email has been sent' });
-	});
-	// end of order comnfirmation mail sending  ..........................................
-	// order comnfirmation sms sending  ..........................................
 	var number = req.user.telephone;
 	//console.log(number);
 	// const text = req.body.text;
@@ -2856,41 +1613,7 @@ router.post('/create', function (req, res, next) {
 		number = "91" + number;
 		//console.log("NEW" + number);
 	}
-	// .......................................{{nexmo commented}}........................................................................................
 
-	// Init Nexmo
-	// const nexmo = new Nexmo({
-	// 	apiKey: '38d2edbc',
-	// 	apiSecret: 'grzR4xHCJDGhDqi2'
-	// }, { debug: true })
-	// nexmo.message.sendSms(
-	// 	'917795565771', number, text, { type: 'unicode' },
-	// 	(err, responseData) => {
-	// 		if (err) {
-	// 			//console.log("SMS" + err);
-	// 		} else {
-	// 			console.dir(responseData);
-	// 			// Get data from response
-	// 			const data = {
-	// 				id: responseData.messages[0]['your booking successful'],
-	// 				number: responseData.messages[0]['number']
-	// 			}
-
-	// 			// Emit to the client
-	// 			//	io.emit('smsStatus', data);
-	// 		}
-	// 	}
-	// );
-	// end of order comnfirmation sms sending  ..........................................
-	//
-	// Send the payment request to paypal
-	// PP will respond with a payment record that includes a redirect url
-	// We'll store the payment in a document and then redirect the user
-	// When the user authorizes, paypal will callback our /execute route and we'll complete the transaction
-	//
-
-	// STORE THE ORDER DATA TO DB
-	// Create Order Record with a pending status.
 	console.log(req.body.arrival);
 	var order = new Order({
 		user: {
@@ -2910,8 +1633,8 @@ router.post('/create', function (req, res, next) {
 		billing_state: req.body.shipping_state,
 		billing_zipcode: req.body.shipping_zipcode,
 		paymentId: 1234, // Adding Dummmy payment id
-		checkin:req.body.arrival,
-		checkout:req.body.depart,
+		checkin: req.body.arrival,
+		checkout: req.body.depart,
 		status: 'pending',
 		total: req.body.price
 	});
@@ -2924,6 +1647,184 @@ router.post('/create', function (req, res, next) {
 
 		req.flash('success', "Order Successful!");
 		//console.log("HERE REDIRECT");
+		// Create the new invoice
+		//''''''''''''''''''''''''''''''''pdf invoice..................................
+		console.log("create new invoice");
+		let myInvoice = new Invoice({
+			config: {
+				template: "public/template/index.html"
+				, tableRowBlock: "public/template/blocks/row.html"
+			}
+			, data: {
+				currencyBalance: {
+					main: 1
+					, secondary: 3.67
+				}
+				, invoice: {
+					number: {
+						series: "PREFIX"
+						, separator: "-"
+						, id: 1
+					}
+					, date: "01/02/2014"
+					, dueDate: "11/02/2014"
+					, explanation: "Thank you for your business!"
+					, currency: {
+						main: "XXX"
+						, secondary: "ZZZ"
+					}
+				}
+				, tasks: [
+					{
+						description: "Some interesting task"
+						, unit: "Hours"
+						, quantity: 5
+						, unitPrice: 2
+					}
+					, {
+						description: "Another interesting task"
+						, unit: "Hours"
+						, quantity: 10
+						, unitPrice: 3
+					}
+					, {
+						description: "The most interesting one"
+						, unit: "Hours"
+						, quantity: 3
+						, unitPrice: 5
+					}
+				]
+			}
+			, seller: {
+				company: "My Company Inc."
+				, registrationNumber: "F05/XX/YYYY"
+				, taxId: "00000000"
+				, address: {
+					street: "The Street Name"
+					, number: "00"
+					, zip: "000000"
+					, city: "Some City"
+					, region: "Some Region"
+					, country: "Nowhere"
+				}
+				, phone: "+40 726 xxx xxx"
+				, email: "me@example.com"
+				, website: "example.com"
+				, bank: {
+					name: "Some Bank Name"
+					, swift: "XXXXXX"
+					, currency: "XXX"
+					, iban: "..."
+				}
+			}
+			, buyer: {
+				company: "Another Company GmbH"
+				, taxId: "00000000"
+				, address: {
+					street: "The Street Name"
+					, number: "00"
+					, zip: "000000"
+					, city: "Some City"
+					, region: "Some Region"
+					, country: "Nowhere"
+				}
+				, phone: "+40 726 xxx xxx"
+				, email: "me@example.com"
+				, website: "example.com"
+				, bank: {
+					name: "Some Bank Name"
+					, swift: "XXXXXX"
+					, currency: "XXX"
+					, iban: "..."
+				}
+			}
+		});
+		// Render invoice as HTML and PDF
+		myInvoice.toPdf('public/invoice/' + req.user._id + 'my-invoice.pdf', (err, data) => {
+			if (err) {
+				console.log("ERROR in saving pdf" + err);
+			}
+			console.log("Saved pdf file");
+		});
+		//''''''''''''''''end invoice.......................................
+		// order comnfirmation mail sending  ..........................................
+		const output = `
+	<p>Booking Confirmation</p>
+	<h3>Details</h3>
+	<ul>  
+	  <li>Name: ${req.user.first_name}</li>		 
+	  <li>Email: ${res.locals.fromEmail}</li>
+	  <li>Phone: ${req.user.telephone}</li>
+	</ul>
+	<p>Our executive will get in touch with you</p>
+  `;
+		let transporter = nodemailer.createTransport({
+			host: 'mail.zo-online.com',
+			port: 587,
+			secure: false, // true for 465, false for other ports
+			auth: {
+				user: 'admin@zo-online.com', // generated ethereal user
+				pass: '22watch22@DS'  // generated ethereal password
+			},
+			tls: {
+				rejectUnauthorized: false
+			}
+		});
+
+		// setup email data with unicode symbols
+		let mailOptions = {
+			from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+			replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+			to: req.user.email, // list of receivers
+			subject: 'booking', // Subject line
+			text: 'Hello world?', // plain text body
+			html: output // html body
+		};
+
+		// send mail with defined transport object
+		transporter.sendMail(mailOptions, (error, info) => {
+			if (error) {
+
+				//console.log("ERROR" + error);
+				return
+				//////console.log(error);
+			}
+
+
+			//console.log("INFo" + info);
+			//console.log('Message sent: %s', info.messageId);
+			//console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+			req.flash('success', "SENT MAIL, KINDLY CHECK!");
+			//	res.render('contact', { msg: 'Email has been sent' });
+		});
+		// end of order comnfirmation mail sending  ..........................................
+		// order comnfirmation sms sending  ..........................................
+		// .......................................{{nexmo commented}}........................................................................................
+
+		// Init Nexmo
+		// const nexmo = new Nexmo({
+		// 	apiKey: '38d2edbc',
+		// 	apiSecret: 'grzR4xHCJDGhDqi2'
+		// }, { debug: true })
+		// nexmo.message.sendSms(
+		// 	'917795565771', number, text, { type: 'unicode' },
+		// 	(err, responseData) => {
+		// 		if (err) {
+		// 			//console.log("SMS" + err);
+		// 		} else {
+		// 			console.dir(responseData);
+		// 			// Get data from response
+		// 			const data = {
+		// 				id: responseData.messages[0]['your booking successful'],
+		// 				number: responseData.messages[0]['number']
+		// 			}
+
+		// 			// Emit to the client
+		// 			//	io.emit('smsStatus', data);
+		// 		}
+		// 	}
+		// );
+		// end of order comnfirmation sms sending  ..........................................
 
 		var data = new Insta.PaymentData();
 
@@ -2936,7 +1837,7 @@ router.post('/create', function (req, res, next) {
 		data.send_sms = 'True';
 		data.send_email = 'True';
 		data.allow_repeated_payments = 'False';
-		data.setRedirectUrl("http://localhost:3000/?orderid="+orderdata.id+"&");
+		data.setRedirectUrl("http://localhost:3000/?orderid=" + orderdata.id + "&");
 
 		Insta.createPayment(data, function (error, response) {
 			if (error) {
@@ -2950,7 +1851,7 @@ router.post('/create', function (req, res, next) {
 				////console.log(response.success);
 				console.log("instamojo SUCESS" + response);
 				// console.log(response.payment_request.longurl);
-				console.log("REQUIRED URL"+JSON.stringify(response));
+				console.log("REQUIRED URL" + JSON.stringify(response));
 				console.log(response['payment_request']);
 				//	//console.log(JSON.parse(response['payment_request']));
 				return res.redirect(response.payment_request.longurl);
@@ -2959,463 +1860,79 @@ router.post('/create', function (req, res, next) {
 		});
 		// return res.redirect('/');
 	})
-
-
-	// create reusable transporter object using the default SMTP transport
-
-
-
-	// paypal.payment.create(create_payment, function(err, payment) {
-	// 	if (err) {
-	// 		//////console.log("ERROR HIT");
-	// 		errorMsg = req.flash('error', err.message);
-	// 		res.redirect('/')
-	// 	} else {
-	// 		req.session.paymentId = payment.id;
-	// 		var ourPayment = payment;
-	// 		ourPayment.user = req.user._id;
-	// 		var newPayment = new Payment(ourPayment);
-	// 		newPayment.save(function(err, newpayment) {
-	// 			if (err) {
-	// 				errorMsg = req.flash('error', err.message);
-	// 				//////console.log('error: ' + err.message);
-	// 				return res.redirect('/shopping-cart');
-	// 			}
-	// 			// Create Order Record with a pending status.
-	// 			var order = new Order({
-	// 				user: {
-	// 					id: req.user._id,
-	// 					first_name: req.user.first_name,
-	// 					last_name: req.user.last_name,
-	// 					email: req.user.email,
-	// 					telephone: req.user.telephone
-	// 				},
-	// 				cart: orders,
-	// 				shipping_address: req.body.shipping_addr1,
-	// 				shipping_city: req.body.shipping_city,
-	// 				shipping_state: req.body.shipping_state,
-	// 				shipping_zipcode: req.body.shipping_zipcode,
-	// 				billing_address: req.body.shipping_addr1,
-	// 				billing_city: req.body.shipping_city,
-	// 				billing_state: req.body.shipping_state,
-	// 				billing_zipcode: req.body.shipping_zipcode,
-	// 				paymentId: payment.id,
-	// 				status: 'pending',
-	// 				total: parseFloat(cart.grandTotal)
-	// 			});
-	// 			order.save(function(err) {
-	// 				if (err) {
-	// 					//////console.log("Error: " + err.message)
-	// 					req.flash('error', 'Unable to save order... ' + err.message);
-	// 					res.redirect('/');
-	// 				}
-	// 			})
-	// 			var redirectUrl;
-	// 			if (payment.payer.payment_method === 'paypal') {
-	// 				var done = 0;
-	// 				for (var i = 0; i < payment.links.length; i++) {
-	// 					done++;
-	// 					var link = payment.links[i];
-	// 					if (link.method === 'REDIRECT') {
-	// 						redirectUrl = link.href;
-	// 					}
-	// 					if (done == payment.links.length) {
-	// 						return res.redirect(redirectUrl);
-	// 					}
-	// 				}
-	// 			}
-	// 		});
-	// 	}
-	// });
-
-
-
 });
 
 
-// Mobile Create
-router.post('/create-mobile', function (req, res, next) {
-	// reference: https://github.com/paypal/PayPal-node-SDK/search?p=2&q=tax&utf8=%E2%9C%93
-	var method = req.body.method;
-	var telephone = req.body.telephone;
-	var email = req.body.email;
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	var first_name = req.body.first_name;
-	var last_name = req.body.last_name;
-	var amount = parseFloat(req.body.amount / 100);
-	var shippingtotal = parseFloat(req.body.shippingtotal / 100);
-	var subtotal = parseFloat(req.body.subtotal / 100);
-	var taxAmount = parseFloat(req.body.totalTax / 100);
-	req.check("email", "Enter a valid email address.");
-	req.check("telephone", "Enter a valid telephone number.");
-	var errors = req.validationErrors();
-	if (errors) {
-		returnObject = {
-			errorMsg: errors,
-			noErrorMsg: false,
-			noMessage: true
-		};
-		// req.flash('error', 'Invalid contact or shipping information.  Please ensure that you have an email and telephone number.');
-		// return res.redirect('/checkout');
 
-		res.send({
-			message: "Invalid contact or shipping information.  Please ensure that you have an email and telephone number.",
-			status: false
-		});
-	}
-	if (!req.session.cart) {
-
-
-		res.send({
-			message: "Session Exp",
-			status: false
-		});
-	}
-
-
-	var cart = new cart(req.session.cart);
-	products = cart.generateArray();
-	tax = taxCalc.calculateTaxReturn(products, req.user._id);
-	var create_payment = {
-		"intent": "sale",
-		"payer": {
-			"payment_method": "instamojo"
-		},
-		"transactions": [{
-			"amount": {
-				"currency": "Rupees",
-				"total": String(amount.toFixed(2)),
-				"details": {
-					"subtotal": String(subtotal.toFixed(2)),
-					"tax": String(taxAmount.toFixed(2)),
-					"shipping": String(shippingtotal.toFixed(2)),
-					"handling_fee": "0.00",
-					"shipping_discount": "0.00"
-				}
-			},
-			"description": "Purchase",
-			"item_list": {
-				"items": []
-			}
-		}]
-	};
-	var custom = {}
-	var item_list = [];
-	var orders = [];
-	for (var i = 0, len = products.length; i < len; i++) {
-		var extprice = parseFloat(products[i].price / 100);
-		extprice = String((extprice).toFixed(2));
-		intprice = String(parseFloat(products[i].price));
-		qty = Number(products[i].qty);
-		tname = 'ticket_name_' + i;
-		oname = 'option_' + i;
-		var ticket_name = req.body['ticket_name_' + i];
-		var ticket_email = req.body['ticket_email_' + i];
-		var option = req.body['option_' + i];
-		custom[i] = {
-			"ticket_name": ticket_name,
-			"ticket_email": ticket_email,
-			"option": option
-		};
-		item = {
-			"name": products[i].item.title,
-			"price": extprice,
-			"quantity": qty,
-			"currency": "USD",
-			"sku": products[i].item.code
-		}
-		create_payment.transactions[0].item_list.items.push(item)
-		order = {
-			productId: products[i].item._id,
-			product_name: products[i].item.title,
-			Product_Group: products[i].item.Product_Group,
-			product_price: intprice,
-			product_price_double: parseFloat(products[i].price / 100),
-			product_qty: qty,
-			paidBy: 'instamojo',
-			ticket_name: ticket_name,
-			ticket_email: ticket_email,
-			option: option,
-			category: products[i].item.category,
-			code: products[i].item.code,
-			vendor_id: products[i].item.vendor_id,
-			date: date
-		}
-		orders.push(order);
-	}
-	if (method === 'instamojo') {
-		create_payment.payer.payment_method = 'instamojo';
-		return_url = "http://" + req.headers.host + "/execute";
-		cancel_url = "http://" + req.headers.host + "/cancel";
-		create_payment.redirect_urls = {
-			"return_url": return_url,
-			"cancel_url": cancel_url
-		};
-	} else if (method === 'credit_card') {
-		var funding_instruments = [{
-			"credit_card": {
-				"type": req.body.type.toLowerCase(),
-				"number": req.body.number,
-				"expire_month": req.body.expire_month,
-				"expire_year": req.body.expire_year,
-				"first_name": req.body.first_name,
-				"last_name": req.body.last_name
-			}
-		}];
-		create_payment.payer.payment_method = 'credit_card';
-		create_payment.custom = custom;
-		create_payment.payer.funding_instruments = funding_instruments;
-	}
-	// order comnfirmation mail sending  ..........................................
-	const output = `
-		<p>Booking Confirmation</p>
-		<h3>Details</h3>
-		<ul>  
-		  <li>Name: ${req.user.first_name}</li>		 
-		  <li>Email: ${res.locals.fromEmail}</li>
-		  <li>Phone: ${req.user.telephone}</li>
-		</ul>
-		<p>Our executive will get in touch with you</p>
-	  `;
-	let transporter = nodemailer.createTransport({
-		host: 'mail.zo-online.com',
-		port: 587,
-		secure: false, // true for 465, false for other ports
-		auth: {
-			user: 'admin@zo-online.com', // generated ethereal user
-			pass: '22watch22@DS'  // generated ethereal password
-		},
-		tls: {
-			rejectUnauthorized: false
-		}
-	});
-
-	// setup email data with unicode symbols
-	let mailOptions = {
-		from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-		replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
-		to: req.user.email, // list of receivers
-		subject: 'booking', // Subject line
-		text: 'Hello world?', // plain text body
-		html: output // html body
-	};
-
-	// send mail with defined transport object
-	transporter.sendMail(mailOptions, (error, info) => {
-		if (error) {
-
-			//console.log("ERROR" + error);
-			return //////console.log(error);
-		}
-
-
-		//console.log("INFo" + info);
-		//console.log('Message sent: %s', info.messageId);
-		//console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-		// req.flash('success', "SENT MAIL, KINDLY CHECK!");
-		res.send({
-			message: "SENT MAIL, KINDLY CHECK!",
-			status: true
-		});
-		//	res.render('contact', { msg: 'Email has been sent' });
-	});
-	// end of order comnfirmation mail sending  ..........................................
-	// order comnfirmation sms sending  ..........................................
-	var number = req.user.telephone;
-	//console.log(number);
-	// const text = req.body.text;
-	const text = "Booking successfull Thank You, Thrillworld";
-	//console.log("NUMBRER" + number);
-	//console.log("NUMBRER" + number[0] + number[1]);
-	//console.log("TEXT" + text);
-
-	if (number.length <= 10) {
-		number = "91" + number;
-		//console.log("NEW" + number);
-	}
-	// .......................................{{nexmo commented}}........................................................................................
-
-	// Init Nexmo
-	// const nexmo = new Nexmo({
-	// 	apiKey: '38d2edbc',
-	// 	apiSecret: 'grzR4xHCJDGhDqi2'
-	// }, { debug: true })
-	// nexmo.message.sendSms(
-	// 	'917795565771', number, text, { type: 'unicode' },
-	// 	(err, responseData) => {
-	// 		if (err) {
-	// 			//console.log("SMS" + err);
-	// 		} else {
-	// 			console.dir(responseData);
-	// 			// Get data from response
-	// 			const data = {
-	// 				id: responseData.messages[0]['your booking successful'],
-	// 				number: responseData.messages[0]['number']
-	// 			}
-
-	// 			// Emit to the client
-	// 			//	io.emit('smsStatus', data);
-	// 		}
-	// 	}
-	// );
-	// end of order comnfirmation sms sending  ..........................................
-	//
-	// Send the payment request to paypal
-	// PP will respond with a payment record that includes a redirect url
-	// We'll store the payment in a document and then redirect the user
-	// When the user authorizes, paypal will callback our /execute route and we'll complete the transaction
-	//
-
-	// STORE THE ORDER DATA TO DB
-	// Create Order Record with a pending status.
-	var order = new Order({
-		user: {
-			id: req.user._id,
-			first_name: req.user.first_name,
-			last_name: req.user.last_name,
-			email: req.user.email,
-			telephone: req.user.telephone
-		},
-		cart: orders,
-		shipping_address: req.body.shipping_addr1,
-		shipping_city: req.body.shipping_city,
-		shipping_state: req.body.shipping_state,
-		shipping_zipcode: req.body.shipping_zipcode,
-		billing_address: req.body.shipping_addr1,
-		billing_city: req.body.shipping_city,
-		billing_state: req.body.shipping_state,
-		billing_zipcode: req.body.shipping_zipcode,
-		paymentId: 1234, // Adding Dummmy payment id
-		status: 'pending',
-		total: parseFloat(cart.grandTotal)
-	});
-	order.save(function (err, orderdata) {
-		if (err) {
-			//////console.log("Error: " + err.message)
-			//req.flash('error', 'Unable to save order... ' + err.message);
-			//res.redirect('/');
-
-			res.send({
-				message: "Unable to save order...",
-				status: false
-			});
-		}
-
-		//req.flash('success', "Order Successful!");
-		//console.log("HERE REDIRECT");
+// create reusable transporter object using the default SMTP transport
 
 
 
-		var data = new Insta.PaymentData();
-
-		data.purpose = "Test";            // REQUIRED
-		data.amount = parseFloat(cart.grandTotal);                  // REQUIRED
-		data.currency = 'INR';
-		data.buyer_name = req.user.first_name;
-		data.email = req.user.email;
-		data.phone = req.user.telephone;
-		data.send_sms = 'True';
-		data.send_email = 'True';
-		data.allow_repeated_payments = 'False';
-		data.setRedirectUrl("http://localhost:3000/?orderid=" + orderdata.id + "&");
-
-		Insta.createPayment(data, function (error, response) {
-			if (error) {
-				// some error
-				//console.log("instamojo ERROR" + error);
-				res.send({
-					message: "instamojo ERROR.",
-					status: false
-				});
-			} else {
-				// Payment redirection link at response.payment_request.longurl
-
-				response = JSON.parse(response);
-
-				res.send({
-					message: "Order Successful",
-					paymentdetails: response,
-					//payment_url:response.payment_request.longurl,
-					status: true
-				});
-
-			}
-		});
-		// return res.redirect('/');
-	})
-
-
-	// create reusable transporter object using the default SMTP transport
-
-
-
-	// paypal.payment.create(create_payment, function(err, payment) {
-	// 	if (err) {
-	// 		//////console.log("ERROR HIT");
-	// 		errorMsg = req.flash('error', err.message);
-	// 		res.redirect('/')
-	// 	} else {
-	// 		req.session.paymentId = payment.id;
-	// 		var ourPayment = payment;
-	// 		ourPayment.user = req.user._id;
-	// 		var newPayment = new Payment(ourPayment);
-	// 		newPayment.save(function(err, newpayment) {
-	// 			if (err) {
-	// 				errorMsg = req.flash('error', err.message);
-	// 				//////console.log('error: ' + err.message);
-	// 				return res.redirect('/shopping-cart');
-	// 			}
-	// 			// Create Order Record with a pending status.
-	// 			var order = new Order({
-	// 				user: {
-	// 					id: req.user._id,
-	// 					first_name: req.user.first_name,
-	// 					last_name: req.user.last_name,
-	// 					email: req.user.email,
-	// 					telephone: req.user.telephone
-	// 				},
-	// 				cart: orders,
-	// 				shipping_address: req.body.shipping_addr1,
-	// 				shipping_city: req.body.shipping_city,
-	// 				shipping_state: req.body.shipping_state,
-	// 				shipping_zipcode: req.body.shipping_zipcode,
-	// 				billing_address: req.body.shipping_addr1,
-	// 				billing_city: req.body.shipping_city,
-	// 				billing_state: req.body.shipping_state,
-	// 				billing_zipcode: req.body.shipping_zipcode,
-	// 				paymentId: payment.id,
-	// 				status: 'pending',
-	// 				total: parseFloat(cart.grandTotal)
-	// 			});
-	// 			order.save(function(err) {
-	// 				if (err) {
-	// 					//////console.log("Error: " + err.message)
-	// 					req.flash('error', 'Unable to save order... ' + err.message);
-	// 					res.redirect('/');
-	// 				}
-	// 			})
-	// 			var redirectUrl;
-	// 			if (payment.payer.payment_method === 'paypal') {
-	// 				var done = 0;
-	// 				for (var i = 0; i < payment.links.length; i++) {
-	// 					done++;
-	// 					var link = payment.links[i];
-	// 					if (link.method === 'REDIRECT') {
-	// 						redirectUrl = link.href;
-	// 					}
-	// 					if (done == payment.links.length) {
-	// 						return res.redirect(redirectUrl);
-	// 					}
-	// 				}
-	// 			}
-	// 		});
-	// 	}
-	// });
+// paypal.payment.create(create_payment, function(err, payment) {
+// 	if (err) {
+// 		//////console.log("ERROR HIT");
+// 		errorMsg = req.flash('error', err.message);
+// 		res.redirect('/')
+// 	} else {
+// 		req.session.paymentId = payment.id;
+// 		var ourPayment = payment;
+// 		ourPayment.user = req.user._id;
+// 		var newPayment = new Payment(ourPayment);
+// 		newPayment.save(function(err, newpayment) {
+// 			if (err) {
+// 				errorMsg = req.flash('error', err.message);
+// 				//////console.log('error: ' + err.message);
+// 				return res.redirect('/wishlist');
+// 			}
+// 			// Create Order Record with a pending status.
+// 			var order = new Order({
+// 				user: {
+// 					id: req.user._id,
+// 					first_name: req.user.first_name,
+// 					last_name: req.user.last_name,
+// 					email: req.user.email,
+// 					telephone: req.user.telephone
+// 				},
+// 				cart: orders,
+// 				shipping_address: req.body.shipping_addr1,
+// 				shipping_city: req.body.shipping_city,
+// 				shipping_state: req.body.shipping_state,
+// 				shipping_zipcode: req.body.shipping_zipcode,
+// 				billing_address: req.body.shipping_addr1,
+// 				billing_city: req.body.shipping_city,
+// 				billing_state: req.body.shipping_state,
+// 				billing_zipcode: req.body.shipping_zipcode,
+// 				paymentId: payment.id,
+// 				status: 'pending',
+// 				total: parseFloat(cart.grandTotal)
+// 			});
+// 			order.save(function(err) {
+// 				if (err) {
+// 					//////console.log("Error: " + err.message)
+// 					req.flash('error', 'Unable to save order... ' + err.message);
+// 					res.redirect('/');
+// 				}
+// 			})
+// 			var redirectUrl;
+// 			if (payment.payer.payment_method === 'paypal') {
+// 				var done = 0;
+// 				for (var i = 0; i < payment.links.length; i++) {
+// 					done++;
+// 					var link = payment.links[i];
+// 					if (link.method === 'REDIRECT') {
+// 						redirectUrl = link.href;
+// 					}
+// 					if (done == payment.links.length) {
+// 						return res.redirect(redirectUrl);
+// 					}
+// 				}
+// 			}
+// 		});
+// 	}
+// });
 
 
 
-});
 
 
 router.get('/like/:id', isLoggedIn, function (req, res, next) {
@@ -3506,6 +2023,20 @@ router.get('/like-mobile/:id', isLoggedIn, function (req, res, next) {
 
 
 router.post('/reviews', isLoggedIn, function (req, res, next) {
+	var pid = req.body.productid;
+	var storage = multer.diskStorage({
+		destination: function(req, file, callback) {
+			callback(null, '.public/images/uploads');
+		},
+		filename: function(req, file, callback) {
+			var fname = file.fieldname + '-' + Date.now() + path.extname(file.originalname);
+			callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+		}
+	});
+	var upload_photos = multer({
+		storage: storage
+	}).array('uploadedFile',9);
+
 	review = new review({
 		review: req.body.review,
 		user: req.body.name,
@@ -3519,14 +2050,14 @@ router.post('/reviews', isLoggedIn, function (req, res, next) {
 			return res.redirect('/');
 		}
 		// res.flash('thanks for your feedback');
-		//console.log("product: " + product);
+		//console.log("product: " + product);       
 		return res.redirect('/');
 	});
 });
 
 
 router.get('/execute', function (req, res, next) {
-	//////console.log("Completing Order: " + res.locals.fromEmail);
+	//console.log("Completing Order: " + res.locals.fromEmail);
 	var paymentId = req.query.paymentId;
 	var token = req.query.token;
 	var PayerID = req.query.PayerID
@@ -3986,7 +2517,7 @@ router.get('/product/:slug3', function (req, res, next) {
 	var slug3 = req.params.slug3;
 	qryFilter = { "_id": slug3 };
 	qryFilter1 = { "productid": slug3 };
-	var user = req.user._id;
+	var user = req.user._id || "Guest";
 	console.log(user);
 	Product.find(qryFilter, function (err, product) {
 		review.find(qryFilter1, function (err, reviews) {
@@ -4042,7 +2573,7 @@ router.get('/product1/:slug3', function (req, res, next) {
 	var user = 'Guest';
 	console.log(user);
 	Product.find(qryFilter, function (err, product) {
-		reviews.find(qryFilter1, function (err, reviews) {
+		review.find(qryFilter1, function (err, reviews) {
 			// console.log(reviews);
 			event = new Event({
 				namespace: 'products',
@@ -4087,39 +2618,6 @@ router.get('/product1/:slug3', function (req, res, next) {
 		});
 	});
 });
-
-router.post('/product-mobile', function (req, res, next) {
-	//console.log("events");
-	var slug3 = req.params.slug3;
-	qryFilter = { "_id": slug3 };
-
-	// if we have a cart, pass it - otherwise, pass an empty object
-	var successMsg = req.flash('success')[0];
-	var errorMsg = req.flash('error')[0];
-	Product.find(qryFilter, function (err, product) {
-		// //console.log("Product: " + JSON.stringify(product));
-
-		if (err || product === 'undefined' || product == null) {
-			// replace with err handling
-			res.send({
-				message: "Error",
-				status: false
-			});
-		}
-
-		if (!product) {
-			res.send({
-				message: "no such event",
-				status: false
-			});
-		} else {
-			req.flash('success');
-			res.send(product);
-		}
-
-	});
-});
-// .................................................
 
 
 router.get('/privacy', function (req, res, next) {
@@ -4171,3 +2669,1051 @@ function notLoggedIn(req, res, next) {
 	}
 	res.redirect('/');
 }
+// ........................................Mobile Apis..............................................
+
+// Mobile Create
+router.post('/create-mobile', function (req, res, next) {
+	// reference: https://github.com/paypal/PayPal-node-SDK/search?p=2&q=tax&utf8=%E2%9C%93
+	var method = req.body.method;
+	var telephone = req.body.telephone;
+	var email = req.body.email;
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	var first_name = req.body.first_name;
+	var last_name = req.body.last_name;
+	var amount = parseFloat(req.body.amount / 100);
+	var shippingtotal = parseFloat(req.body.shippingtotal / 100);
+	var subtotal = parseFloat(req.body.subtotal / 100);
+	var taxAmount = parseFloat(req.body.totalTax / 100);
+	req.check("email", "Enter a valid email address.");
+	req.check("telephone", "Enter a valid telephone number.");
+	var errors = req.validationErrors();
+	if (errors) {
+		returnObject = {
+			errorMsg: errors,
+			noErrorMsg: false,
+			noMessage: true
+		};
+		// req.flash('error', 'Invalid contact or shipping information.  Please ensure that you have an email and telephone number.');
+		// return res.redirect('/checkout');
+
+		res.send({
+			message: "Invalid contact or shipping information.  Please ensure that you have an email and telephone number.",
+			status: false
+		});
+	}
+	if (!req.session.cart) {
+
+
+		res.send({
+			message: "Session Exp",
+			status: false
+		});
+	}
+
+
+	var cart = new cart(req.session.cart);
+	products = cart.generateArray();
+	tax = taxCalc.calculateTaxReturn(products, req.user._id);
+	var create_payment = {
+		"intent": "sale",
+		"payer": {
+			"payment_method": "instamojo"
+		},
+		"transactions": [{
+			"amount": {
+				"currency": "Rupees",
+				"total": String(amount.toFixed(2)),
+				"details": {
+					"subtotal": String(subtotal.toFixed(2)),
+					"tax": String(taxAmount.toFixed(2)),
+					"shipping": String(shippingtotal.toFixed(2)),
+					"handling_fee": "0.00",
+					"shipping_discount": "0.00"
+				}
+			},
+			"description": "Purchase",
+			"item_list": {
+				"items": []
+			}
+		}]
+	};
+	var custom = {}
+	var item_list = [];
+	var orders = [];
+	for (var i = 0, len = products.length; i < len; i++) {
+		var extprice = parseFloat(products[i].price / 100);
+		extprice = String((extprice).toFixed(2));
+		intprice = String(parseFloat(products[i].price));
+		qty = Number(products[i].qty);
+		tname = 'ticket_name_' + i;
+		oname = 'option_' + i;
+		var ticket_name = req.body['ticket_name_' + i];
+		var ticket_email = req.body['ticket_email_' + i];
+		var option = req.body['option_' + i];
+		custom[i] = {
+			"ticket_name": ticket_name,
+			"ticket_email": ticket_email,
+			"option": option
+		};
+		item = {
+			"name": products[i].item.title,
+			"price": extprice,
+			"quantity": qty,
+			"currency": "USD",
+			"sku": products[i].item.code
+		}
+		create_payment.transactions[0].item_list.items.push(item)
+		order = {
+			productId: products[i].item._id,
+			product_name: products[i].item.title,
+			Product_Group: products[i].item.Product_Group,
+			product_price: intprice,
+			product_price_double: parseFloat(products[i].price / 100),
+			product_qty: qty,
+			paidBy: 'instamojo',
+			ticket_name: ticket_name,
+			ticket_email: ticket_email,
+			option: option,
+			category: products[i].item.category,
+			code: products[i].item.code,
+			vendor_id: products[i].item.vendor_id,
+			date: date
+		}
+		orders.push(order);
+	}
+	if (method === 'instamojo') {
+		create_payment.payer.payment_method = 'instamojo';
+		return_url = "http://" + req.headers.host + "/execute";
+		cancel_url = "http://" + req.headers.host + "/cancel";
+		create_payment.redirect_urls = {
+			"return_url": return_url,
+			"cancel_url": cancel_url
+		};
+	} else if (method === 'credit_card') {
+		var funding_instruments = [{
+			"credit_card": {
+				"type": req.body.type.toLowerCase(),
+				"number": req.body.number,
+				"expire_month": req.body.expire_month,
+				"expire_year": req.body.expire_year,
+				"first_name": req.body.first_name,
+				"last_name": req.body.last_name
+			}
+		}];
+		create_payment.payer.payment_method = 'credit_card';
+		create_payment.custom = custom;
+		create_payment.payer.funding_instruments = funding_instruments;
+	}
+	// order comnfirmation mail sending  ..........................................
+	const output = `
+		<p>Booking Confirmation</p>
+		<h3>Details</h3>
+		<ul>  
+		  <li>Name: ${req.user.first_name}</li>		 
+		  <li>Email: ${res.locals.fromEmail}</li>
+		  <li>Phone: ${req.user.telephone}</li>
+		</ul>
+		<p>Our executive will get in touch with you</p>
+	  `;
+	let transporter = nodemailer.createTransport({
+		host: 'mail.zo-online.com',
+		port: 587,
+		secure: false, // true for 465, false for other ports
+		auth: {
+			user: 'admin@zo-online.com', // generated ethereal user
+			pass: '22watch22@DS'  // generated ethereal password
+		},
+		tls: {
+			rejectUnauthorized: false
+		}
+	});
+
+	// setup email data with unicode symbols
+	let mailOptions = {
+		from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+		replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+		to: req.user.email, // list of receivers
+		subject: 'booking', // Subject line
+		text: 'Hello world?', // plain text body
+		html: output // html body
+	};
+
+	// send mail with defined transport object
+	transporter.sendMail(mailOptions, (error, info) => {
+		if (error) {
+
+			//console.log("ERROR" + error);
+			return //////console.log(error);
+		}
+
+
+		//console.log("INFo" + info);
+		//console.log('Message sent: %s', info.messageId);
+		//console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+		// req.flash('success', "SENT MAIL, KINDLY CHECK!");
+		res.send({
+			message: "SENT MAIL, KINDLY CHECK!",
+			status: true
+		});
+		//	res.render('contact', { msg: 'Email has been sent' });
+	});
+	// end of order comnfirmation mail sending  ..........................................
+	// order comnfirmation sms sending  ..........................................
+	var number = req.user.telephone;
+	//console.log(number);
+	// const text = req.body.text;
+	const text = "Booking successfull Thank You, Thrillworld";
+	//console.log("NUMBRER" + number);
+	//console.log("NUMBRER" + number[0] + number[1]);
+	//console.log("TEXT" + text);
+
+	if (number.length <= 10) {
+		number = "91" + number;
+		//console.log("NEW" + number);
+	}
+	// .......................................{{nexmo commented}}........................................................................................
+
+	// Init Nexmo
+	// const nexmo = new Nexmo({
+	// 	apiKey: '38d2edbc',
+	// 	apiSecret: 'grzR4xHCJDGhDqi2'
+	// }, { debug: true })
+	// nexmo.message.sendSms(
+	// 	'917795565771', number, text, { type: 'unicode' },
+	// 	(err, responseData) => {
+	// 		if (err) {
+	// 			//console.log("SMS" + err);
+	// 		} else {
+	// 			console.dir(responseData);
+	// 			// Get data from response
+	// 			const data = {
+	// 				id: responseData.messages[0]['your booking successful'],
+	// 				number: responseData.messages[0]['number']
+	// 			}
+
+	// 			// Emit to the client
+	// 			//	io.emit('smsStatus', data);
+	// 		}
+	// 	}
+	// );
+	// end of order comnfirmation sms sending  ..........................................
+	//
+	// Send the payment request to paypal
+	// PP will respond with a payment record that includes a redirect url
+	// We'll store the payment in a document and then redirect the user
+	// When the user authorizes, paypal will callback our /execute route and we'll complete the transaction
+	//
+
+	// STORE THE ORDER DATA TO DB
+	// Create Order Record with a pending status.
+	var order = new Order({
+		user: {
+			id: req.user._id,
+			first_name: req.user.first_name,
+			last_name: req.user.last_name,
+			email: req.user.email,
+			telephone: req.user.telephone
+		},
+		cart: orders,
+		shipping_address: req.body.shipping_addr1,
+		shipping_city: req.body.shipping_city,
+		shipping_state: req.body.shipping_state,
+		shipping_zipcode: req.body.shipping_zipcode,
+		billing_address: req.body.shipping_addr1,
+		billing_city: req.body.shipping_city,
+		billing_state: req.body.shipping_state,
+		billing_zipcode: req.body.shipping_zipcode,
+		paymentId: 1234, // Adding Dummmy payment id
+		status: 'pending',
+		total: parseFloat(cart.grandTotal)
+	});
+	order.save(function (err, orderdata) {
+		if (err) {
+			//////console.log("Error: " + err.message)
+			//req.flash('error', 'Unable to save order... ' + err.message);
+			//res.redirect('/');
+
+			res.send({
+				message: "Unable to save order...",
+				status: false
+			});
+		}
+
+		//req.flash('success', "Order Successful!");
+		//console.log("HERE REDIRECT");
+
+
+
+		var data = new Insta.PaymentData();
+
+		data.purpose = "Test";            // REQUIRED
+		data.amount = parseFloat(cart.grandTotal);                  // REQUIRED
+		data.currency = 'INR';
+		data.buyer_name = req.user.first_name;
+		data.email = req.user.email;
+		data.phone = req.user.telephone;
+		data.send_sms = 'True';
+		data.send_email = 'True';
+		data.allow_repeated_payments = 'False';
+		data.setRedirectUrl("http://localhost:3000/?orderid=" + orderdata.id + "&");
+
+		Insta.createPayment(data, function (error, response) {
+			if (error) {
+				// some error
+				//console.log("instamojo ERROR" + error);
+				res.send({
+					message: "instamojo ERROR.",
+					status: false
+				});
+			} else {
+				// Payment redirection link at response.payment_request.longurl
+
+				response = JSON.parse(response);
+
+				res.send({
+					message: "Order Successful",
+					paymentdetails: response,
+					//payment_url:response.payment_request.longurl,
+					status: true
+				});
+
+			}
+		});
+		// return res.redirect('/');
+	})
+});
+
+// Get Shop Mobile
+router.get('/getallevents', function (req, res, next) {
+
+	Product.find(function (err, products) {
+		productChunks = [];
+		chunkSize = 5;
+		for (var i = (5 - chunkSize); i < products.length; i += chunkSize) {
+			productChunks.push(products.slice(i, i + chunkSize))
+		}
+
+		res.send(products);
+	});
+});
+
+
+router.post('/geteventdetails', function (req, res, next) {
+	//console.log("events");
+	var slug3 = req.params.slug3;
+	qryFilter = { "_id": slug3 };
+
+	// if we have a cart, pass it - otherwise, pass an empty object
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	Product.find(qryFilter, function (err, product) {
+		// //console.log("Product: " + JSON.stringify(product));
+
+		if (err || product === 'undefined' || product == null) {
+			// replace with err handling
+			res.send({
+				message: "Error",
+				status: false
+			});
+		}
+
+		if (!product) {
+			res.send({
+				message: "no such event",
+				status: false
+			});
+		} else {
+			req.flash('success');
+			res.send(product);
+		}
+
+	});
+});
+// .................................................
+
+// Mobile Checkout
+router.post('/checkout-mobile', function (req, res, next) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	var email = req.body.email;
+	var telephone = req.body.telephone;
+
+	var method = req.body.method;
+	var item_name = req.body.item_name;
+
+	var shipping_addr1 = req.body.shipping_addr1;
+	var shipping_city = req.body.shipping_city;
+	var shipping_state = req.body.shipping_state;
+	var shipping_zip = req.body.shipping_zip;
+	var shipping_flag = req.body.shipping_flag;
+	var shipping_flags = req.body.shipping_flags;
+	var cart = new cart(req.session.cart);
+	if (shipping_flag && process.env.enableShipping) {
+		res.send({
+			message: "Enter correct address",
+			status: false
+		});
+	}
+
+
+
+	res.send({
+		message: "Enter a valid email address and Enter a valid telephone number.",
+		status: false
+	});
+
+	meanlogger.log('shopping-cart', 'Viewed checkout', req.user);
+	var errors = req.validationErrors();
+	if (errors) {
+		if (shipping_flag && process.env.enableShipping) {
+			// req.flash('error', 'Invalid shipping information.');
+			// return res.redirect('/wishlist');
+
+			res.send({
+				message: "Invalid shipping information.",
+				status: false
+			});
+		}
+		returnObject = {
+			errorMsg: errors,
+			noErrorMsg: false,
+			noMessage: true
+		};
+		// req.flash('error', 'Invalid contact information.  Please ensure that you have an email and telephone number.');
+		// return res.redirect('/wishlist');
+
+		res.send({
+			message: "Invalid contact information.  Please ensure that you have an email and telephone number",
+			status: false
+		});
+	}
+
+	if (telephone || email) {
+		if (!req.user.telephone) {
+			User.findOneAndUpdate({
+				_id: req.user._id
+			}, {
+					$set: {
+						telephone: telephone
+					}
+				}, function (err, user) {
+					if (err) {
+						//////console.log("unable to update user telephone");
+					}
+					req.user.telephone = telephone;
+				});
+		}
+		if (!req.user.email && email) {
+			User.findOneAndUpdate({
+				_id: req.user._id
+			}, {
+					$set: {
+						email: email
+					}
+				}, function (err, user) {
+					if (err) {
+						//////console.log("unable to update user telephone");
+					}
+					req.user.email = email;
+				});
+		}
+	}
+	taxDesc = "";
+	var subtotal = parseFloat(req.body.amount).toFixed(2);
+	var shippingtotal = 0;
+	errorMsg = req.flash('error')[0];
+	successMsg = req.flash('success')[0];
+	products = cart.generateArray();
+	shippingCalc.calculateShipping(products, function (err, result) {
+		if (err) {
+			//////console.log("Unable to calculate shipping " + err);
+			res.send({
+				message: "Some error occurred",
+				status: false
+			});
+		}
+		if (!shipping_flag || shipping_flag == null) {
+			shippingtotal = 0;
+		} else {
+			shippingtotal = result.totalShipping;
+		}
+		if ((shipping_state == taxConfig.ourStateCode) && process.env.enableTax == true) {
+			taxDesc = "PA and Philadelphia Sales Tax Applies";
+			products = cart.generateArray();
+			taxCalc.calculateTaxAll(products, req.user._id, function (err, results) {
+				if (err) {
+					//////console.log(err);
+					res.send({
+						message: "Some error occurred",
+						status: false
+					});
+				}
+				if (!req.session.cart) {
+					res.send({
+						message: "Session Exp",
+						status: false
+					});
+				}
+				var totalTax = results.taxAmount.toFixed(2);
+				var grandtotal = ((parseFloat(subtotal) + parseFloat(totalTax) + parseFloat(shippingtotal))).toFixed(2);
+				var errorMsg = req.flash('error')[0];
+				// res.render('shop/checkout', {
+				// 	user: req.user,
+				// 	layout: 'eshop/blank',
+				// 	shipping_addr1: shipping_addr1,
+				// 	shipping_city: shipping_city,
+				// 	shipping_state: shipping_state,
+				// 	shipping_zip: shipping_zip,
+				// 	shipping_flag: shipping_flag,
+				// 	email: email,
+				// 	telephone: telephone,
+				// 	taxDesc: taxDesc,
+				// 	products: cart.generateArray(),
+				// 	subtotal: subtotal,
+				// 	enableTax: process.env.enableTax,
+				// 	enableShipping: process.env.enableShipping,
+				// 	totalTax: totalTax,
+				// 	shippingtotal: shippingtotal,
+				// 	grandtotal: grandtotal,
+				// 	successMsg: successMsg,
+				// 	noMessage: !successMsg,
+				// 	errorMsg: errorMsg,
+				// 	noErrorMsg: !errorMsg
+				// });
+
+				res.send({
+					shipping_addr1: shipping_addr1,
+					shipping_city: shipping_city,
+					shipping_state: shipping_state,
+					shipping_zip: shipping_zip,
+					shipping_flag: shipping_flag,
+					email: email,
+					telephone: telephone,
+					taxDesc: taxDesc,
+					products: cart.generateArray(),
+					subtotal: subtotal,
+					enableTax: process.env.enableTax,
+					enableShipping: process.env.enableShipping,
+					totalTax: totalTax,
+					shippingtotal: shippingtotal,
+					grandtotal: grandtotal,
+					successMsg: successMsg,
+					noMessage: !successMsg,
+					errorMsg: errorMsg,
+					noErrorMsg: !errorMsg
+				});
+
+
+
+			})
+		} else {
+			var totalTax = 0;
+			var grandtotal = (parseFloat(subtotal) + parseFloat(shippingtotal));
+			// res.render('shop/checkout', {
+			// 	user: req.user,
+			// 	layout: 'eshop/blank',
+			// 	shipping_addr1: shipping_addr1,
+			// 	shipping_city: shipping_city,
+			// 	shipping_state: shipping_state,
+			// 	shipping_zip: shipping_zip,
+			// 	taxDesc: taxDesc,
+			// 	products: cart.generateArray(),
+			// 	subtotal: subtotal,
+			// 	totalTax: totalTax,
+			// 	enableTax: process.env.enableTax,
+			// 	enableShipping: process.env.enableShipping,
+			// 	shippingtotal: shippingtotal,
+			// 	grandtotal: grandtotal,
+			// 	successMsg: successMsg,
+			// 	noMessage: !successMsg,
+			// 	errorMsg: errorMsg,
+			// 	noErrorMsg: !errorMsg
+			// });
+
+
+			res.send({
+				shipping_addr1: shipping_addr1,
+				shipping_city: shipping_city,
+				shipping_state: shipping_state,
+				shipping_zip: shipping_zip,
+				taxDesc: taxDesc,
+				products: cart.generateArray(),
+				subtotal: subtotal,
+				totalTax: totalTax,
+				enableTax: process.env.enableTax,
+				enableShipping: process.env.enableShipping,
+				shippingtotal: shippingtotal,
+				grandtotal: grandtotal,
+				successMsg: successMsg,
+				noMessage: !successMsg,
+				errorMsg: errorMsg,
+				noErrorMsg: !errorMsg
+			});
+		}
+	});
+});
+// category based on mobile
+router.get('/category-mobile/', function (req, res, next) {
+	var category_slug = req.params.slug;
+	req.session.category = req.params.slug;
+	var q = req.query.q;
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+	var url = 'mongodb://localhost:27017/hackathon';
+	navcats = {};
+	navgroups = {};
+	if (req.params.q) {
+		search = {
+			$match: {
+				$and: [{
+					$text: {
+						$search: q
+					}
+				}
+					// { category: new RegEx(category_slug, 'i')}
+				]
+			}
+		}
+	} else {
+		search = {
+			$match: {
+				// category: new RegExp(category_slug, 'i')
+			}
+		}
+	}
+	MongoClient.connect(url, function (err, db) {
+		var collection = db.collection('products');
+		collection.aggregate([{
+			"$match": { category: "Television" }
+		},
+		{ "$unwind": "$Attributes" },
+		{
+			"$facet": {
+				price: [
+					{
+						$bucket: {
+							groupBy: {
+								"$divide": ["$price", 100]
+							},
+							boundaries: [0, 200, 400, 500, 600, 700, 1000, 2000, 5000],
+							default: "Over 5000.00",
+							output: { "count": { $sum: 1 } }
+						}
+					},
+					{
+						"$project": {
+							lowerPriceBound: "$_id",
+							count: 1,
+							_id: 0
+						}
+					}
+				],
+				brands: [
+					{
+						"$sortByCount": "$brand"
+					},
+					{
+						"$project": {
+							brand: "$_id",
+							count: 1,
+							_id: 0
+						}
+					}
+				],
+				ScreenSize: [
+					{
+						"$match": { "Attributes.Name": "ScreenSize" }
+					},
+					{
+						"$sortByCount": "$Attributes.Value"
+					},
+					{
+						"$project": {
+							ScreenSize: "$_id",
+							count: 1,
+							_id: 0
+						}
+					}
+				],
+				resolution: [
+					{
+						"$match": { "Attributes.Name": "Resolution" }
+					},
+					{
+						"$sortByCount": "$Attributes.Value"
+					},
+					{
+						"$project": {
+							resolution: "$_id",
+							count: 1,
+							_id: 0
+						}
+					}
+				],
+				number_of_ports: [
+					{
+						"$match": {
+							"Attributes.Name": "NumberofPorts"
+						}
+					},
+					{
+						"$sortByCount": "$Attributes.Value"
+					},
+					{
+						"$project": {
+							ports: "$_id",
+							count: 1,
+							_id: 0
+						}
+					}
+				]
+			}
+		}
+		], function (err, results) {
+			//////console.log("Product-unwound: " + JSON.stringify(results));
+			//////console.log("Err-unwound: " + JSON.stringify(err));
+			Product.aggregate([{
+				$sortByCount: "$category"
+			}], function (err, allcats) {
+				Product.aggregate([
+					search, {
+						$sortByCount: "$category"
+					}
+				], function (err, navcats) {
+					Category.findOne({
+						// slug: new RegExp(category_slug, 'i')
+						$or: [{
+							'slug': new RegExp(category_slug, 'i')
+						}, {
+							'name': new RegExp(category_slug, 'i')
+						}],
+
+					}, function (err, category) {
+						if (err) {
+							//////console.log("Error finding category " + category_slug);
+
+
+							res.send({
+								message: "Cannot find category",
+								status: false
+							});
+						}
+						if (!category) {
+							//////console.log("Error finding category " + category_slug);
+
+							res.send({
+								message: "Cannot find category",
+								status: false
+							});
+						}
+						Product.aggregate([search, {
+							$sortByCount: "$Product_Group"
+						}], function (err, navgroups) {
+							if (q) {
+								srch = {
+									$text: {
+										search: q
+									}
+								}
+							} else {
+								srch = {}
+							}
+							/* find all products in category selected */
+							categCondition = {
+								$match: {
+									$and: [{
+										$or: [{
+											'category': 'Television'
+										}, {
+											'category': new RegExp(category.name, 'i')
+										}]
+									},
+									{
+										status: {
+											$ne: 'deleted'
+										}
+									},
+									{
+										$or: [{
+											"inventory.onHand": {
+												$gt: 0
+											}
+										}, {
+											"inventory.disableOnZero": false
+										}]
+									}
+									]
+								}
+							}
+							categCondition = {
+								$and: [{
+									$or: [{
+										'category': new RegExp(category.slug, 'i')
+									}, {
+										'category': new RegExp(category.name, 'i')
+									}]
+								},
+								{
+									status: {
+										$ne: 'deleted'
+									}
+								},
+								{
+									$or: [{
+										"inventory.onHand": {
+											$gt: 0
+										}
+									}, {
+										"inventory.disableOnZero": false
+									}]
+								}
+								]
+							}
+							Product.find({ category: "Television" }, function (err, products) {
+								if (err || !products || products === 'undefined') {
+									//////console.log("Error: " + err.message);
+
+
+									res.send({
+										message: "Problem finding products",
+										status: false
+									});
+								}
+								if (category.format != 'table') {
+									productChunks = [];
+									chunkSize = 4;
+									for (var i = (4 - chunkSize); i < products.length; i += chunkSize) {
+										productChunks.push(products.slice(i, i + chunkSize))
+									};
+								}
+								res.send(category);
+							});
+						});
+					});
+				})
+			})
+		})
+	})
+})
+
+router.get('/frontpage-mobile', function (req, res, next) {
+	qryFilter = { "Product_Group": 'SIMPLE' };
+
+	// if we have a cart, pass it - otherwise, pass an empty object
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+
+	Product.find(qryFilter, function (err, product) {
+		// console.log("Product: " + JSON.stringify(product));
+
+		if (err || product === 'undefined' || product == null) {
+			// replace with err handling
+			var errorMsg = req.flash('error', 'unable to find product');
+			res.send(errorMsg);
+		}
+
+		if (!product) {
+			req.flash('error', 'Product is not found.');
+			res.send('error', 'Product is not found.');
+		}
+		pro = product.toString();
+		res.send(pro);
+	});// Mobile Category Slug
+	router.get('/category-mobile/:slug', function (req, res, next) {
+		var category_slug = req.params.slug;
+		req.session.category = req.params.slug;
+		var q = req.query.q;
+		var successMsg = req.flash('success')[0];
+		var errorMsg = req.flash('error')[0];
+		if (req.params.q) {
+			search = {
+				$match: {
+					$and: [{
+						$text: {
+							$search: q
+						}
+					}
+						// { category: new RegEx(category_slug, 'i')}
+					]
+				}
+			}
+		} else {
+			search = {
+				$match: {
+					// category: new RegExp(category_slug, 'i')
+				}
+			}
+		}
+		/* Create a list of categories and product counts within CAMERAS (100) */
+
+		Product.aggregate([{
+			$sortByCount: "$category"
+		}], function (err, allcats) {
+			Product.aggregate([
+				search, {
+					$sortByCount: "$category"
+				}
+			], function (err, navcats) {
+				Category.findOne({
+					// slug: new RegExp(category_slug, 'i')
+					$or: [{
+						'slug': new RegExp(category_slug, 'i')
+					}, {
+						'name': new RegExp(category_slug, 'i')
+					}],
+
+				}, function (err, category) {
+					if (err) {
+						//////console.log("Error finding category " + category_slug);
+						req.flash('error', 'Cannot find category');
+						res.send({
+							message: "Error",
+							status: false
+						});
+					}
+					if (!category) {
+						//////console.log("Error finding category " + category_slug);
+						req.flash('error', 'Cannot find category');
+						res.send({
+							message: "Error",
+							status: false
+						});
+					}
+					Product.aggregate([search, {
+						$sortByCount: "$Product_Group"
+					}], function (err, navgroups) {
+						if (q) {
+							srch = {
+								$text: {
+									search: q
+								}
+							}
+						} else {
+							srch = {}
+						}
+						/* find all products in category selected */
+
+						categCondition = {
+							$match: {
+								$and: [{
+									$or: [{
+										'category': new RegExp(category.slug, 'i')
+									}, {
+										'category': new RegExp(category.name, 'i')
+									}]
+								},
+								{
+									status: {
+										$ne: 'deleted'
+									}
+								},
+								{
+									$or: [{
+										"inventory.onHand": {
+											$gt: 0
+										}
+									}, {
+										"inventory.disableOnZero": false
+									}]
+								}
+								]
+							}
+						}
+						categCondition = {
+							$and: [{
+								$or: [{
+									'category': new RegExp(category.slug, 'i')
+								}, {
+									'category': new RegExp(category.name, 'i')
+								}]
+							},
+							{
+								status: {
+									$ne: 'deleted'
+								}
+							},
+							{
+								$or: [{
+									"inventory.onHand": {
+										$gt: 0
+									}
+								}, {
+									"inventory.disableOnZero": false
+								}]
+							}
+							]
+						}
+						Product.find(categCondition, function (err, products) {
+
+							if (err || !products || products === 'undefined') {
+
+								req.flash('error', 'Problem finding products');
+								res.send({
+									message: "Error",
+									status: false
+								});
+							}
+							if (category.format != 'table') {
+								productChunks = [];
+								chunkSize = 4;
+								for (var i = (4 - chunkSize); i < products.length; i += chunkSize) {
+									productChunks.push(products.slice(i, i + chunkSize))
+								};
+								// products = productChunks
+							}
+							res.send(category);
+						});
+					});
+				});
+			})
+		})
+	});
+});
+// mobile add to cart
+router.post('/add-to-cart-mobile', function (req, res, next) {
+	var theId = new ObjectId(req.body.user);
+	console.log("productId:" + req.body.productId + "," + "name:" + req.body.name + "price:" + req.body.price);
+	User.findOneAndUpdate({
+		_id: theId
+	}, {
+			// $addToSet: {
+			// 	"productId": req.body.productId
+			// }
+			$addToSet: {
+				'product': {
+					"productId": req.body.productId,
+					"name": req.body.name,
+					"price": req.body.price,
+					"imagePath": req.body.imagePath
+
+				}
+			}
+		}, {
+			safe: true,
+			upsert: false
+		}, function (err, product) {
+			event = new Event({
+				namespace: 'products',
+				person: {
+					id: req.body.user,
+
+				},
+				action: 'addtocart',
+				thing: {
+					type: "product",
+					id: req.body.productId,
+					name: req.body.name,
+
+				}
+			});
+			event.save(function (err, eventId) {
+				if (err) {
+					//////console.log("Error: " + err.message);
+					return -1;
+				}
+			})
+		});
+	res.send('added to cart successfully');
+});
+

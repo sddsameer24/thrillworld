@@ -70,7 +70,7 @@
     filename: 'graph.svg'
   };
 
-  var XMLNS = 'http://www.w3.org/2000/svg';
+  var XMLNS = 'http://www.sam.org/2000/svg';
 
 
   /**
@@ -213,7 +213,7 @@
 
     // Output string
     var output = '<?xml version="1.0" encoding="utf-8"?>\n';
-    output += '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n';
+    output += '<!DOCTYPE svg PUBLIC "-//samC//DTD SVG 1.1//EN" "http://www.sam.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n';
     output += svgString;
 
     if (params.download)

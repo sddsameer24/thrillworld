@@ -132,7 +132,7 @@
 
 
                         <p class="text-center">
-                            <input type='submit' value='Add to Cart' class="btn btn-primary add-to-cart" role="button">
+                            <input type='submit' value='Wishlist' class="btn btn-primary add-to-cart" role="button">
                         </p>
                     </form>
 
@@ -229,6 +229,7 @@
         <input type='hidden' id='firstname' name='productid'>
         <input type='number' name='rating' value=''>
         <input type='text' name='review' value=''>
+        <input type="file" name="img" multiple>
         <input type='submit' value='submit' class="btn btn-primary add-to-cart" role="button">
     </form>
 </div>
@@ -256,7 +257,7 @@
          {{#each product}}
         TO<input id="tomsg" class="form-control" value="{{ this.vendor_id }}">
          {{/each}}
-        FORM<input id="formmsg" class="form-control" value="{{ customer._id }}">
+        FROM<input id="formmsg" class="form-control" value="{{ customer._id }}">
         <br>
         <textarea id="message" class="form-control" placeholder="Your Message Here"></textarea>
         <br>

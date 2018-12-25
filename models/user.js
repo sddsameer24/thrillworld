@@ -2,7 +2,11 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 var bcrypt = require('bcrypt-nodejs');
 var random = require('mongoose-simple-random');
-
+// var uniqueValidator = require('mongoose-unique-validator')
+var validateEmail = function(email) {
+    var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    return re.test(email)
+};
 var userSchema = new Schema({
 	resetPasswordToken: String,
   	resetPasswordExpires: Date,
@@ -10,23 +14,24 @@ var userSchema = new Schema({
       type: { type: String },
 	  coordinates: [ Number ]
 	},
-	email: {
-		type: String,
-		required: false
-	},
+	email:    { 
+		type: String,     
+		required:  true,
+		validate: [validateEmail, 'Please fill a valid email address'],
+			 match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
+		},
 	password: {
 		type: String,
-		required: false
+		required: true
 	},
 	first_name: {
 		type: String,
-		required: false
+		required: true
 	},
 	last_name: {
 		type: String,
 		required: false
 	},
-
 	addr1: {
 		type: String,
 		required: false
@@ -130,7 +135,7 @@ userSchema.pre('save', function(next) {
 });
 
 userSchema.plugin(random);
-
+// userSchema.plugin(uniqueValidator)
 userSchema.methods.comparePassword = function(candidatePassword, cb) {
   bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
     if (err) return cb(err);
@@ -141,10 +146,8 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
 userSchema.methods.encryptPassword = function(password) {
 	return bcrypt.hashSync(password, bcrypt.genSaltSync(5), null)
 };
-
 userSchema.methods.validPassword = function(password) {
 	return bcrypt.compareSync(password, this.password);
 }
 userSchema.index({ loc : '2dsphere' });
-
 module.exports = mongoose.model('User', userSchema);

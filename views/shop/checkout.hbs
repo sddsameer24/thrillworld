@@ -148,6 +148,20 @@
                             <input type='submit' value='Pay on Arrival' class="btn btn-primary add-to-cart" role="button"  data-toggle="tooltip" data-placement="top" title="Yet you will have to pay 30% as advance">
                         </p>
                     </form>
+                    <form action='/addtocart' method='POST'>
+                        <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
+                        <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
+                        <input type='hidden' class='text-right' name='pname' value='{{this.name}}'>
+                        <input type="hidden" id="two" name="userid" />
+                        <input type="hidden" id="adultc" name="adult">
+                        <input type="hidden" id="childrenc" name="children">
+                        <input type="hidden" id="kidsc" name="kids">
+                        <input type="hidden" id="subtotal1" name="subtotal">
+                        <p class="text-center">
+                            <input type='submit' value='Add to cart' class="btn btn-primary add-to-cart" role="button"  data-toggle="tooltip" data-placement="top">
+                        </p>
+                    </form>
+
 
                 </div>
                 {{!--

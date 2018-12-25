@@ -10,7 +10,7 @@
                 <ol class="breadcrumb">
                     <li>
                         <i class="fa fa-dashboard"></i>
-                        <a href="/admin">Dashboard</a>
+                        <a href="/vendor">Dashboard</a>
                     </li>
                     <li class="active">
                         <i class="fa fa-bar-chart-o"></i> {{adminPageTitle}}
@@ -44,13 +44,13 @@
                         <div class="panel-heading">
                             <ul class="nav nav-pills">
                                 <li role="presentation" class="{{#if allUsers}} active {{/if}}">
-                                    <a href="/admin/users?filter=allUsers">All Users</a>
+                                    <a href="/vendor/users?filter=allUsers">All Users</a>
                                 </li>
                                 <li role="presentation" class="{{#if adminUsers}} active {{/if}}">
-                                    <a href="/admin/users?filter=adminUsers">Admin Users </a>
+                                    <a href="/vendor/users?filter=adminUsers">Admin Users </a>
                                 </li>
                                 <li role="presentation" class="{{#if nonAdminUsers}} active {{/if}}">
-                                    <a href="/admin/users?filter=nonAdminUsers">Non Admin Users</a>
+                                    <a href="/vendor/users?filter=nonAdminUsers">Non Admin Users</a>
                                 </li>
                             </ul>
                         </div>
@@ -129,7 +129,7 @@
                                                             <h4 class="modal-title custom_align" id="Heading">Update User</h4>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action='/admin/edit-user' method='POST'>
+                                                            <form action='/vendor/edit-user' method='POST'>
                                                                 <input type='hidden' name='_id' value='{{this._id}}'>
                                                                 <div class="form-group">
                                                                     <ul class="list-group">
@@ -148,7 +148,7 @@
                                                                     </ul>
                                                                     <label for='role'>Role</label>
                                                                     <select class='form-control' name='role'>
-                                                                        <option value='admin'>Admin</option>
+                                                                        <option value='vendor'>Vendor</option>
                                                                         <option value='' selected>Normal</option>
                                                                         <option value='banned'>Disabled</option>
                                                                     </select>
@@ -166,7 +166,7 @@
                                             </div>
                                         </td>
                                         <td class="text-center">
-                                            <form action='/admin/delete-user' method='POST'>
+                                            <form action='/vendor/delete-user' method='POST'>
                                                 <input type=hidden name='_id' value='{{this._id}}'> {{!--
                                                 <input type="hidden" id="_csrf" name="_csrf" value="{{csrfToken}}" /> --}}
                                                 <p data-placement="top" data-toggle="tooltip" title="Delete">
@@ -193,7 +193,7 @@
                                                             <h4 class="modal-title custom_align" id="Heading">View User Document</h4>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action='/admin/update-order' method='POST'>
+                                                            <form action='/vendor/update-order' method='POST'>
                                                                 <textarea rows=15 class='form-control'>{{this}}</textarea>
                                                             </form>
                                                         </div>

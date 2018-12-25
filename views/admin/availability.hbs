@@ -1,5 +1,12 @@
+<div class="row">
+  <div class="col-md-6">
+<div id="calendar" style="text-align:center;"></div>
+  </div>
+  <div class="col-md-6">
+ <h2 text-align="center"></h2>
+  </div>
+</div>
 
-<div id="calendar"></div>
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
 <script>
@@ -239,25 +246,20 @@
     //Remove any events in the current details element
     var currentWrapper = ele.querySelector('.events');
     var wrapper = createElement('div', 'events in' + (currentWrapper ? ' new' : ''));
-
     events.forEach(function(ev) {
       var div = createElement('div', 'event');
       var square = createElement('div', 'event-category ' + ev.color);
       var span = createElement('span', '', ev.eventName);
-
       div.appendChild(square);
       div.appendChild(span);
       wrapper.appendChild(div);
     });
-
     if(!events.length) {
       var div = createElement('div', 'event empty');
       var span = createElement('span', '', 'No Events');
-
       div.appendChild(span);
       wrapper.appendChild(div);
     }
-
     if(currentWrapper) {
       currentWrapper.className = 'events out';
       currentWrapper.addEventListener('webkitAnimationEnd', function() {
@@ -327,9 +329,7 @@
 !function() {
   var data = [
    {{#each docs }}
- 
-   {  eventName: {{#each this.cart }}'{{product_name}}'{{/each}}+'-' +'{{this.user.first_name}}', calendar: 'Arrivals', color: 'orange', date: '{{this.checkin}}' },
-  {  eventName: {{#each this.cart }}'{{product_name}}'{{/each}}+'-' +'{{this.user.first_name}}', calendar: 'Departure', color: 'green', date: '{{this.checkout}}' },
+   {  eventName: {{#each this.cart }}'{{product_name}}'{{/each}}+'-' +'{{this.user.first_name}}', calendar: 'Arrivals', color: 'orange', date: '2018-11-28' },
    {{/each}} 
      ];
 
@@ -352,15 +352,16 @@
   -webkit-transform: translate3d(0, 0, 0);
   -moz-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
-  width: 420px;
+  width: 100%;
   margin: 0 auto;
+  margin-top: 31px;
   height: 570px;
   overflow: hidden;
 }
 
 .header {
   height: 50px;
-  width: 420px;
+  width: 100%;
   background: rgba(66, 66, 66, 1);
   text-align: center;
   position:relative;

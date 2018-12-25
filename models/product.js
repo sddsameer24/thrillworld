@@ -10,6 +10,9 @@ var schema = new Schema({
 		type: Number,
 		required: false
 	},
+	adminapproval: {
+		type: Boolean
+	},
 	inventory: {
 		onHand: Number,
 		disableAtZero: Boolean
@@ -17,11 +20,18 @@ var schema = new Schema({
 	tags: [{
 		type: String
 	}],
+
+	dates: [String],
+	
 	brand: String,
 	status: {
 		type: String
 	},
 	imagePath: {
+		type: String,
+		required: false
+	},
+	Token: {
 		type: String,
 		required: false
 	},

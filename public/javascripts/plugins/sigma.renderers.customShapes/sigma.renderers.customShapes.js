@@ -97,7 +97,7 @@
       image.setAttributeNS(null, 'clip-path',
         'url(' + absolutePath + '#' + clipPathId + ')');
       image.setAttributeNS(null, 'pointer-events', 'none');
-      image.setAttributeNS('http://www.w3.org/1999/xlink', 'href',
+      image.setAttributeNS('http://www.sam.org/1999/xlink', 'href',
         node.image.url);
       group.appendChild(def);
       group.appendChild(image);
