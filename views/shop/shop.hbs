@@ -1,124 +1,265 @@
+{{!--
 <!--shop/shop.hbs-->
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&v=3&libraries=geometry"></script>
 <div class="container">
+
+    {{# each products }}
     <div class="row">
-        <div class="col-md-12">
+        {{# each this}}
+        <div class="col-md-3">
+            <div class="thumbnail">
+                <div class="product_wrapper">
+                    <div class="panel-body">
+                        <div class="vertical-center thumbnail-image-container">
+                            <span id="ex1" class="zoom" style="position: relative; overflow: hidden;">
+                                <a href='/product/{{this._id}}'>
+                                    <img class="zoomImg img-responsive" src="{{ this.imagePath }}" alt="...">
+                                    <script>$('a.photo').zoom({ magnify: 4, url: '{{this.imagePath}}' });</script>
+                                </a>
+                            </span>
+                        </div>
 
-            <div class="row">
-                <div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
-                    <div id="success" class="alert alert-success" {{#if noMessage}}hidden{{/if}}>
-                        {{successMsg}}
-                    </div>
-                    <div id="danger" class="alert alert-danger" {{#if noErrorMsg}}hidden{{/if}}>
-                        {{errorMsg}}
-                    </div>
-                </div>
-            </div>
-            {{>search}}
-            <div class="row">
-                {{# each products }}
-                <div class="row">
-                    {{# each this}}
-                    <div class="col-md-3">
-                        <div class="thumbnail">
-                            <div class="product_wrapper">
-                                <div class="panel-body">
-                                    <div class="vertical-center thumbnail-image-container">
-                                        <span id="ex1" class="zoom" style="position: relative; overflow: hidden;">
-                                            <a href='/product/{{this._id}}'>
-                                                <img class="zoomImg img-responsive" src="{{ this.imagePath }}" alt="...">
-                                                <script>$('a.photo').zoom({ magnify: 4, url: '{{this.imagePath}}' });</script>
-                                            </a>
-                                        </span>
-                                    </div>
-
-                                    <div class="text-left">
+                        <div class="text-left">
 
 
-                                        <h3 class="product-title product-title-home top-pad-10">
-                                            {{#if ../../isLoggedIn}}
-                                            <a href='/product/{{this._id}}'>{{this.code}} - {{this.title}}</a>
-                                            {{else}}
-                                            <a href='/product1/{{this._id}}'>{{this.code}} - {{this.title}}</a>
-                                            {{/if}}
-                                        </h3>
-                                    </div>
-                                    <div class="text-right">
-                                        {{#if ../../isLoggedIn}}
-                                        <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
-                                            <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
-                                        {{else}}
-                                        <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }} {{/if}}
-                                        <script>
-                                            $(document).ready(function () {
-                                                $('[data-toggle="tooltip"]').tooltip();
-                                            });
-                                        </script>
-
-                                    </div>
-
-                                    <h4 class="product-description">
-                                        {{this.description}}
-                                    </h4>
-                                    {{#if ../../isLoggedIn}}
-                                    <a class="text-center btn-primary" href='/product/{{this._id}}'>
-                                        <button type='submit' href='/product/{{this._id}}' value='Wishlist' class="btn btn-primary add-to-cart" role="button">View</button>
-                                    </a>
-                                    {{else}}
-                                    <a class="text-center btn-primary" href='/product1/{{this._id}}'>
-                                        <button type='submit' href='/product1/{{this._id}}' value='Wishlist' class="btn btn-primary add-to-cart" role="button">View</button>
-                                    </a>
-                                    {{/if}}
-
-                                    <p>you are</p>
-                                    <p id="demo"></p>
-                                    <p>KM away</p>
-                                    <!-- product wrapper -->
-                                </div>
-                            </div>
-                            <!-- thumbnail -->
+                            <h3 class="product-title product-title-home top-pad-10">
+                                {{#if ../../isLoggedIn}}
+                                <a href='/product/{{this._id}}'>{{this.code}} - {{this.title}}</a>
+                                {{else}}
+                                <a href='/product1/{{this._id}}'>{{this.code}} - {{this.title}}</a>
+                                {{/if}}
+                            </h3>
+                        </div>
+                        <div class="text-right">
+                            {{#if ../../isLoggedIn}}
+                            <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
+                                <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
+                            {{else}}
+                            <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }} {{/if}}
                             <script>
-
-                                var x = document.getElementById("demo");
-                                var distance
-                                myFunction();
-
-                                function myFunction() {
-
-                                    if (navigator.geolocation) {
-                                        navigator.geolocation.getCurrentPosition(showPosition);
-                                    } else {
-                                        x.innerHTML = "Geolocation is not supported by this browser.";
-                                    }
-                                }
-
-                                function showPosition(position) {
-
-                                    Latitude = position.coords.latitude;
-
-                                    Longitude = position.coords.longitude;
-                                    lat2 = this.Latitude;
-                                    lon2 = this.Longitude;
-                                    var loc1 = new google.maps.LatLng(Latitude, Longitude);
-                                    var loc2 = new google.maps.LatLng(lat2, lon2);
-
-                                    //console.log(google.maps.geometry.spherical.computeDistanceBetween(loc1,loc2));
-                                    distance = google.maps.geometry.spherical.computeDistanceBetween(loc1, loc2)
-
-                                    x.innerHTML = distance
-                                }
-
-
-
+                                $(document).ready(function () {
+                                    $('[data-toggle="tooltip"]').tooltip();
+                                });
                             </script>
 
                         </div>
-                        <!-- col md-3 -->
+
+                        <h4 class="product-description">
+                            {{this.description}}
+                        </h4>
+                        {{#if ../../isLoggedIn}}
+                        <a class="text-center btn-primary" href='/product/{{this._id}}'>
+                            <button type='submit' href='/product/{{this._id}}' value='Wishlist' class="btn btn-primary add-to-cart" role="button">View</button>
+                        </a>
+                        {{else}}
+                        <a class="text-center btn-primary" href='/product1/{{this._id}}'>
+                            <button type='submit' href='/product1/{{this._id}}' value='Wishlist' class="btn btn-primary add-to-cart" role="button">View</button>
+                        </a>
+                        {{/if}}
+
+                        <p>you are</p>
+                        <p id="demo"></p>
+                        <p>KM away</p>
+                        <!-- product wrapper -->
                     </div>
-                    {{/each}}
-                    <!--each this -->
                 </div>
-                {{/each}}
-                <!-- each products -->
+                <!-- thumbnail -->
+                <script>
+
+                    var x = document.getElementById("demo");
+                    var distance
+                    myFunction();
+
+                    function myFunction() {
+
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(showPosition);
+                        } else {
+                            x.innerHTML = "Geolocation is not supported by this browser.";
+                        }
+                    }
+
+                    function showPosition(position) {
+
+                        Latitude = position.coords.latitude;
+
+                        Longitude = position.coords.longitude;
+                        lat2 = this.Latitude;
+                        lon2 = this.Longitude;
+                        var loc1 = new google.maps.LatLng(Latitude, Longitude);
+                        var loc2 = new google.maps.LatLng(lat2, lon2);
+
+                        //console.log(google.maps.geometry.spherical.computeDistanceBetween(loc1,loc2));
+                        distance = google.maps.geometry.spherical.computeDistanceBetween(loc1, loc2)
+
+                        x.innerHTML = distance
+                    }
+                </script>
+
+            </div>
+            <!-- col md-3 -->
+        </div>
+        {{/each}}
+        <!--each this -->
+    </div>
+    {{/each}}
+    <!-- each products -->
+
+</div> --}}
+<div class="container">
+    {{!-- <div class="modal fade" id="squarespaceModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">×</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3 class="modal-title" id="lineModalLabel">We need some details</h3>
+                </div>
+                <div class="modal-body">
+
+                    <!-- content goes here -->
+                    <form action='/addtocart' method='POST'>
+                        <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
+                        <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
+                        <input type='hidden' class='text-right' name='pname' value='{{this.name}}'>
+                        <input type="hidden" id="two" name="userid" />
+                        <div>
+                            <ul>
+                                <li>
+                                    <lable>Adults </lable>
+                                    <input id="adultc" name="adult">
+                                </li>
+                                <li>
+                                    <lable>kids</lable>
+                                    <input id="kidsc" name="kids">
+                                </li>
+                                <li>
+                                    <lable>children</lable>
+                                    <input id="childrenc" name="children">
+                                </li>
+                                <li>
+                                    <lable>arrival</lable>
+                                    <input id="childrenc" type="date" name="children">
+                                </li>
+                                <li>
+                                    <lable>departure</lable>
+                                    <input id="childrenc" type="date" name="children">
+                                </li>
+                            </ul>
+
+
+
+                        </div>
+
+
+                        <input type="hidden" id="adultc" name="imagePath" value="{{this.imagePath}}">
+
+
+                        <input type="hidden" id="subtotal1" name="subtotal">
+                        <p class="text-center">
+                            <input type='submit' value='Add to cart' class="btn btn-primary add-to-cart" role="button" data-toggle="tooltip" data-placement="top">
+                        </p>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-justified" role="group" aria-label="group button">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" role="button">Close</button>
+                        </div>
+                        <div class="btn-group btn-delete hidden" role="group">
+                            <button type="button" id="delImage" class="btn btn-default btn-hover-red" data-dismiss="modal" role="button">Delete</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" id="saveImage" class="btn btn-default btn-hover-green" data-action="save" role="button">Save</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+    </div> --}}
+    <div class="row">
+        {{# each products }} {{# each this}}
+        <div class="col-md-3 col-sm-6">
+            <div class="product-grid">
+                <div class="product-image">
+
+                    {{#if ../../isLoggedIn}}
+                    <a href='/product/{{this._id}}'></a>
+                    {{else}}
+                    <a href='/product1/{{this._id}}'></a>
+                    {{/if}}
+                    <img class="pic-1" src="{{ this.imagePath }}">
+                    <img class="pic-2" src="{{ this.imagePath }}">
+                    </a>
+
+                    <ul class="social">
+                        {{#if ../../isLoggedIn}}
+                        <li>
+                            <a href='/product/{{this._id}}' data-tip="Quick View">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                        {{else}}
+                        <li>
+                            <a href='/product1/{{this._id}}' data-tip="Quick View">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                        {{/if}}
+
+                        <li>
+                            <a href="" data-tip="Add to Wishlist">
+                                <form action='/add-to-cart' method='POST'>
+                                    <input type='hidden'  name='productId' value='{{ this._id }}'>
+                                    <input type='hidden' name='imagePath' value='{{ this.imagePath }}'>
+                                    <input type='hidden' name='name' value='{{this.name}}'>
+                                    <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
+                                    <button type='submit' class="btn" role="button"></button>
+                                </form>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/checkout/{{this._id}}" data-tip="Add to Cart">
+                                <i class="fa fa-shopping-cart"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <span class="product-new-label">1 km</span>
+                    <span class="product-discount-label">
+                        <div class="text-right">
+                            {{#if ../../isLoggedIn}}
+                            <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
+                                <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
+                            {{else}}
+                            <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }} {{/if}}
+                           
+
+                        </div>
+                    </span>
+                </div>
+                <ul class="rating">
+                    <li class="fa fa-star"></li>
+                    <li class="fa fa-star"></li>
+                    <li class="fa fa-star"></li>
+                    <li class="fa fa-star"></li>
+                    <li class="fa fa-star disable"></li>
+                </ul>
+                <div class="product-content">
+                    <h3 class="title">
+                        <a href="#">{{this.title}}</a>
+                    </h3>
+                    <div class="price">{{this.price}}
+                        <span></span>
+                    </div>
+                    <p></p>
+                    <a class="add-to-cart" href="">+ Add To Cart</a>
+                </div>
+            </div>
+        </div>
+        {{/each}} {{/each}}
+
+    </div>
+</div>

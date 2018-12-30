@@ -959,6 +959,22 @@ router.post('/delete-product', isAdmin, function (req, res, next) {
     Product.remove({ _id: product_id }, function (err, product) {
         if (err) {
             res.send(500, 'Error deleting order.');
+            
+        }
+        product.status = 'deleted';
+        return res.redirect('/admin/products');
+    })
+});
+router.post('/reject-product', function (req, res, next) {
+    successMsg = req.flash('success')[0];
+    errorMsg = req.flash('error')[0];
+    var product_id = req.body._id;
+    console.log("reject-product");
+    meanlogger.log("trash", "Deleting product " + product_id, req.user);
+    Product.remove({ _id: product_id }, function (err, product) {
+        if (err) {
+            res.send(500, 'Error deleting order.');
+
         }
         product.status = 'deleted';
         return res.redirect('/admin/products');
@@ -980,7 +996,8 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
         category: req.body.category,
         Product_Group: req.body.Product_Group,
         taxable: req.body.taxable,
-        shippable: req.body.shippable
+        shippable: req.body.shippable,
+        adminapproval:'true'
     }
     if (req.files) {
         imageFile = req.files.imageFile;
@@ -1010,23 +1027,57 @@ router.get('/edit-product/:slug3',function (req, res, next) {
     var adminPageTitle = "Approve Events";
     var adminPageUrl = "admin/edit-product";
     var slug3 = req.params.slug3;
-    qryFilter = {Token:slug3};
+    console.log("slug="+slug3);
+	qryFilter = { "Token": slug3 };
     Product.find(qryFilter, function(err, products) {
-       console.log(products);
-                res.render('admin/add-product', {
+        Category.find({}, function (err, allcats) {
+        console.log("product:"+products);
+                res.render('admin/edit-product', {
                     adminPageTitle: adminPageTitle,
                     adminPageUrl: adminPageUrl,
                     layout: 'admin-page.hbs',
                     noMessage: !successMsg,
                     noErrorMsg: !errorMsg,
                     errorMsg: errorMsg,
+                    allcats: allcats,
                     products: products,
                     successMsg: successMsg
                 });
-            })
+            });
+        }); 
         });
  
-
+        router.post('/aproove-product',function (req, res, next) {
+            errorMsg = req.flash('error')[0];
+            successMsg = req.flash('success')[0];
+            var imageFile;
+            var updated = {
+                name: req.body.name,
+                title: req.body.title,
+                description: req.body.description,
+                price: req.body.price,
+                Wifi: req.body.Wifi,
+                campfire: req.body.campfire,
+                Pool: req.body.Pool,
+                parking: req.body.parking,
+                category: req.body.category,
+                Product_Group: req.body.Product_Group,
+                taxable: req.body.taxable,
+                shippable: req.body.shippable,
+                adminapproval:'true'
+            }
+           
+            Product.findOneAndUpdate({ _id: req.body._id }, { $set: updated }, function (err, product) {
+                if (err) {
+                    //////console.log("Unable to update product - " + err.message);
+                    req.flash('error', "Unable to update product - " + err.message);
+                    return res.redirect('/admin/products');
+                };
+                //////console.log("Product " + req.body.name + " Updated");
+                req.flash('success', 'Product ' + req.body.name + ' Updated!');
+                return res.redirect('/admin/products');
+            });
+        });
 router.post('/edit-product', isAdmin, function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];

@@ -47,7 +47,7 @@ router.get('/profile', isLoggedIn, csrfProtection, function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	res.render('user/profile', {
-		layout: 'eshop/blank',
+		layout: 'eshop/blankall',
 		user: req.user,
 		errorMsg: errorMsg,
 		noErrorMsg: !errorMsg,
@@ -89,33 +89,19 @@ router.get('/orders', isLoggedIn, function (req, res, next) {
 			// }
 			// return arr;
 			res.render('user/orders', {
-				layout: 'eshop/blank',
+				layout: 'eshop/blankall',
 				user: req.user,
 				orders: orders,
 			});
 		});
 });
 
-// Mobile Orders
-// Mobile 
-
 router.get('/logout', isLoggedIn, function (req, res, next) {
 	meanlogger.log("auth", "logged out", req.user);
-
 	req.session.destroy()
 	req.logout();
 	res.redirect('/');
-
-		// res.status(500).send({
-		// 			message:  "Logged Out Sucessfully",
-		// 			status: true
-		// 		});
-
-	
 });
-
-
-
 
 router.get('/logout-and-delete', isLoggedIn, function (req, res, next) {
 	meanlogger.log("auth", "logged out and deleted account", req.user);

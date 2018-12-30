@@ -809,7 +809,50 @@ router.post('/edit-product', isAdmin, function(req, res, next) {
         };
         //console.log("Product " + req.body.name + " Updated");
         req.flash('success', 'Product ' + req.body.name + ' Updated!');
-        return res.redirect('/vendor/products');
+        console.log("product: " + product);
+          
+            let transporter = nodemailer.createTransport({
+				host: 'mail.zo-online.com',
+				port: 587,
+				secure: false, // true for 465, false for other ports
+				auth: {
+					user: 'admin@zo-online.com', // generated ethereal user
+					pass: 'PI,FX%EsZ$EQ'  // generated ethereal password
+				},
+				tls: {
+					rejectUnauthorized: false
+				}
+			});
+			console.log("mailingtransporter: ");
+			// setup email data with unicode symbols
+			let mailOptions = {
+				from: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+				to: 'sdsameer24@gmail.com', // list of receivers
+				subject: 'New Event Added',
+				text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+					'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+					'http://' + req.headers.host + '/admin/edit-product/' + token + '\n\n' +
+					'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+			};
+			console.log("mailingtransporteroptions: "+mailOptions);
+			// send mail with defined transport object
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+
+					console.log("ERRORsending" + error);
+					return //////console.log(error);
+				}
+
+
+				//console.log("INFo" + info);
+				//console.log('Message sent: %s', info.messageId);
+				console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+				req.flash('success', "SENT MAIL, KINDLY CHECK!");
+				// res.render('contact', { msg: 'Email has been sent' });
+			});
+            // end of order comnfirmation mail sending
+            return res.redirect('/vendor/products');
     });
 });
 

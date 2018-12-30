@@ -86,6 +86,10 @@ var addtocartSchema = new Schema({
 		type: String,
 		required: false
 	},
+	imagePath:{
+		type: String,
+		required: false
+	},
 	paymentId: {
 		type: String,
 		required: false

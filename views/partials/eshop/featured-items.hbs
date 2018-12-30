@@ -1,4 +1,4 @@
-<h1 class="feah">Featured in Thrillworld</h1>
+{{!--
 <div class="features_items">
     <!--featured_items-->
     {{#each featured}} {{#each this}} {{#if this.name }}
@@ -38,16 +38,15 @@
                         {{#if ../../isLoggedIn}}
                         <a href="/product/{{this._id}}" class="btn btn-primary" role="button">View Details</a>
                         <form action='/add-to-cart' method='POST'>
-                        <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
-                        <input type='hidden' id='id' name='imagePath' value='{{ this.imagePath }}'>
-                         <input type='hidden' name='name' value    ='{{this.name}}'>
+                            <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
+                            <input type='hidden' id='id' name='imagePath' value='{{ this.imagePath }}'>
+                            <input type='hidden' name='name' value='{{this.name}}'>
                             <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
-                     
-                        <p class="text-center">
-                            <input type='submit' value='Wishlist' class="btn btn-primary add-to-cart" role="button">
-                        </p>
-                        
-                    </form>
+
+                            <p class="text-center">
+                                <input type='submit' value='Wishlist' class="btn btn-primary add-to-cart" role="button">
+                            </p>
+                        </form>
                         {{else}}
                         <a href="/product1/{{this._id}}" class="btn btn-primary" role="button">View Details</a>
                         {{/if}}
@@ -57,4 +56,165 @@
             </div>
         </div>
     </div>
-    {{/if}} {{/each}} {{/each}}
+    {{/if}} {{/each}} {{/each}} --}}
+    <h1 class="feah">Featured in Thrillworld</h1>
+    <div id="myCarousel" class="carousel slide"  style="background-color:#eeeeee">
+        <div class="carousel-inner"  style="background-color:#eeeeee">
+            <div class="item active"  style="background-color:#eeeeee">
+
+                <div class="col-md-4 panel panel-default">
+                    <a href="/product/{{featured1._id}}">
+                    <div class="row" >
+                        <div class="col-md-6">
+                             <img src="{{ featured1.imagePath }}" class="img-responsive">
+                        </div>
+                        <div class="col-md-6">
+                             <h2>{{featured1.title}}</h2></br>
+                            <p>{{featured1.description}}</p></br>
+                            <h3>Rs:{{featured1.price}} /person</h3>
+                        </div>
+                    </div>
+                        <h3 style="color:brown">{{ featured1.title }}</h3>
+                    </a></div>
+                </div>
+            <div class="item"  style="background-color:#eeeeee">
+                <div class="col-md-4 panel panel-default">
+                    <a href="/product/{{featured5._id}}">
+                        <div class="row">
+                        <div class="col-md-6">
+                             <img src="{{ featured5.imagePath }}" class="img-responsive">
+                        </div>
+                        <div class="col-md-6">
+                            <h2>{{featured5.title}}</h2></br>
+                            <p>{{featured5.description}}</p></br>
+                            <h3>Rs:{{featured5.price}} /person</h3>
+                        </div>
+                    </div>
+                        <h3 style="color:brown">{{ featured5.title }}</h3>
+                    </a> </div>
+            </div>
+            <div class="item"  style="background-color:#eeeeee">
+                <div class="col-md-4 panel panel-default">
+                    <a href="/product/{{featured2._id}}">
+                        <div class="row">
+                        <div class="col-md-6">
+                             <img src="{{ featured2.imagePath }}" class="img-responsive">
+                        </div>
+                        <div class="col-md-6">
+                             <h2>{{featured2.title}}</h2></br>
+                            <p>{{featured2.description}}</p></br>
+                            <h3>Rs:{{featured2.price}} /person</h3>
+                        </div>
+                    </div>
+                        <h3 style="color:brown">{{ featured2.title }}</h3>
+                    </a> </div>
+            </div>
+            <div class="item"  style="background-color:#eeeeee">
+                <div class="col-md-4 panel panel-default">
+                    <a href="/product/{{featured3._id}}">
+                        <div class="row">
+                        <div class="col-md-6">
+                             <img src="{{ featured3.imagePath }}" class="img-responsive">
+                        </div>
+                        <div class="col-md-6">
+                             <h2>{{featured3.title}}</h2></br>
+                            <p>{{featured3.description}}</p></br>
+                            <h3>Rs:{{featured3.price}} /person</h3>
+                        </div>
+                    </div>
+                        <h3 style="color:brown">{{ featured3.title }}</h3>
+                    </a> </div>
+            </div>
+            <div class="item"  style="background-color:#eeeeee">
+                <div class="col-md-4 panel panel-default">
+                    <a href="/product/{{featured4._id}}">
+                        <div class="row">
+                        <div class="col-md-6">
+                             <img src="{{ featured4.imagePath }}" class="img-responsive">
+                        </div>
+                        <div class="col-md-6">
+                            <h2>{{featured4.title}}</h2></br>
+                            <p>{{featured4.description}}</p></br>
+                            <h3>Rs:{{featured4.price}} /person</h3>
+                        </div>
+                    </div>
+                        <h3 style="color:brown">{{ featured4.title }}</h3>
+                    </a></div>
+            </div>
+            <div class="item"  style="background-color:#eeeeee">
+                <div class="col-md-4 panel panel-default">
+                    <a href="/product/{{featured6._id}}">
+                       <div class="row">
+                        <div class="col-md-6">
+                             <img src="{{ featured5.imagePath }}" class="img-responsive">
+                        </div>
+                        <div class="col-md-6">
+                          <h2>{{featured6.title}}</h2></br>
+                            <p>{{featured6.description}}</p></br>
+                           <h3>Rs:{{featured6.price}} /person</h3>
+                        </div>
+                    </div>
+                        <h3 style="color:brown">{{ featured6.title }}</h3>
+                    </a></div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+    <script>
+        $('#myCarousel').carousel({
+            interval: 10000
+        })
+
+        $('.carousel .item').each(function () {
+            var next = $(this).next();
+            if (!next.length) {
+                next = $(this).siblings(':first');
+            }
+            next.children(':first-child').clone().appendTo($(this));
+
+            if (next.next().length > 0) {
+                next.next().children(':first-child').clone().appendTo($(this));
+            }
+            else {
+                $(this).siblings(':first').children(':first-child').clone().appendTo($(this));
+            }
+        });
+    </script>
+    <style>
+        .carousel-inner .active.left {
+            left: -33%;
+        }
+
+        .carousel-inner .active.right {
+            left: 33%;
+        }
+
+        .carousel-inner .next {
+            left: 33%
+        }
+
+        .carousel-inner .prev {
+            left: -33%
+        }
+
+        .carousel-control.left {
+            background-image: none;
+        }
+
+        .carousel-control.right {
+            background-image: none;
+        }
+
+        .carousel-inner .item {
+            background: white;
+        }
+    </style>

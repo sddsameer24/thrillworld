@@ -14,73 +14,43 @@
     <link href="{{themeurl}}" rel="stylesheet">
     <link href="/stylesheets/tourist.css" rel="stylesheet">
     <link href="/stylesheets/responsive.css" rel="stylesheet">
-    <!--[if lt IE 9]>
-    <script src="js/html5shiv.js"></script>
-    <script src="js/respond.min.js"></script>
-    <![endif]-->
     <link href="/images/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="/images/favicon.ico" />
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
+  
 </head>
+
 <body>
-    {{>eshop/header}} {{>eshop/advertisement}}
-    <section>
+    {{>eshop/headerall}}
+     
+    <section class="tophig">
+        {{>search}}
         <div class="container">
             {{!--{{>eshop/slider}}--}}
             <div class="row">
                 <div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
                     {{#if successMsg}}
-                    <div id="success" class="alert alert-success {{#if noMessage}}hidden{{/if}}" >
+                    <div id="success" class="alert alert-success {{#if noMessage}}hidden{{/if}}">
                         {{successMsg}}
                     </div>
-                    {{/if}}
-                    {{#if errorMsg}}
+                    {{/if}} {{#if errorMsg}}
                     <div id="danger" class="alert alert-danger {{#if noErrorMsg}}hidden{{/if}}">
                         {{errorMsg}}
                     </div>
                     {{/if}}
                 </div>
             </div>
-            <div class="row">
-                <div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
-                    {{#if isLoggedIn}}
-                    <div id="success" class="alert alert-success" >
-                        <h3>Welcome, {{user.first_name}}</h3>
-                    </div>
-                    {{else}}
-                    <div id="info" class="alert alert-info">
-                        <h3>You must first Login before you can purchase products.</h3>
-                        <a href="/user/signin">CLICK HERE</a>
-                    </div>
-                    {{/if}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-3">
-                    {{>eshop/left-sidebar-tv}}
-                </div>
-                <div class="col-sm-9 padding-right">
-                    {{>eshop/featured-items}} {{!-- {{>eshop/recommended-items}} --}} </div>
+               {{>eshop/left-sidebar-tv}}
+            <div class="row">           
+                    {{{body}}}
             </div>
         </div>
     </section>
-
     {{>eshop/footer}}
-
     <script src="/javascripts/jquery.js"></script>
     <script src="/javascripts/jquery.scrollUp.min.js"></script>
     <script src="/javascripts/bootstrap.min.js"></script>
-    <script src="/javascripts/jquery.prettyPhoto.js"></script>
     <script src="/javascripts/main.js"></script>
-    <script src="/javascripts/Tourist.js/tourist.js"></script>
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function () {
-            $("a[rel^='prettyPhoto']").prettyPhoto();
-        });
-    </script>
-</body>
 
+
+</body>
 </html>
