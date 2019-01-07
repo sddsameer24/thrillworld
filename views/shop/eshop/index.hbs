@@ -29,14 +29,21 @@
                         </li>
                         {{/if}}
 
-                        <li>
+                      <li>
                             <a href="" data-tip="Add to Wishlist">
-                                <i class="fa fa-shopping-bag"></i>
+                                <form action='/add-to-cart' method='POST'>
+                                    <input type='hidden'  name='productId' value='{{ this._id }}'>
+                                    <input type='hidden' name='imagePath' value='{{ this.imagePath }}'>
+                                    <input type='hidden' name='name' value='{{this.name}}'>
+                                    <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
+                                    <button type='submit' class="btn" role="button"></button>
+                                </form>
                             </a>
+                            
                         </li>
-                        <li>
-                            <a href="" data-tip="Add to Cart">
-                                <i class="fa fa-shopping-cart"></i>
+                         <li>
+                            <a href="/checkout/{{this._id}}" data-tip="Book now">
+                                <i class="fa fa-home"></i>
                             </a>
                         </li>
                     </ul>
@@ -44,9 +51,9 @@
                     <span class="product-discount-label"> <div class="text-right">
                             {{#if ../../isLoggedIn}}
                             <a href="/like/{{this._id}}" data-toggle="tooltip" title="{{this.likes.length}} likes" class="btn btn-default btn-small">
-                                <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }}</a>
+                                <span class="glyphicon glyphicon-thumbs-up"></span> {{ this.likes.length }}</a>
                             {{else}}
-                            <span class="glyphicon glyphicon-heart"></span> {{ this.likes.length }} {{/if}}
+                            <span class="glyphicon glyphicon-thumbs-up"></span> {{ this.likes.length }} {{/if}}
                             <script>
                                 $(document).ready(function () {
                                     $('[data-toggle="tooltip"]').tooltip();
@@ -70,7 +77,7 @@
                         <span></span>
                     </div>
                     <p></p>
-                    <a class="add-to-cart" href="">+ Add To Cart</a>
+                   
                 </div>
             </div>
         </div>

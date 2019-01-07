@@ -73,14 +73,14 @@
                         <br>{{this.ticket_name}}
                         <br>{{this.ticket_email}} {{/if}}
                     </td>
-                    <td>{{money this.product_price}}</td>
+                    <td>{{this.product_price}}</td>
                 </tr>
                 {{/each}}
             </div>
         </table>
     </td>
     <P>Approval:<td class="text-left">{{this.status}}</td></P>
-    <p>total paid:<td class="text-right">{{money this.total}}</td></p>
+    <p>total paid:<td class="text-right">{{this.total}}</td></p>
 
     <div class="row">
         <div style="float:right">

@@ -230,7 +230,6 @@ router.get('/', isAdmin, function (req, res, next) {
 router.get('/availability', function (req, res, next) {
     errorMsg = req.flash('error')[0];
     successMsg = req.flash('success')[0];
-
     Order.find({}, function (err, docs) {
         console.log(docs);
         res.render('admin/availability', {
@@ -1084,26 +1083,29 @@ router.post('/edit-product', isAdmin, function (req, res, next) {
     var imageFile;
     var updated = {
         name: req.body.name,
-        title: req.body.title,
-        description: req.body.description,
-        price: req.body.price,
+        code: req.body.code,
         Wifi: req.body.Wifi,
         campfire: req.body.campfire,
         Pool: req.body.Pool,
         parking: req.body.parking,
-        category: req.body.category,
+        title: req.body.title,
         Product_Group: req.body.Product_Group,
+        price: req.body.price,
+        description: req.body.description,
+        shippable: req.body.shippable,
         taxable: req.body.taxable,
-        shippable: req.body.shippable
+        category: req.body.category,
+        Longitude: req.body.Longitude,
+        Latitude: req.body.Latitude
     }
     if (req.files) {
         imageFile = req.files.imageFile;
-        imageFile.mv('public/images/' + req.body.name + '.png', function (err) {
+        imageFile.mv('public/images/' + req.user._id + req.body.code + req.body.name + 'g1' + '.png', function(err) {
             if (err) {
                 res.status(500).send(err);
             }
-        })
-        updated.imagePath = '/images/' + req.body.name + '.png'
+        });
+        updated.imagePath = 'public/images/' + req.user._id + req.body.code + req.body.name + 'g1' + '.png'
 
     }
     Product.findOneAndUpdate({ _id: req.body._id }, { $set: updated }, function (err, product) {
@@ -1229,6 +1231,7 @@ router.post('/add-product', isAdmin, function (req, res, next) {
         imagePathg1: '/images/' + req.user._id + req.body.code + req.body.name + 'g1' + '.png',
         imagePathg2: '/images/' + req.user._id + req.body.code + req.body.name + 'g2' + '.png',
         imagePathg3: '/images/' + req.user._id + req.body.code + req.body.name + 'g3' + '.png',
+        vendor_id: req.user._id
     });
     console.log(product);
     product.save(function (err) {

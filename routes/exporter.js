@@ -62,9 +62,8 @@ router.get('/products', function (req, res){
 		var fieldNames = ['Name', 'Title', 'Description', 'Ship?','Tax?','Price','Cost','Product_Group','Options'];
 		var data = json2csv({ data: products, fields: fields, fieldNames: fieldNames });
 		res.set('Content-Disposition', ["attachment; filename=", filename, '.csv'].join(''))
-		res.end(JSON.stringify(someObject));
+		res.end(JSON.stringify());
 	});
-
 });
 
 /**

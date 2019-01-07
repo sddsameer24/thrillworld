@@ -793,12 +793,12 @@ router.post('/edit-product', isAdmin, function(req, res, next) {
     }
     if (req.files) {
         imageFile = req.files.imageFile;
-        imageFile.mv('public/images/' + req.body.name + '.png', function(err) {
+        imageFile.mv('public/images/' + req.user._id + req.body.code + req.body.name + 'g1' + '.png', function(err) {
             if (err) {
                 res.status(500).send(err);
             }
-        })
-        updated.imagePath = '/images/' + req.body.name + '.png'
+        });
+        updated.imagePath = 'public/images/' + req.user._id + req.body.code + req.body.name + 'g1' + '.png'
 
     }
     Product.findOneAndUpdate({ _id: req.body._id }, { $set: updated }, function(err, product) {

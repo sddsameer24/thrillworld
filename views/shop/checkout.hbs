@@ -1,5 +1,5 @@
 <div class="product">
-    <input type="hidden" id="one" name="one" value="{{this.user}}" /> {{#each product}}
+    <input id="one" name="one" value="{{this.user}}" /> {{#each product}}
     <div class="container">
         <div class="card">
             <h2 class="p-0 m-0" style="text-align:center" ; id="product-title">{{this.name}}</h2>
@@ -57,7 +57,7 @@
                                 <strike></strike>
                             </span> &nbsp; &nbsp;
                             <p>Price Per Person : Rs
-                                <span id="ticket_price">{{money this.price}}</span>
+                                <span id="ticket_price">{{this.price}}</span>
                             </p>
                         </div>
                     </div>
@@ -81,27 +81,38 @@
                         <input type='hidden' class='text-right' name='pname' value='{{this.vendor_id}}'>
                         <input type="hidden" id="two" name="userid" />
                         <div class="row">
-                            <div class="col-md-6" id="arrival">
+                            <div class="col-md-6">
                                 <label>Date of arrival</label>
-                                <input type="date" name="arrival"> &nbsp;
+                                <input id="arrival" type="date" name="arrival"> &nbsp;
                             </div>
-                            <div class="col-md-6" id="depart">
+                            <div class="col-md-6">
                                 <label>Date of depart</label>
-                                <input type="date" name="depart"> &nbsp;
+                                <input id="depart" type="date" name="depart"> &nbsp;
+
                             </div>
                         </div>
+                         
                         <script>
                             function calc() {
-                                var children = 0;
                                 var adults = document.getElementById("adult").value;
                                 var children = document.getElementById("children").value;
                                 var price = document.getElementById("ticket_price").innerHTML;
+                            
                                 var noTickets = parseFloat(adults) + parseFloat(children);
+                                
                                 var total = parseFloat(price) * noTickets;
-                                if (!isNaN(total))
-                                    document.getElementById("total").innerHTML = total
-                                    document.getElementById("subtotal").value = total
-                                    document.getElementById("subtotal1").value = total
+                                var user = document.getElementById("one").value;
+                                document.getElementById("total").innerHTML = total;
+                                document.getElementById("subtotalp").value = total;
+                                document.getElementById("subtotalc").value = total;
+                                document.getElementById("subtotalp").value = total;
+                                document.getElementById("subtotalc").value = total;
+                                document.getElementById("product_qtyp").value = noTickets;
+                                document.getElementById("product_qtyc").value = noTickets;
+                                document.getElementById("two").value = user;
+                                document.getElementById("three").value = user;
+                               
+                                
                             }
                         </script>
                         <div class="row">
@@ -125,7 +136,7 @@
                         <h2>
                             <p>Subtotal :
                                 <b>Rs
-                                    <span id="total" name="subtotal" class="user-location"></span>
+                                    <span id="total" name="subtotal" class="user-location"></span>/Day
                                 </b>
                             </p>
                         </h2>
@@ -140,26 +151,29 @@
                         <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
                         <input type='hidden' class='text-right' name='pname' value='{{this.name}}'>
                         <input type="hidden" id="two" name="userid" />
-                        <input type="hidden" id="adultc" name="adult">
-                        <input type="hidden" id="childrenc" name="children">
-                        <input type="hidden" id="kidsc" name="kids">
-                        <input type="hidden" id="subtotal1" name="subtotal">
+                        <input type="hidden" id="adultp" name="adult">
+                        <input type="hidden" id="childrenp" name="children">
+                        <input type='hidden' id="arrivalp" name="arrival">
+                        <input type='hidden' id="departurep" name="departure">
+                        <input type="hidden" id="product_qtyp" name="product_qty">
+                        <input type="hidden" id="subtotalp" name="subtotal">
                         <p class="text-center">
-                            <input type='submit' value='Pay on Arrival' class="btn btn-primary add-to-cart" role="button"  data-toggle="tooltip" data-placement="top" title="Yet you will have to pay 30% as advance">
+                            <input type='submit' value='Pay on Arrival' class="btn btn-primary add-to-cart" role="button" data-toggle="tooltip" data-placement="top"
+                                title="Yet you will have to pay 30% as advance">
                         </p>
                     </form>
                     <form action='/addtocart' method='POST'>
                         <input type='hidden' id='id' name='productId' value='{{ this._id }}'>
                         <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
                         <input type='hidden' class='text-right' name='pname' value='{{this.name}}'>
-                        <input type="hidden" id="two" name="userid" />
-                        <input type="hidden" id="adultc" name="adult">
-                        <input type="hidden" id="adultc" name="imagePath" value="{{this.imagePath}}">
-                        <input type="hidden" id="childrenc" name="children">
-                        <input type="hidden" id="kidsc" name="kids">
-                        <input type="hidden" id="subtotal1" name="subtotal">
+                        <input type='hidden' id="three" name="userid" />
+                        <input type='hidden' id="product_qtyc" name="product_qty">
+                        <input type='hidden' id="arrivalp" name="arrival">
+                        <input type='hidden' id="departurec" name="departure">
+                        <input type='hidden' id="imagePathc" name="imagePath" value="{{this.imagePath}}">
+                        <input type='hidden' id="subtotalc" name="subtotal">
                         <p class="text-center">
-                            <input type='submit' value='Add to cart' class="btn btn-primary add-to-cart" role="button"  data-toggle="tooltip" data-placement="top">
+                            <input type='submit' value='Add to cart' class="btn btn-primary add-to-cart" role="button" data-toggle="tooltip" data-placement="top">
                         </p>
                     </form>
 

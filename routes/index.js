@@ -155,7 +155,6 @@ router.get('/shopa', function (req, res, next) {
 		for (var i = (5 - chunkSize1); i < products.length; i += chunkSize1) {
 			productChunks1.push(products.slice(i, i + chunkSize1))
 		}
-		
 		res.render('shop/shop', {
 			layout: 'eshop/featured-items.hbs',
 			products: productChunks1,
@@ -163,6 +162,7 @@ router.get('/shopa', function (req, res, next) {
 		});
 	});
 });
+
 router.get('/shopd', function (req, res, next) {
 
 	Product.find(function (err, products) {
@@ -368,7 +368,11 @@ router.get('/', function (req, res, next) {
 							req.flash('error', 'Product is not found.');
 							res.redirect('/');
 						}
-						console.log("featured"+featured[1]);
+						for(i=0;i<6;i++)
+						{
+							console.log("featured"+i+featured[i]);
+						}
+						
 						res.render('shop/eshop', {
 							layout: 'eshop/eshop',
 							title: title,
@@ -405,19 +409,58 @@ router.get('/', function (req, res, next) {
 				});
 		});
 });
-router.get('/hostsignup', function (req, res, next) {
 
+
+router.post('/contactform', function (req, res, next) {
+	let transporter = nodemailer.createTransport({
+		host: 'mail.zo-online.com',
+		port: 587,
+		secure: false, // true for 465, false for other ports
+		auth: {
+			user: 'admin@zo-online.com', // generated ethereal user
+			pass: 'PI,FX%EsZ$EQ'  // generated ethereal password
+		},
+		tls: {
+			rejectUnauthorized: false
+		}
+	});
+	console.log("mailingtransporter: ");
+	// setup email data with unicode symbols
+	let mailOptions = {
+		from: '"Thrillworld Enquiry" <admin@zo-online.com>', // sender address
+		replyTo: '"Thrillworld Confirmation" <admin@zo-online.com>', // sender address
+		to: 'sdsameer24@gmail.com', // list of receivers
+		subject: 'New Enquiry',
+		text: 'new enquiry from '+req.body.name+'Mentioned phonenumber'+req.body.mobile+req.body.email+'And the query is '+req.body.message,
+	};
+	console.log("mailingtransporteroptions: "+mailOptions);
+	// send mail with defined transport object
+	transporter.sendMail(mailOptions, (error, info) => {
+		if (error) {
+			console.log("ERRORsending" + error);
+			return //////console.log(error);
+		}
+		//console.log("INFo" + info);
+		//console.log('Message sent: %s', info.messageId);
+		console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+		req.flash('success', "SENT MAIL, KINDLY CHECK!");
+		res.render('/home', { msg: 'Email has been sent' });
+	});
+});
+
+router.get('/hostsignup', function (req, res, next) {
 	var messages = req.flash('error');
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	res.render('user/hostsignup', {
-		layout: 'eshop/blank',
+		layout: 'eshop/blankall',
 		//csrfToken: req.csrfToken(),
 		"successMsg": successMsg,
 		"noMessage": !successMsg,
 		"message": messages,
 		"errorMsg": messages[0],
 		"noErrorMsg": !messages,
+		isLoggedIn: req.isAuthenticated()
 	});
 });
 
@@ -435,16 +478,15 @@ router.post('/hostreg', function (req, res, next) {
 	newUser.state = req.body.state;
 	newUser.zipcode = req.body.zipcode;
 	newUser.telephone = req.body.telephone;
-	newUser.role = "vendor";
+	newUser.role = 'vendor';
 	newUser.save(function (err, newUser) {
 		console.log(" REGISTER HIT");
 		if (err) {
 			console.log("error REGISTER HIT");
 			res.redirect('/hostsignup');
-			////console.log('User unsuccessfully registered');
 		}
 		//console.log('User successfully registered');
-		console.log(newUser);
+		console.log("newuser"+newUser);
 		req.flash('success', 'User successfully registered check your mail for vendor access.');
 		res.redirect('/user/signin');
 	});
@@ -1193,6 +1235,7 @@ router.get('/checkout/:slug3', isLoggedIn, function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	var slug3 = req.params.slug3;
+	console.log(req.user);
 	qryFilter = { "_id": slug3 };
 	meanlogger.log('shopping-cart', 'Viewed checkout', req.user);
 	Product.find(qryFilter, function (err, product) {
@@ -1213,11 +1256,14 @@ router.post('/addtocart', function (req, res, next) {
 		productId: req.body.productId,
 		product_name: req.body.pname,
 		product_price: req.body.price,
-		product_qty: req.body.adult,
+		product_tprice: req.body.subtotal,
+		product_qty: req.body.product_qty,
 		vendor_id: req.body.vendor_id,
 		ticket_name: req.user.first_name,
 		ticket_email: req.user.email,
 		imagePath:req.body.imagePath,
+		checkin:req.body.arrival,
+		checkout:req.body.depart,
 	}
 	console.log(addtocart);
 	cartlist.push(addtocart);
@@ -2174,34 +2220,34 @@ router.post('/create', function (req, res, next) {
 		// .......................................{{nexmo commented}}........................................................................................
 
 		// Init Nexmo
-		// const nexmo = new Nexmo({
-		// 	apiKey: '38d2edbc',
-		// 	apiSecret: 'grzR4xHCJDGhDqi2'
-		// }, { debug: true })
-		// nexmo.message.sendSms(
-		// 	'917795565771', number, text, { type: 'unicode' },
-		// 	(err, responseData) => {
-		// 		if (err) {
-		// 			//console.log("SMS" + err);
-		// 		} else {
-		// 			console.dir(responseData);
-		// 			// Get data from response
-		// 			const data = {
-		// 				id: responseData.messages[0]['your booking successful'],
-		// 				number: responseData.messages[0]['number']
-		// 			}
+		const nexmo = new Nexmo({
+			apiKey: '38d2edbc',
+			apiSecret: 'grzR4xHCJDGhDqi2'
+		}, { debug: true })
+		nexmo.message.sendSms(
+			'917795565771', number, text, { type: 'unicode' },
+			(err, responseData) => {
+				if (err) {
+					//console.log("SMS" + err);
+				} else {
+					console.dir(responseData);
+					// Get data from response
+					const data = {
+						id: responseData.messages[0]['your booking successful'],
+						number: responseData.messages[0]['number']
+					}
 
-		// 			// Emit to the client
-		// 			//	io.emit('smsStatus', data);
-		// 		}
-		// 	}
-		// );
+					// Emit to the client
+					//	io.emit('smsStatus', data);
+				}
+			}
+		);
 		// end of order comnfirmation sms sending  ..........................................
 
 		var data = new Insta.PaymentData();
 
 		data.purpose = "Test";            // REQUIRED
-		data.amount = req.body.price;                  // REQUIRED
+		data.amount = "100";                  // REQUIRED
 		data.currency = 'INR';
 		data.buyer_name = req.user.first_name;
 		data.email = req.user.email;

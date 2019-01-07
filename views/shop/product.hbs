@@ -1,4 +1,117 @@
- {{#each product}}
+<script>
+    var socket = io();
+    $(() => {
+        $("#send").click(() => {
+            sendMessage({ to: $("#tomsg").val(), form: $("#formmsg").val(), message: $("#message").val() });
+        })
+
+        getMessages()
+    })
+
+    socket.on('message', addMessages)
+
+    function addMessages(message) {
+        $("#messages").append(`<h4> TO: ${message.to} <br/>FORM: ${message.form} </h4> <p> ${message.message} </p>`)
+    }
+
+    function getMessages() {
+        $.get('http://localhost:3000/messages/', (data) => {
+            data.forEach(addMessages);
+        })
+    }
+
+    function sendMessage(message) {
+        $.post('http://localhost:3000/messages', message)
+    }
+</script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script>
+    $(function () {
+        $("#addClass").click(function () {
+            $('#sidebar_secondary').addClass('popup-box-on');
+        });
+
+        $("#removeClass").click(function () {
+            $('#sidebar_secondary').removeClass('popup-box-on');
+        });
+    });
+</script>
+<div class="container text-center">
+    <div class="row">
+
+
+        <div class="text-center">
+            <a class="open-btn chat" id="addClass">
+                <img src="/images/livechat.png" class="chatimg" style="width: 90px; height: 90px; border-radius: 60px;">
+            </a>
+        </div>
+
+
+
+    </div>
+</div>
+
+<aside id="sidebar_secondary" class="tabbed_sidebar ng-scope chat_sidebar">
+
+    <div class="popup-head">
+        <div class="popup-head-left pull-left">
+            <img class="md-user-image" title="User-Image" src="/images/user_1.jpg">
+            <h1>Host here!!!!</h1>
+        </div>
+        <div class="popup-head-right pull-right">
+
+
+
+            <button data-widget="remove" id="removeClass" class="chat-header-button pull-right" type="button">
+                <i class="glyphicon glyphicon-minus"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="chat" class="chat_box_wrapper chat_box_small chat_box_active" style="opacity: 1; display: block; transform: translateX(0px);">
+        <div class="chat_box touchscroll chat_box_colors_a">
+
+            <div class="chat_message_wrapper chat_message_right">
+
+                <ul class="chat_message">
+                    <li>
+                        <p>
+                            <div id="messages">
+
+                            </div>
+                        </p>
+                    </li>
+                </ul>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="chat_submit_box">
+        <div class="uk-input-group">
+            <div class="nawfell-chat-box">
+
+                </span>
+                {{#each product}}
+                <input type="hidden" id="tomsg" class="form-control" value="{{ this.vendor_id }}"> {{/each}}
+                <input type="hidden" id="formmsg" class="form-control" value="{{this.user}}">
+
+                <textarea id="message" class="form-control" placeholder="Your Message Here"></textarea>
+
+                <button id="send" class="btn btn-success">Send</button>
+
+                </span>
+            </div>
+
+
+        </div>
+    </div>
+
+    </div>
+
+</aside>
+{{#each product}}
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -14,24 +127,7 @@
                 <div class="overview-img">
                     <img class="img-responsive" src="{{this.imagePath}}">
                 </div>
-                <div class="overview-links pull-right">
-                    <ul class=list-inline>
-                        <li class="list-inline-item">
-                            <a href="#">Exterior Images</a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#">Interior Images</a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#">Insurance</a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#">Loans</a>
-                        </li>
 
-
-                    </ul>
-                </div>
             </div>
             <div class="col-md-6">
                 <div class="overview-title">
@@ -46,180 +142,122 @@
                     <i class="fa fa-star-half-o"></i>
                 </div>
                 <div class="overview-pricing">
-                    <h3>Rs{{money this.price}}*</h3>
+                    <h3>Rs{{this.price}}*</h3>
                 </div>
 
                 <div class="overview-btns">
-                    <button type="button" class="btn btn-danger">Book now</button>
+                    <button href="/checkout/{{this._id}}" type="button" class="btn btn-danger">Book now</button>
 
                 </div>
+
                 <div class="overview-btns">
-                    <button type="button" class="btn btn-danger">Add to cart</button>
+                    <form action='/add-to-cart' method='POST'>
+                        <input type='hidden' name='productId' value='{{ this._id }}'>
+                        <input type='hidden' name='imagePath' value='{{ this.imagePath }}'>
+                        <input type='hidden' name='name' value='{{this.name}}'>
+                        <input type='hidden' class='text-right' name='price' value='{{this.price}}'>
+                        <button type='submit' class="btn btn-danger" role="button">Add to Wish list</button>
+                    </form>
+                </div>
+                <div class="addthis_inline_share_toolbox"></div>
 
-                </div>
-                <div class="overview-btns">
-                    <button type="button" class="btn btn-danger">Add to Wish list</button>
-
-                </div>
-                <div class="social-icons mt-3">
-                    <a href="https://www.facebook.com/" class="text-secondary">
-                        <i id="social-fb" class="fa fa-facebook-square fa-2x social"></i>
-                    </a>
-                    <a href="https://twitter.com/" class="text-secondary">
-                        <i id="social-tw" class="fa fa-twitter-square fa-2x "></i>
-                    </a>
-                    <a href="https://plus.google.com/" class="text-secondary">
-                        <i id="social-gp" class="fa fa-google-plus-square fa-2x"></i>
-                    </a>
-                    <a href="mailto:bootsnipp@gmail.com" class="text-secondary">
-                        <i id="social-em" class="fa fa-envelope-square fa-2x "></i>
-                    </a>
-                </div>
             </div>
-
         </div>
     </div>
-</div>
-<div class="container">
-    <div class="row">
-        <div class="col-md-3 pl-1 pr-1">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 pl-1 pr-1">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <h2>Key Specs</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-free-code-camp fa-2x text-secondary"></i>
+                                {{#if campfire}}
+                                <p>Yes</p>
+                                {{else}}
+                                <p>No</p>
+                                {{/if}}
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-wifi fa-2x text-secondary"></i>
+
+                                {{#if Wifi}}
+                                <p>Yes</p>
+                                {{else}}
+                                <p>No</p>
+                                {{/if}}
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-car fa-2x text-secondary"></i>
+                                {{#if Pool}}
+                                <p>Yes</p>
+                                {{else}}
+                                <p>No</p>
+                                {{/if}}
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-car fa-2x text-secondary"></i>
+                                {{#if Pool}}
+                                <p>Yes</p>
+                                {{else}}
+                                <p>No</p>
+                                {{/if}}
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-tachometer fa-2x text-secondary"></i>
+                                {{#if Pool}}
+                                <p>Yes</p>
+                                {{else}}
+                                <p>No</p>
+                                {{/if}}
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <h2>More About Event</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p>Lorem Ipsum is simply dummy text Lorem Ipsum is simply dummy text of the printing and typesetting
+                                    industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+                                    when an unknown printer took a galley of type and scrambled it to make a type specimen
+                                    book. It has survived not only five centuries, but also the leap into electronic typesetting,
+                                    remaining essentially unchanged. It was popularised in the 1960s with the release of
+                                    Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing
+                                    software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply
+                                    dummy text Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                                    Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an
+                                    unknown printer took a galley of type and scrambled it to make a type specimen book.
+                                    It has survived not only five centuries, but also the leap into electronic typesetting,
+                                    remaining essentially unchanged. It was popularised in the 1960s with the release of
+                                    Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing
+                                    software like Aldus PageMaker including versions of Lorem Ipsum. </p>
+                            </div>
 
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-12">
-            <div class="card mb-2">
-                <div class="card-header">
-                    <h2>Key Specs</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-2 text-center">
-                            <i class="fa fa-free-code-camp fa-2x text-secondary"></i>
-                            {{#if campfire}}
-                            <p>Yes</p>
-                            {{else}}
-                            <p>No</p>
-                            {{/if}}
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <i class="fa fa-wifi fa-2x text-secondary"></i>
-
-                            {{#if Wifi}}
-                            <p>Yes</p>
-                            {{else}}
-                            <p>No</p>
-                            {{/if}}
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <i class="fa fa-car fa-2x text-secondary"></i>
-                            {{#if Pool}}
-                            <p>Yes</p>
-                            {{else}}
-                            <p>No</p>
-                            {{/if}}
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <i class="fa fa-car fa-2x text-secondary"></i>
-                            {{#if Pool}}
-                            <p>Yes</p>
-                            {{else}}
-                            <p>No</p>
-                            {{/if}}
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <i class="fa fa-tachometer fa-2x text-secondary"></i>
-                            {{#if Pool}}
-                            <p>Yes</p>
-                            {{else}}
-                            <p>No</p>
-                            {{/if}}
-
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-            <div class="card mb-2">
-                <div class="card-header">
-                    <h2>More About Event</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <p>Lorem Ipsum is simply dummy text Lorem Ipsum is simply dummy text of the printing and typesetting
-                                industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when
-                                an unknown printer took a galley of type and scrambled it to make a type specimen book. It
-                                has survived not only five centuries, but also the leap into electronic typesetting, remaining
-                                essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets
-                                containing Lorem Ipsum passages, and more recently with desktop publishing software like
-                                Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text Lorem
-                                Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
-                                the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley
-                                of type and scrambled it to make a type specimen book. It has survived not only five centuries,
-                                but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised
-                                in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more
-                                recently with desktop publishing software like Aldus PageMaker including versions of Lorem
-                                Ipsum. </p>
-                        </div>
-                        
-                    </div>
-                </div>
-            </div>
-            </div>
-  <div class="container">
-    <br>
-    <div class="jumbotron">
-        <h1 class="display-4">Send Message</h1>
-        <div id="messages">
-
-        </div>
-        <br>
-        
-        TO<input id="tomsg" class="form-control" value="{{ this.vendor_id }}">
-        
-        FROM<input id="formmsg" class="form-control" value="{{../this.user}}">
-        <br>
-        <textarea id="message" class="form-control" placeholder="Your Message Here"></textarea>
-        <br>
-        <button id="send" class="btn btn-success">Send</button>
-    </div>
-    
-</div>
-
-<script>
-   var socket = io();
-    $(() => {
-        $("#send").click(()=>{
-            sendMessage({to: $("#tomsg").val(),form: $("#formmsg").val(), message: $("#message").val()});
-        })
-
-        getMessages()
-    })
-
-    socket.on('message', addMessages)
-
-    function addMessages(message){
-        $("#messages").append(`<h4> TO: ${message.to} <br/>FORM: ${message.form} </h4> <p> ${message.message} </p>`)
-    }
-
-    function getMessages(){
-      $.get('http://localhost:3000/messages/', (data) => {
-        data.forEach(addMessages);
-      })
-    }
-
-    function sendMessage(message){
-      $.post('http://localhost:3000/messages', message)
-    }
-</script>
         </div>
     </div>
 </div>
@@ -362,3 +400,4 @@
         </div>
     </div>
 </div>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5c2b2bdf974ef6c6"></script>

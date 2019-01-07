@@ -9,7 +9,7 @@
 		{{/if}}
 		<ul class="nav nav-tabs">
 		  <li><a href="/user/profile">Account Details</a></li>
-		  <li class="active"><a href="/user/orders">Orders</a></li>
+		  <li class="active"><a href="/user/orders">My Bookings</a></li>
 		</ul>
 	</div>
 	<div class="row">
@@ -33,13 +33,13 @@
 								<td>{{this.Product_Group}}</td>
 								<td>{{this.paidBy}}</td>
 								<td>{{this.product_qty}}</td>
-								<td>{{money this.product_price}}</td>
+								<td>{{this.product_price}}</td>
 							</tr>
 						{{/each}}
 						</tbody>
 					</table>
-				</div>
-				<div class="panel-footer"><p class="text-right"><h2 class="text-right">{{money this.total}}</h2></p></div>
+				</div>   
+				<div class="panel-footer"><p class="text-right"><h2 class="text-right">{{this.total}}</h2></p></div>
 			
 			<p data-placement="top" data-toggle="tooltip" title="View Document ">
         <button class="ui right floated btn btn-warning btn-xs" data-title="view" data-toggle="modal" data-target="#view-{{this._id}}"> <span class="glyphicon glyphicon-eye-open"></span>

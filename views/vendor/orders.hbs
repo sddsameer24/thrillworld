@@ -115,7 +115,7 @@
                                                     <br>{{this.ticket_email}} {{/if}} {{#if this.option }} Option: {{this.option}}
                                                     {{/if}}
                                                 </td>
-                                                <td>{{money this.product_price}}
+                                                <td>{{this.product_price}}
                                             </tr>
                                             {{/each}}
                                         </tbody>
@@ -123,7 +123,7 @@
                                     </td>
                                     <td class="text-left">{{this.status}}</td>
                                     <td class="text-left">{{this.receipt_status}}</td>
-                                    <td class="text-right">${{money this.total}}</td>
+                                    <td class="text-right">${{this.total}}</td>
                                     <td class="text-right">{{this.note}}</td>
                                     <td>
                                         <p data-placement="top" data-toggle="tooltip" title="Update Order ">
