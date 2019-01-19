@@ -408,7 +408,7 @@ router.post('/signin', function (req, res, next) {
 				res.redirect('/user/signin');
 
 				res.render('user/signin', {
-					layout: 'eshop/blank',
+					layout: 'eshop/blankall',
 					authFacebook: authFacebook,
 					authGoogle: authGoogle,
 					noErrorMessage: !errorMsg,
@@ -499,9 +499,6 @@ router.get('/google/callback', passport.authenticate('google', {
 
 module.exports = router;
 
-// Mindspace
-// https://www.youtube.com/watch?v=XVYApTfR6XE
-
 function isLoggedIn(req, res, next) {
 	if (req.isAuthenticated()) {
 		return next();
@@ -540,8 +537,8 @@ router.get('/signin', csrfProtection, function (req, res, next) {
 	var messages = req.flash('error');
 	
 	res.render('user/signin', {
-		layout: 'eshop/blank',
-		// csrfToken: req.csrfToken(),
+		layout: 'eshop/blankall',
+		csrfToken: req.csrfToken(),
 		authFacebook: authFacebook,
 		authGoogle: authGoogle,
 		noErrorMessage: !errorMsg,
@@ -705,9 +702,6 @@ router.get('/google/callback', passport.authenticate('google', {
 
 module.exports = router;
 
-// Mindspace
-// https://www.youtube.com/watch?v=XVYApTfR6XE
-
 function isLoggedIn(req, res, next) {
 	if (req.isAuthenticated()) {
 		return next();
@@ -729,7 +723,6 @@ function saveSession(req, res, next) {
 router.get('/signin', csrfProtection, function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
-	////console.log("Error: " + JSON.stringify(errorMsg));
 	if (process.env.FACEBOOK_ID) {
 		var authFacebook = true
 	} else {
@@ -744,8 +737,7 @@ router.get('/signin', csrfProtection, function (req, res, next) {
 	var messages = req.flash('error');
 	
 	res.render('user/signin', {
-		layout: 'eshop/blank',
-		// csrfToken: req.csrfToken(),
+		layout: 'eshop/blankall',
 		authFacebook: authFacebook,
 		authGoogle: authGoogle,
 		noErrorMessage: !errorMsg,

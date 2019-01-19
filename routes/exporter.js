@@ -57,12 +57,12 @@ router.get('/products', function (req, res){
 		$unwind: "$options"
 	}],function(err,products) {
 		// res.json(categories);
-		var filename = ['Products-', Date.now()].join('');
+		var filename = ['Events-', Date.now()].join('');
 		var fields = ['name', 'title', 'description', 'shippable','taxable','price','cost','Product_Group','options'];
 		var fieldNames = ['Name', 'Title', 'Description', 'Ship?','Tax?','Price','Cost','Product_Group','Options'];
 		var data = json2csv({ data: products, fields: fields, fieldNames: fieldNames });
 		res.set('Content-Disposition', ["attachment; filename=", filename, '.csv'].join(''))
-		res.end(JSON.stringify());
+		res.end(JSON.stringify(data));
 	});
 });
 
@@ -80,7 +80,7 @@ router.get('/users', function (req, res){
 		var fieldNames = ['first_name', 'last_name', 'email', 'name','ordered','sku','status'];
 		var data = json2csv({ data: users, fields: fields, fieldNames: fieldNames });
 		res.set('Content-Disposition', ["attachment; filename=", filename, '.csv'].join(''))
-		res.end(JSON.stringify(someObject));
+		res.end(JSON.stringify(data));
 	});
 
 });
@@ -93,12 +93,12 @@ router.get('/orders', function (req, res){
 			includeArrayIndex: "item_no"
 		}
 	}],function(err,orders) {
-		var filename = ['Orders-', Date.now()].join('');
+		var filename = ['Bookings-', Date.now()].join('');
 		var fields = ['_id','user.first_name', 'user.last_name', 'user.email', 'status','created','cart.product_name','cart.option','cart.product_price','cart.ticket_name','cart.ticket_email'];
 		var fieldNames = ['ID','First name', 'Last Name', 'Email', 'Status','Ordered','Item','Option','Price','Ticket Name','Ticket Email'];
 		var data = json2csv({ data: orders, fields: fields, fieldNames: fieldNames });
 		res.set('Content-Disposition', ["attachment; filename=", filename, '.csv'].join(''))
-		res.end(JSON.stringify(someObject));
+		res.end(JSON.stringify(data));
 	});
 
 });

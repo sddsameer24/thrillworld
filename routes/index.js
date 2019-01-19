@@ -2014,7 +2014,8 @@ router.post('/create', function (req, res, next) {
 		paidBy: 'instamojo',
 		ticket_name: req.user.first_name,
 		ticket_email: req.user.email,
-
+		checkin: req.body.arrival,
+		checkout: req.body.depart,
 	}
 	console.log(order);
 	orders.push(order);
@@ -2051,8 +2052,6 @@ router.post('/create', function (req, res, next) {
 		billing_state: req.body.shipping_state,
 		billing_zipcode: req.body.shipping_zipcode,
 		paymentId: 1234, // Adding Dummmy payment id
-		checkin: req.body.arrival,
-		checkout: req.body.depart,
 		status: 'pending',
 		total: req.body.price
 	});

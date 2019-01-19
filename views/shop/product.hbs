@@ -146,10 +146,9 @@
                 </div>
 
                 <div class="overview-btns">
-                    <button href="/checkout/{{this._id}}" type="button" class="btn btn-danger">Book now</button>
+                    <a href="/checkout/{{this._id}}" type="button" class="btn btn-danger">Book now</a>
 
                 </div>
-
                 <div class="overview-btns">
                     <form action='/add-to-cart' method='POST'>
                         <input type='hidden' name='productId' value='{{ this._id }}'>
