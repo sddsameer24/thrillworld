@@ -99,7 +99,7 @@ router.get('/whypaypal', function (req, res, next) {
 /* host main Info Page */
 router.get('/listing', function (req, res, next) {
 	res.render('shop/listing'), {
-		layout: 'eshop/blank'
+		layout: 'eshop/blankall'
 	}
 
 });
@@ -108,7 +108,7 @@ router.get('/signup', function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	res.render('user/signup', {
-		layout: 'eshop/blank',
+		layout: 'eshop/blankall',
 		//csrfToken: req.csrfToken(),
 		"successMsg": successMsg,
 		"noMessage": !successMsg,

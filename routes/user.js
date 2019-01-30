@@ -121,7 +121,7 @@ router.get('/forgot', function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	res.render('user/forgot', {
-		layout: 'eshop/blank',
+		layout: 'eshop/blankall',
 		user: req.user,
 		errorMsg: errorMsg,
 		noErrorMsg: !errorMsg,
@@ -347,7 +347,7 @@ router.get('/signup', function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	res.render('user/signup', {
-		layout: 'eshop/blank',
+		layout: 'eshop/blankall',
 		//csrfToken: req.csrfToken(),
 		"successMsg": successMsg,
 		"noMessage": !successMsg,
@@ -611,13 +611,14 @@ router.post('/signin', function (req, res, next) {
 				res.redirect('/user/signin');
 
 				res.render('user/signin', {
-					layout: 'eshop/blank',
+					layout: 'eshop/blankall',
 					authFacebook: authFacebook,
 					authGoogle: authGoogle,
 					noErrorMessage: !errorMsg,
 					noErrorMsg: !errorMsg,
 					successMsg: successMsg,
-					noMessage: !successMsg
+					noMessage: !successMsg,
+					message:errorMsg
 				});
 				// return res.redirect('/user/signin');
 			}
@@ -1289,7 +1290,7 @@ router.post('/login', function (req, res, next) {
 				});
 
 				res.render('user/signin', {
-					layout: 'eshop/blank',
+					layout: 'eshop/blankall',
 					authFacebook: authFacebook,
 					authGoogle: authGoogle,
 					noErrorMessage: !errorMsg,
