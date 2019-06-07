@@ -142,6 +142,7 @@ passport.use(new FacebookStrategy({
 	callbackURL: '/user/facebook/callback',
 	profileFields: ['name', 'email', 'link', 'locale', 'timezone'],
 	passReqToCallback: true
+	
 }, (req, accessToken, refreshToken, profile, done) => {
 	if (req.user) {
 		User.findOne({

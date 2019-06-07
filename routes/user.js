@@ -150,7 +150,7 @@ router.post('/forgot', function (req, res, next) {
 					console.log('no account with that email.');
 					return res.redirect('/user/forgot');
 				}
-				console.log("token:"+token);
+				console.log("token:" + token);
 				user.resetPasswordToken = token;
 				user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
@@ -196,7 +196,7 @@ router.post('/forgot', function (req, res, next) {
 					'http://' + req.headers.host + '/user/reset/' + token + '\n\n' +
 					'If you did not request this, please ignore this email and your password will remain unchanged.\n'
 			};
-			console.log("mailingtransporteroptions: "+mailOptions);
+			console.log("mailingtransporteroptions: " + mailOptions);
 			// send mail with defined transport object
 			transporter.sendMail(mailOptions, (error, info) => {
 				if (error) {
@@ -233,8 +233,8 @@ router.get('/reset/:token', function (req, res) {
 		resetPasswordExpires: {
 			$gt: Date.now()
 		}
-	}, function (err,user) {
-		
+	}, function (err, user) {
+
 		//console.log("Found User: " + JSON.stringify(user));
 		res.render('user/reset', {
 			user: req.user,
@@ -244,15 +244,15 @@ router.get('/reset/:token', function (req, res) {
 			successMsg: successMsg,
 			noMessage: !successMsg,
 		});
-		
-		});
+
 	});
+});
 router.post('/reset/:token', function (req, res) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	pass = req.body.password;
 	conf = req.body.confirmation;
-	token = req.params.token;	
+	token = req.params.token;
 	async.waterfall([
 		function (done) {
 			User.findOne({
@@ -283,7 +283,7 @@ router.post('/reset/:token', function (req, res) {
 			});
 		},
 		function (user, done) {
-			console.log("done"+user);
+			console.log("done" + user);
 			let transporter = nodemailer.createTransport({
 				host: 'mail.zo-online.com',
 				port: 587,
@@ -304,7 +304,7 @@ router.post('/reset/:token', function (req, res) {
 				to: user.email, // list of receivers
 				subject: 'Your password has been changed',
 				text: 'Hello,\n\n' +
-				'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+					'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
 			};
 			// var mailOptions = {
 			// 	to: user.email,
@@ -331,7 +331,7 @@ router.post('/reset/:token', function (req, res) {
 	], function (err) {
 		if (err) {
 			req.flash('error', 'Unknown Error during reset.')
-			
+
 		}
 		res.redirect('/user/forgot');
 	});
@@ -403,7 +403,7 @@ router.post('/signin', function (req, res, next) {
 		function (err, user, info) {
 			////console.log("trying to log in");
 			if (err) {
-				
+
 				req.flash('error', 'Internal Server Error');
 				res.redirect('/user/signin');
 
@@ -423,7 +423,7 @@ router.post('/signin', function (req, res, next) {
 				////console.log("Error Login - invalid credentials");
 				return res.redirect('/user/signin');
 
-				
+
 				// res.status(500).send({
 				// 	message:  "Some error occurred while creating the Note.",
 				// 	status: false
@@ -446,10 +446,10 @@ router.post('/signin', function (req, res, next) {
 					////console.log("Error Login - invalid credentials");
 					return res.redirect('/user/signin');
 
-				// 	res.status(500).send({
-				// 	message:  "Signin incoorect",
-				// 	status: false
-				// });
+					// 	res.status(500).send({
+					// 	message:  "Signin incoorect",
+					// 	status: false
+					// });
 
 					// return res.render('user/signin', {
 					// 	layout: 'eshop/blank',
@@ -463,8 +463,8 @@ router.post('/signin', function (req, res, next) {
 				}
 				req.flash('success', 'Logged In Successfully');
 				// res.send(user);
-				
-			  return res.redirect('/');
+
+				return res.redirect('/');
 			});
 		})(req, res, next);
 });
@@ -476,7 +476,7 @@ router.get('/facebook', passport.authenticate('facebook', {
 
 // router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/user/signin' }), (req, res) => {
 router.get('/facebook/callback', passport.authenticate('facebook', {
-	failureRedirect: '/'
+	failureRedirect: '/user/signin'
 }), (req, res) => {
 	res.redirect(req.session.returnTo || '/');
 });
@@ -535,7 +535,7 @@ router.get('/signin', csrfProtection, function (req, res, next) {
 	}
 	req.session.oldUrl = req.get('referer');
 	var messages = req.flash('error');
-	
+
 	res.render('user/signin', {
 		layout: 'eshop/blankall',
 		csrfToken: req.csrfToken(),
@@ -606,7 +606,7 @@ router.post('/signin', function (req, res, next) {
 		function (err, user, info) {
 			////console.log("trying to log in");
 			if (err) {
-				
+
 				req.flash('error', 'Internal Server Error');
 				res.redirect('/user/signin');
 
@@ -618,7 +618,7 @@ router.post('/signin', function (req, res, next) {
 					noErrorMsg: !errorMsg,
 					successMsg: successMsg,
 					noMessage: !successMsg,
-					message:errorMsg
+					message: errorMsg
 				});
 				// return res.redirect('/user/signin');
 			}
@@ -627,7 +627,7 @@ router.post('/signin', function (req, res, next) {
 				////console.log("Error Login - invalid credentials");
 				return res.redirect('/user/signin');
 
-				
+
 				// res.status(500).send({
 				// 	message:  "Some error occurred while creating the Note.",
 				// 	status: false
@@ -650,10 +650,10 @@ router.post('/signin', function (req, res, next) {
 					////console.log("Error Login - invalid credentials");
 					return res.redirect('/user/signin');
 
-				// 	res.status(500).send({
-				// 	message:  "Signin incoorect",
-				// 	status: false
-				// });
+					// 	res.status(500).send({
+					// 	message:  "Signin incoorect",
+					// 	status: false
+					// });
 
 					// return res.render('user/signin', {
 					// 	layout: 'eshop/blank',
@@ -667,23 +667,21 @@ router.post('/signin', function (req, res, next) {
 				}
 				req.flash('success', 'Logged In Successfully');
 				// res.send(user);
-				
-			  return res.redirect('/');
+
+				return res.redirect('/');
 			});
 		})(req, res, next);
 });
 
-router.get('/facebook', passport.authenticate('facebook', {
-	scope: ['email', 'user_location'],
-	failureFlash: true
-}));
+// router.get('/facebook', passport.authenticate('facebook', {
+// 	scope: ['email', 'user_location'],
+// 	failureFlash: true
+// }));
 
 // router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/user/signin' }), (req, res) => {
-router.get('/facebook/callback', passport.authenticate('facebook', {
-	failureRedirect: '/'
-}), (req, res) => {
-	res.redirect(req.session.returnTo || '/');
-});
+// 	console.log("Facebook login");
+// 	res.redirect(req.session.returnTo || '/');
+// });
 
 router.get('/twitter', passport.authenticate('twitter'));
 router.get('/twitter/callback', passport.authenticate('twitter', {
@@ -736,7 +734,7 @@ router.get('/signin', csrfProtection, function (req, res, next) {
 	}
 	req.session.oldUrl = req.get('referer');
 	var messages = req.flash('error');
-	
+
 	res.render('user/signin', {
 		layout: 'eshop/blankall',
 		authFacebook: authFacebook,
@@ -789,7 +787,7 @@ router.get('/signin', csrfProtection, function (req, res, next) {
 
 router.post('/updateuserdetails', function (req, res, next) {
 
-	if(req.body.email){
+	if (req.body.email) {
 		User.update({
 			email: req.body.email
 		}, req.body)
@@ -798,28 +796,28 @@ router.post('/updateuserdetails', function (req, res, next) {
 				req.flash('success', 'User Updated');
 				// res.redirect('/user/profile');
 				res.send({
-					message:  "Updated Profile",
+					message: "Updated Profile",
 					status: true
 				});
-	
+
 			})
 			.catch(function (err) {
 				////console.log("Error: " + JSON.stringify(err));
 				req.flash('error', 'Problem updating user profile.');
 				res.send({
-					message:  "Some error occurred",
+					message: "Some error occurred",
 					status: false
 				});
-	
+
 			});
-	}else{
+	} else {
 		res.send({
-			message:  "Some error occurred",
+			message: "Some error occurred",
 			status: false
 		});
 	}
 
-	
+
 });
 
 // Mobile Profile
@@ -834,14 +832,14 @@ router.post('/getuserdetails', function (req, res, next) {
 	console.log("events1");
 
 	User.find(qryFilter, function (err, user) {
-		
+
 		console.log("user: " + JSON.stringify(user));
-{
+		{
 			req.flash('success');
 			for (i = 0; i < user.length; i++) {
 				res.send(user[i]);
 			}
-			
+
 		}
 	});
 });
@@ -853,7 +851,7 @@ router.get('/mybookings', isLoggedIn, function (req, res, next) {
 	// res.render('user/profile', {layout:'fullpage.hbs',user: req.user, payments: payments,hasPayments:0});
 
 	Order.find({
-		$or: [ {
+		$or: [{
 			"user.email": req.user.email
 		}]
 	}, null, {
@@ -863,7 +861,7 @@ router.get('/mybookings', isLoggedIn, function (req, res, next) {
 		}, function (err, orders) {
 			if (err) {
 				res.send({
-					message:  "Some error occurred",
+					message: "Some error occurred",
 					status: false
 				});
 			}
@@ -887,17 +885,17 @@ router.get('/mybookings', isLoggedIn, function (req, res, next) {
 // MOBILE LOGOUT
 router.get('/logoutmobile', isLoggedIn, function (req, res, next) {
 	meanlogger.log("auth", "logged out", req.user);
-//console.log("MOBILE HIT");
+	//console.log("MOBILE HIT");
 	req.session.destroy()
 	req.logout();
 	// res.redirect('/');
 
-		res.status(500).send({
-					message:  "Logged Out Sucessfully",
-					status: true
-				});
+	res.status(500).send({
+		message: "Logged Out Sucessfully",
+		status: true
+	});
 
-	
+
 });
 
 // Mobile
@@ -908,7 +906,7 @@ router.get('/logout-and-delete-mobile', isLoggedIn, function (req, res, next) {
 			////console.log("Problem removing user record.");
 			req.flash('error', 'Unable to delete user record.');
 			res.send({
-				message:  "Error ",
+				message: "Error ",
 				status: false
 			});
 		}
@@ -917,7 +915,7 @@ router.get('/logout-and-delete-mobile', isLoggedIn, function (req, res, next) {
 	//req.session.destroy()
 	req.logout();
 	res.send({
-		message:  "Logged Out Sucessfully and Deleted",
+		message: "Logged Out Sucessfully and Deleted",
 		status: true
 	});
 });
@@ -937,31 +935,31 @@ router.post('/forgot-mobile', function (req, res, next) {
 				email: req.body.email
 			}, function (err, user) {
 				//console.log("USERR"+user);
-				if (user===null || !user ) {
+				if (user === null || !user) {
 					//console.log("ERRRRRRRR");
 					req.flash('error', 'No account with that email address exists.');
 					////console.log('no account with that email.');
 					res.send({
-						message:  "No account with that email address exists.",
+						message: "No account with that email address exists.",
 						status: false
 					});
 
 				}
-				else{
+				else {
 					user.resetPasswordToken = token;
-				user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+					user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
-				user.save(function (err) {
-					if (err) {
-						req.flash('error', 'An error occurred.');
-						res.send({
-							message:  "An error occurred.",
-							status: false
-						});
-					}
-					////console.log("Saved User: " + JSON.stringify(user));
-					done(err, token, user);
-				});
+					user.save(function (err) {
+						if (err) {
+							req.flash('error', 'An error occurred.');
+							res.send({
+								message: "An error occurred.",
+								status: false
+							});
+						}
+						////console.log("Saved User: " + JSON.stringify(user));
+						done(err, token, user);
+					});
 				}
 			});
 		},
@@ -1025,8 +1023,8 @@ router.post('/forgot-mobile', function (req, res, next) {
 			// 			return res.redirect('/user/forgot');
 			// 		}
 			// 	});
-			
-		
+
+
 			let transporter = nodemailer.createTransport({
 				host: 'mail.zo-online.com',
 				port: 587,
@@ -1058,7 +1056,7 @@ router.post('/forgot-mobile', function (req, res, next) {
 
 					//console.log("ERROR" + error);
 					res.send({
-						message:  "An error occurred.",
+						message: "An error occurred.",
 						status: false
 					});
 				}
@@ -1069,9 +1067,9 @@ router.post('/forgot-mobile', function (req, res, next) {
 				//console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 				req.flash('success', "SENT MAIL, KINDLY CHECK!");
 				res.send({
-					message:  "Sent Forgot Email.",
+					message: "Sent Forgot Email.",
 					status: true
-				});	
+				});
 				//	res.render('contact', { msg: 'Email has been sent' });
 			});
 			// end of order comnfirmation mail sending  ..........................................
@@ -1080,14 +1078,14 @@ router.post('/forgot-mobile', function (req, res, next) {
 		if (err) {
 			req.flash('error', 'A problem has occurred ' + err);
 			res.send({
-				message:  "An error occurred.",
+				message: "An error occurred.",
 				status: false
 			});
-		}else{
+		} else {
 			res.send({
-				message:  "Sent Forgot Email.",
+				message: "Sent Forgot Email.",
 				status: true
-			});	
+			});
 		}
 		//res.redirect('/user/forgot');
 	});
@@ -1105,22 +1103,22 @@ router.get('/reset-mobile/:token', function (req, res) {
 		}
 	}, function (err, user) {
 
-		if(err){
+		if (err) {
 			res.send({
-				message:  "An error occurred.",
+				message: "An error occurred.",
 				status: false
 			});
 
-		}else{
+		} else {
 			//console.log("Found User: " + JSON.stringify(user));
-		
-			res.send(user);	
+
+			res.send(user);
 		}
-		
-	
-		
-		});
+
+
+
 	});
+});
 
 
 // Mobile Post 
@@ -1130,7 +1128,7 @@ router.post('/reset-mobile/:token', function (req, res) {
 	var errorMsg = req.flash('error')[0];
 	pass = req.body.password;
 	conf = req.body.confirmation;
-	token = req.params.token;	
+	token = req.params.token;
 	async.waterfall([
 		function (done) {
 			User.findOne({
@@ -1142,28 +1140,28 @@ router.post('/reset-mobile/:token', function (req, res) {
 				if (err) {
 					////console.log("Error: " + err.message);
 					res.send({
-						message:  "An error occurred.",
+						message: "An error occurred.",
 						status: false
 					});
-				}else{
+				} else {
 					//console.log("User: " + JSON.stringify(user));
-				// if (!user) {
-				// 	errorMsg = req.flash('error', 'Password reset token is invalid or has expired.');
-				// 	return res.redirect('back');
-				// }
-				user.password = req.body.password;
-				user.resetPasswordToken = undefined;
-				user.resetPasswordExpires = undefined;
+					// if (!user) {
+					// 	errorMsg = req.flash('error', 'Password reset token is invalid or has expired.');
+					// 	return res.redirect('back');
+					// }
+					user.password = req.body.password;
+					user.resetPasswordToken = undefined;
+					user.resetPasswordExpires = undefined;
 
-				user.save(function (err) {
-					req.logIn(user, function (err) {
-						done(err, user);
+					user.save(function (err) {
+						req.logIn(user, function (err) {
+							done(err, user);
+						});
 					});
-				});
-				res.send(user);
+					res.send(user);
 
 				}
-				
+
 			});
 		},
 		function (user, done) {
@@ -1196,11 +1194,11 @@ router.post('/reset-mobile/:token', function (req, res) {
 	], function (err) {
 		if (err) {
 			req.flash('error', 'Unknown Error during reset.')
-		//	res.redirect('user/reset');
-		res.send({
-			message:  "An error occurred.",
-			status: false
-		});
+			//	res.redirect('user/reset');
+			res.send({
+				message: "An error occurred.",
+				status: false
+			});
 		}
 	});
 });
@@ -1208,7 +1206,7 @@ router.post('/reset-mobile/:token', function (req, res) {
 
 // Mobile register 
 
-router.post('/register',function (req, res, next) {
+router.post('/register', function (req, res, next) {
 
 	req.session.first_name = req.body.first_name;
 	req.session.last_name = req.body.last_name;
@@ -1219,10 +1217,10 @@ router.post('/register',function (req, res, next) {
 	req.session.telephone = req.body.telephone;
 	req.session.zipcode = req.body.zipcode;
 	//console.log("REGISTER HIT");
-	if(req.body.email || req.body.password || req.body.first_name || req.body.last_name || req.body.addr1 || req.body.city ||  req.body.addr2 ||  req.body.state ||req.body.zipcode || req.body.telephone ){
-		
+	if (req.body.email || req.body.password || req.body.first_name || req.body.last_name || req.body.addr1 || req.body.city || req.body.addr2 || req.body.state || req.body.zipcode || req.body.telephone) {
+
 		var newUser = new User();
-		
+
 		console.log("1244 old REGISTER HIT");
 
 		newUser.email = req.body.email;
@@ -1238,23 +1236,23 @@ router.post('/register',function (req, res, next) {
 		newUser.telephone = req.body.telephone;
 		newUser.role = 'visitor';
 		newUser.save(function (err, result) {
-			if(!err){
+			if (!err) {
 				req.flash('success', 'User successfully registered.');
 				res.send({
-					message:  "Customer Registered",
+					message: "Customer Registered",
 					status: true
 				});
-			}else
-			res.send({
-				message:  "Error"+err,
-				status: true
-			});
+			} else
+				res.send({
+					message: "Error" + err,
+					status: true
+				});
 		});
 	}
 
-	else{
+	else {
 		res.send({
-			message:  "Error",
+			message: "Error",
 			status: false
 		});
 	}
@@ -1284,8 +1282,8 @@ router.post('/login', function (req, res, next) {
 				req.flash('error', 'Internal Server Error');
 				////console.log("Error: " + err.message);
 				// res.redirect('/user/signin');
-					res.status(500).send({
-					message:  "Some error occurred while creating the Note.",
+				res.status(500).send({
+					message: "Some error occurred while creating the Note.",
 					status: false
 				});
 
@@ -1305,9 +1303,9 @@ router.post('/login', function (req, res, next) {
 				// ////console.log("Error Login - invalid credentials");
 				// return res.redirect('/user/signin');
 
-				
+
 				res.send({
-					message:  "Some error occurred",
+					message: "Some error occurred",
 					status: false
 				});
 
@@ -1328,10 +1326,10 @@ router.post('/login', function (req, res, next) {
 					// ////console.log("Error Login - invalid credentials");
 					// return res.redirect('/user/signin');
 
-				// 	res.send({
-				// 	message:  "Signin incoorect",
-				// 	status: false
-				// });
+					// 	res.send({
+					// 	message:  "Signin incoorect",
+					// 	status: false
+					// });
 
 					// return res.render('user/signin', {
 					// 	layout: 'eshop/blank',
@@ -1342,13 +1340,13 @@ router.post('/login', function (req, res, next) {
 					// 	successMsg: successMsg,
 					// 	noMessage: !successMsg,
 					// })
-				}else{
+				} else {
 					res.send(user);
 				}
 				// req.flash('success', 'Logged In Successfully');
-				
-				
-			//   return res.redirect('/user/profile');
+
+
+				//   return res.redirect('/user/profile');
 			});
 		})(req, res, next);
 });

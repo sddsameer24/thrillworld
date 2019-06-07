@@ -120,7 +120,7 @@ var hbs = expressHbs.create({
           }, "") + "." + p[1];
         }
     },
-    defaultLayout: 'layout',
+    defaultLayout: 'eshop/blankall',
     extname: '.hbs',
 });
 
