@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Meta tags -->
+    <title>{{title}}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ThrillWorld - An Implementation of Thrillworld ">
+    <meta name="author" content="">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- stylesheets -->
+	<link rel="icon" href="/images/favicon.ico">
+    <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+    <link href="/stylesheets/font-awesome.css" rel="stylesheet">
+     <link href="/stylesheets/main.css" rel="stylesheet">
+	 <script src="/javascripts/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link href="//fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+	<link href="//fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,700i,800,900" rel="stylesheet">  
+	
+</head>   
+<body>
+	<div class="side-btn right-side-btn">
+  <a href="/hostsignup">Add to listing</a>
+     </div>
+	 {{>eshop/header}}
+	<!-- About us -->
+	<div class="agile-about" id="about">
+		<h1 class="text-center"><a>Featured In ThrillWorld</a></h1>
+		
+
+		 {{>eshop/featured-items}}
+	</div>
+	<!-- //About us -->
+  <!-- Gallery Property -->
+	<div class="samls-property" id="property">	
+		{{>eshop/category}}
+		<div class="clearfix"></div>
+	</div>
+	<!-- //Gallery Property-->
+	<!-- our guides -->
+	<div class="sam-guides" id="agent">
+		<h1 class="text-center"><a>Users Reviews</a></h1>
+		<div class="container">
+			
+			<div class="guide-grids">
+				<div class="col-md-3 col-sm-6 col-xs-6 guide1">
+					<img src="images/gallery4.jpg" alt="guide1" class="img-responsive">
+					<h4>Emily Jean</h4>
+					<p class="designation">Senior Agent</p>
+					<p>If you are going to use a passage of Lorem Ipsum, you need to be sure there is embarrassing.</p>
+					<div class="social-wthree-icons bnragile-icons">
+							<ul>
+								<li><a href="#" class="fa fa-facebook icon icon-border facebook"> </a></li>
+								<li><a href="#" class="fa fa-twitter icon icon-border twitter"> </a></li>
+								<li><a href="#" class="fa fa-google-plus icon icon-border googleplus"> </a></li>
+							</ul>
+							<div class="clearfix"> </div>
+						</div>
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-6 guide2">
+					<img src="images/gallery3.jpg" alt="guide2" class="img-responsive">
+					<h4>Alexandra Anna</h4>
+					<p class="designation">Land Agent</p>
+					<p>If you are going to use a passage of Lorem Ipsum, you need to be sure there is embarrassing.</p>
+					<div class="social-wthree-icons bnragile-icons">
+							<ul>
+								<li><a href="#" class="fa fa-facebook icon icon-border facebook"> </a></li>
+								<li><a href="#" class="fa fa-twitter icon icon-border twitter"> </a></li>
+								<li><a href="#" class="fa fa-google-plus icon icon-border googleplus"> </a></li>
+							</ul>
+							<div class="clearfix"> </div>
+						</div>
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-6 guide3">
+					<img src="images/gallery2.jpg" alt="guide3" class="img-responsive">
+					<h4>Mark Phillips</h4>
+					<p class="designation">House Agent</p>
+					<p>If you are going to use a passage of Lorem Ipsum, you need to be sure there is embarrassing.</p>
+					<div class="social-wthree-icons bnragile-icons">
+							<ul>
+								<li><a href="#" class="fa fa-facebook icon icon-border facebook"> </a></li>
+								<li><a href="#" class="fa fa-twitter icon icon-border twitter"> </a></li>
+								<li><a href="#" class="fa fa-google-plus icon icon-border googleplus"> </a></li>
+							</ul>
+							<div class="clearfix"> </div>
+						</div>
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-6 guide4">
+					<img src="images/gallery1.jpg" alt="guide4" class="img-responsive">
+					<h4>Hail Steinfeld</h4>
+					<p class="designation">Loan Agent</p>
+					<p>If you are going to use a passage of Lorem Ipsum, you need to be sure there is embarrassing.</p>
+					<div class="social-wthree-icons bnragile-icons">
+							<ul>
+								<li><a href="#" class="fa fa-facebook icon icon-border facebook"> </a></li>
+								<li><a href="#" class="fa fa-twitter icon icon-border twitter"> </a></li>
+								<li><a href="#" class="fa fa-google-plus icon icon-border googleplus"> </a></li>
+							</ul>
+							<div class="clearfix"> </div>
+						</div>
+				</div>
+
+			</div>
+			<div class="clearfix"> </div>
+		</div>
+	</div>
+	<!-- //our guides -->
+	<!-- testimonials -->
+	
+	<!-- //testimonials -->
+  <!-- contact -->
+	<div class="samls-contact" id="contact">
+		<h3 class="center">Contact Us</h3>
+		<div class="container">
+			<form action="/contactform" method="post">
+				<div class="form-input">
+					<label>Name <span class="sam-star"> * </span> </label>
+					<input type="text" name="name" placeholder="Your Name" required>
+				</div>
+				<div class="form-input">
+					<label>Email <span class="sam-star"> * </span> </label>
+					<input type="email" name="email" placeholder="Your Email" required>
+				</div>
+				<div class="form-input">
+					<label>Phone <span class="sam-star"> * </span> </label>
+					<input type="text" name="mobile" placeholder="Phone Number" required>
+				</div>
+				<div class="form-textarea">
+					<label>Message <span class="sam-star"> * </span> </label>
+					<textarea name="message" placeholder="Your Message" rows="5" cols="20" required></textarea>
+				</div>
+				<input type="Submit" value="Submit Message">
+			</form>
+			<div class="map">
+				{{!-- <iframe src="https://www.google.com/maps/embed/v1/place?q=pawna%20lake%20camping&key=AIzaSyCqB67Jedp1AjE5ZiZmfLqVNFZmHOsFM6k" allowfullscreen></iframe> --}}
+				<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d396368.68564402737!2d-94.8559081017095!3d39.09211671179675!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87c0f75eafe99997%3A0x558525e66aaa51a2!2sKansas+City%2C+MO%2C+USA!5e0!3m2!1sen!2sin!4v1509960130500" allowfullscreen></iframe>
+			</div>
+		</div>	
+			{{>eshop/footer}}
+		</div>
+	</div>	
+	<!-- smooth scrolling -->
+	 <script src="/javascripts/SmoothScroll.min.js"></script>
+	  <script src="/javascripts/move-top.js"></script>
+	   <script src="/javascripts/easing.js"></script>
+	
+	<!-- here stars scrolling icon -->
+	<script type="text/javascript">
+		$(document).ready(function() {
+			/*
+				var defaults = {
+				containerID: 'toTop', // fading element id
+				containerHoverID: 'toTopHover', // fading element hover id
+				scrollSpeed: 1200,
+				easingType: 'linear'
+				};
+			*/
+
+			$().UItoTop({ easingType: 'easeOutQuart' });
+
+			});
+	</script>
+	<!-- //here ends scrolling icon -->
+<!-- smooth scrolling -->
+
+<!-- scrolling script -->
+<script type="text/javascript">
+	jQuery(document).ready(function($) {
+		$(".scroll").click(function(event){
+			event.preventDefault();
+			$('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
+		});
+	});
+</script>
+<!-- //scrolling script -->
+
+</body>
+</html>
