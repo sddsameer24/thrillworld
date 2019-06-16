@@ -2380,7 +2380,7 @@
 
 			<div class="featured-products">
 				<div class="container">
-					<h2 class="title-div wow slideInLeft pull-left" data-wow-duration="1s" data-wow-delay="0s" data-wow-offset="10">Our Top Featured products</h2>
+					<h2 class="title-div wow slideInLeft pull-left" data-wow-duration="1s" data-wow-delay="0s" data-wow-offset="10">Our Top Featured events</h2>
 					<div class="clear"></div>
 					<div class="featured-navigation pull-right">
 						<span class="">
@@ -2568,22 +2568,31 @@
 					<h2 class="title-div wow slideInLeft" data-wow-duration="1s" data-wow-delay="0s" data-wow-offset="10">Our Latest Events available</h2>
 					<div class="products">
 						<div class="row">
-
+							{{# each products }}
 							<div class="col-md-3">
+								{{# each this}}
 								<div class="product-item">
 									<div class="product-borde-inner">
-										<a href="product_single.html">
-											<img src="images/product-slide/product1.png" class="img img-responsive" />
+										{{#if ../../isLoggedIn}}
+										<a href="/product/{{this._id}}">
+											{{else}}
+											<a href="/product1/{{this._id}}"></a>
+											{{/if}}
+											<img src="{{ this.imagePath }}" class="img img-responsive" />
 										</a>
 
 										<div class="product-price">
-											<a href="product_single.html">Paragliding</a>
+											{{#if ../../isLoggedIn}}
+											<a href='/product/{{this._id}}'>{{this.code}} - {{this.title}}</a>
+											{{else}}
+											<a href='/product1/{{this._id}}'>{{this.code}} - {{this.title}}</a>
+											{{/if}}
 											<br />
 											<span class="prev-price">
-												<del>200$</del>
+												<del>{{this.price}}</del>
 											</span>
 											<span class="current-price">
-												150$
+												{{this.price}}Rs
 											</span>
 										</div>
 
@@ -2594,218 +2603,16 @@
 										<div class="clearfix"></div>
 									</div>
 								</div>
+								{{/each}}
+								<!--each this -->
 							</div>
-							<!-- End Latest products[single] -->
-							<div class="col-md-3">
-								<div class="product-item">
-									<div class="product-borde-inner">
-										<a href="product_single.html">
-											<img src="images/product-slide/product2.png" class="img img-responsive" />
-										</a>
-
-										<div class="product-price">
-											<a href="product_single.html">Paragliding</a>
-											<br />
-											<span class="prev-price">
-												<del>200$</del>
-											</span>
-											<span class="current-price">
-												150$
-											</span>
-										</div>
-
-										<a href="cart.html" class="btn btn-cart text-center add-to-cart pull-right">
-											<i class="fa fa-cart-plus"></i>
-											Add to cart
-										</a>
-										<div class="clearfix"></div>
-									</div>
-								</div>
-							</div>
-							<!-- End Latest products[single] -->
-							<div class="col-md-3">
-								<div class="product-item">
-									<div class="product-borde-inner">
-										<a href="product_single.html">
-											<img src="images/product-slide/product3.png" class="img img-responsive" />
-										</a>
-
-										<div class="product-price">
-											<a href="product_single.html">Paragliding</a>
-											<br />
-											<span class="prev-price">
-												<del>200$</del>
-											</span>
-											<span class="current-price">
-												150$
-											</span>
-										</div>
-
-										<a href="cart.html" class="btn btn-cart text-center add-to-cart pull-right">
-											<i class="fa fa-cart-plus"></i>
-											Add to cart
-										</a>
-										<div class="clearfix"></div>
-									</div>
-								</div>
-							</div>
-							<!-- End Latest products[single] -->
-
-							<div class="col-md-3">
-								<div class="product-item">
-									<div class="product-borde-inner">
-										<a href="product_single.html">
-											<img src="images/product-slide/product4.png" class="img img-responsive" />
-										</a>
-
-										<div class="product-price">
-											<a href="product_single.html">Paragliding</a>
-											<br />
-											<span class="prev-price">
-												<del>200$</del>
-											</span>
-											<span class="current-price">
-												150$
-											</span>
-										</div>
-
-										<a href="cart.html" class="btn btn-cart text-center add-to-cart pull-right">
-											<i class="fa fa-cart-plus"></i>
-											Add to cart
-										</a>
-										<div class="clearfix"></div>
-									</div>
-								</div>
-							</div>
-							<!-- End Latest products[single] -->
-							<div class="col-md-3">
-								<div class="product-item">
-									<div class="product-borde-inner">
-										<a href="product_single.html">
-											<img src="images/product-slide/product1.png" class="img img-responsive" />
-										</a>
-
-										<div class="product-price">
-											<a href="product_single.html">Paragliding</a>
-											<br />
-											<span class="prev-price">
-												<del>200$</del>
-											</span>
-											<span class="current-price">
-												150$
-											</span>
-										</div>
-
-										<a href="cart.html" class="btn btn-cart text-center add-to-cart pull-right">
-											<i class="fa fa-cart-plus"></i>
-											Add to cart
-										</a>
-										<div class="clearfix"></div>
-									</div>
-								</div>
-							</div>
-							<!-- End Latest products[single] -->
-							<div class="col-md-3">
-								<div class="product-item">
-									<div class="product-borde-inner">
-										<a href="product_single.html">
-											<img src="images/product-slide/product4.png" class="img img-responsive" />
-										</a>
-
-										<div class="product-price">
-											<a href="product_single.html">Paragliding</a>
-											<br />
-											<span class="prev-price">
-												<del>200$</del>
-											</span>
-											<span class="current-price">
-												150$
-											</span>
-										</div>
-
-										<a href="cart.html" class="btn btn-cart text-center add-to-cart pull-right">
-											<i class="fa fa-cart-plus"></i>
-											Add to cart
-										</a>
-										<div class="clearfix"></div>
-									</div>
-								</div>
-							</div>
-							<!-- End Latest products[single] -->
-							<div class="col-md-3">
-								<div class="product-item">
-									<div class="product-borde-inner">
-										<a href="product_single.html">
-											<img src="images/product-slide/product2.png" class="img img-responsive" />
-										</a>
-
-										<div class="product-price">
-											<a href="product_single.html">Paragliding</a>
-											<br />
-											<span class="prev-price">
-												<del>200$</del>
-											</span>
-											<span class="current-price">
-												150$
-											</span>
-										</div>
-
-										<a href="cart.html" class="btn btn-cart text-center add-to-cart pull-right">
-											<i class="fa fa-cart-plus"></i>
-											Add to cart
-										</a>
-										<div class="clearfix"></div>
-									</div>
-								</div>
-							</div>
-							<!-- End Latest products[single] -->
-							<div class="col-md-3">
-								<div class="product-item">
-									<div class="product-borde-inner">
-										<a href="product_single.html">
-											<img src="images/product-slide/product3.png" class="img img-responsive" />
-										</a>
-
-										<div class="product-price">
-											<a href="product_single.html">Paragliding</a>
-											<br />
-											<span class="prev-price">
-												<del>200$</del>
-											</span>
-											<span class="current-price">
-												150$
-											</span>
-										</div>
-
-										<a href="cart.html" class="btn btn-cart text-center add-to-cart pull-right">
-											<i class="fa fa-cart-plus"></i>
-											Add to cart
-										</a>
-										<div class="clearfix"></div>
-									</div>
-								</div>
-							</div>
-							<!-- End Latest products[single] -->
-
-							<div class="clearfix"></div>
-
-
-
+							{{/each}}
 
 
 						</div>
-						<!-- End Latest products row-->
-						<a href="products.html" class="btn btn-blue btn-lg pull-right btn-more wow slideInRight" data-wow-duration="1s" data-wow-delay="0s"
-						 data-wow-offset="10">
-							<span>See More Events.. </span>
-						</a>
-						<div class="clear"></div>
-					</div>
-					<!-- End products div-->
-				</div>
-				<!-- End container latest products-->
-			</div>
-			<!-- End Latest products -->
+						</div>
+						</div>
+						
 
 			<div class="services-area">
 				<div class="services">
@@ -2865,10 +2672,10 @@
 							<div class="clearfix"></div>
 							<ul>
 								<li>
-									<i class="fa fa-map-marker"></i> Copyright © 2018 Thrillworld Tours Pvt. Ltd. • Kamshet, Maharashtra </li>
+									<i class="fa fa-map-marker"></i>Thrillworld Tours Pvt. Ltd. • Kamshet, Maharashtra </li>
 								<li>
 									<i class="fa fa-mobile"></i> • Tel: +91 838 100 4848 </li>
-								
+
 								<li>
 									<i class="fa fa-envelope-o"></i>
 									<a href="mailto:thrillworld@gmail.com"> thrillworld@gmail.com</a>
@@ -2966,8 +2773,7 @@
 		<div class="footer-bottom">
 			<p class="footer-credit">
 				&copy;
-				<script type="text/javascript">document.write(new Date().getFullYear())</script> - All rights reserved
-				Thrillworld Tours Pvt. Ltd. • Kamshet, Maharashtra • Tel: +91 838 100 4848
+				<script type="text/javascript">document.write(new Date().getFullYear())</script> - All rights reserved Thrillworld Tours Pvt. Ltd. • Kamshet, Maharashtra • Tel: +91 838 100 4848
 			</p>
 		</div>
 		<!--End Footer bottom -->
