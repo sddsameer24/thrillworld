@@ -343,13 +343,15 @@ router.use('/', notLoggedIn, function (req, res, next) {
 });
 
 router.get('/signup', function (req, res, next) {
+	console.log(req.flash);
 	var messages = req.flash('error');
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];
 	res.render('user/signup', {
 		layout: 'eshop/blankall',
-		//csrfToken: req.csrfToken(),
+		// csrfToken: req.csrfToken(),
 		"successMsg": successMsg,
+		"hasErrors" : messages.length>0,
 		"noMessage": !successMsg,
 		"message": messages,
 		"errorMsg": messages[0],
@@ -362,7 +364,6 @@ router.post('/signup', passport.authenticate('local.signup', {
 	failureRedirect: '/user/signup',
 	failureFlash: true
 }), function (req, res, next) {
-	console.log("signup");
 	meanlogger.log("auth", "signup attempt", req.user);
 	req.session.first_name = req.body.first_name;
 	req.session.last_name = req.body.last_name;
@@ -381,7 +382,44 @@ router.post('/signup', passport.authenticate('local.signup', {
 		res.redirect('/user/profile');
 	}
 });
-
+router.get('/signin', csrfProtection, function (req, res, next) {
+	var successMsg = req.flash('success')[0];
+	var errorMsg = req.flash('error')[0];
+    console.log("Error: " + JSON.stringify(errorMsg));
+	if (process.env.FACEBOOK_ID) {
+		var authFacebook = true
+	} else {
+		var authFacebook = false;
+	}
+	if (process.env.GOOGLE_ID) {
+		var authGoogle = true;
+	} else {
+		var authGoogle = false;
+	}
+	req.session.oldUrl = req.get('referer');
+	var messages = req.flash('error');
+	res.render('user/signin', {
+		layout: 'eshop/blank',
+		// csrfToken: req.csrfToken(),
+		authFacebook: authFacebook,
+		authGoogle: authGoogle,
+		noErrorMessage: !errorMsg,
+        errorMsg: errorMsg,
+		message: messages,
+		first_name: req.session.first_name,
+		last_name: req.session.last_name,
+		addr1: req.session.addr1,
+		city: req.session.city,
+		state: req.session.state,
+		zipcode: req.session.zipcode,
+		telephone: req.session.telephone,
+		email: req.session.email,
+		noErrorMsg: !errorMsg,
+		successMsg: successMsg,
+		noMessage: !successMsg,
+		hasErrors: messages.length > 0
+	});
+});
 router.post('/signin', function (req, res, next) {
 	var successMsg = req.flash('success')[0];
 	var errorMsg = req.flash('error')[0];

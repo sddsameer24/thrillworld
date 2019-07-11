@@ -7,10 +7,6 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const TwitterStrategy = require('passport-twitter').Strategy;
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
-// dotenv.load({ path: '.env.hackathon' });
-
-// Mindspace meanstack cart tutorial
-//https://www.youtube.com/watch?v=GHNLWHGCBEc
 passport.serializeUser(function (user, done) {
 	done(null, user.id);
 }); 
@@ -27,7 +23,7 @@ passport.use('local.signup', new LocalStrategy({
 	passReqToCallback: true
 }, function (req, email, password, done) {
 	process.nextTick(function () {
-    ////console.log("Here...");
+    console.log("Here...");
 		req.checkBody('email', 'Invalid Email').notEmpty().isEmail();
 		req.checkBody('password', 'Invalid Password').notEmpty().isLength({
 			min: 4
@@ -52,33 +48,36 @@ passport.use('local.signup', new LocalStrategy({
 		});
 		req.checkBody('zipcode', 'Invalid Zipcode').notEmpty().isLength({
 			min: 2
-		});
+		}); 
 		var errors = req.validationErrors();
 		if (errors) {
 			var messages = [];
 			errors.forEach(function (error) {
 				messages.push(error.msg);
+              
 			});
 			if (req.body.password != req.body.verifypassword) {
 				msg = 'Password and Verification do not match.';
 				messages.push(msg);
 			}
-			return done(null, false, req.flash('error', messages));
-		}
+			console.log(messages);
+			return done(null, true, req.flash('error', messages));
+		} 
 		User.findOne({
 			'email': email
 		}, function (err, user) {
 			if (err) {
+				console.log(err);
 				return done(err);
 			}
 			if (user) {
-        ////console.log("User email exists.");
+        console.log("User email exists.");
 				return done(null, false, req.flash('error', 'Email is already in use.'));
 			}
 			var newUser = new User();
 			newUser.email = email;
-			// newUser.password = newUser.encryptPassword(password);
-			newUser.password = req.body.password;
+			newUser.password = newUser.encryptPassword(password);
+		 	//newUser.password = req.body.password;
 			newUser.first_name = req.body.first_name;
 			newUser.last_name = req.body.last_name;
 			newUser.addr1 = req.body.addr1;
