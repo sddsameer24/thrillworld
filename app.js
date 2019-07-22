@@ -53,15 +53,6 @@ var fs = require('fs');
 
 require('./config/pp-config');
 require('./config/insta-config');
-var categoryrecord = {
-  "_id": "ObjectId('58485813edf44d95fb117223')",
-  "name": "Television",
-  "slug": "Television",
-  "attributes": [ ],
-  "ancestors": [ ],
-  "__v": 0
-};
-
 var app = express();
 if (process.env.NODE_ENV) {
   // ////console.log("USING .env.hackathon-" + process.env.NODE_ENV);
@@ -153,7 +144,7 @@ docs(app, mongoose); // 2nd param is optional
 app.use(breadcrumbs.setHome());
 
 app.use(session({
-    secret:'mysecret',
+    secret:'thrillworldsameer',
     resave: false,
     saveUninitialized: false,
     // Re-use our existing mongoose connection to mongodb.

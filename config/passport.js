@@ -8,6 +8,7 @@ const TwitterStrategy = require('passport-twitter').Strategy;
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 passport.serializeUser(function (user, done) {
+	console.log("line 11"+user.id);
 	done(null, user.id);
 }); 
 
@@ -60,7 +61,6 @@ passport.use('local.signup', new LocalStrategy({
 				msg = 'Password and Verification do not match.';
 				messages.push(msg);
 			}
-			console.log(messages);
 			return done(null, true, req.flash('error', messages));
 		} 
 		User.findOne({

@@ -1,103 +1,49 @@
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="navbar-header">
-        <a class="navbar-brand" href="/admin">{{title}}</a>
-        <button style="color:antiquewhite;" type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>   
+<nav id="sidebar">
+    <div class="sidebar-header">
+        <h3>Dashboard</h3>
     </div>
-    <!-- Top Menu Items -->
-    <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-    <div class="collapse navbar-collapse navbar-ex1-collapse">
-        <ul class="nav navbar-nav side-nav">
-            <li class="active">
-                <a href="/admin">
-                    <i class="fa fa-fw fa-dashboard"></i> Activity</a>
-            </li>
-            <li>
-                <a href="/admin/orders">
-                    <i class="fa fa-fw fa-bar-chart-o"></i>Booking</a>
-            </li>
-            <li>
-                <a href="/admin/products">
-                    <i class="fa fa-window-restore"></i>Property Details</a>
-            </li>
-            <li>
-                <a href="/admin/availability">
-                    <i class="fa fa-fw fa-table"></i>Availability</a>
-            </li>
-            <li>
-                <a href="/admin/messages">
-                    <i class="fa fa-commenting"></i>Messages</a>
-            </li>
-            <li>
-                <a href="/admin/categories">
-                    <i class="fa fa-database"></i> Categories</a>
-            </li>
-            <li>
-                <a href="/admin/users">
-                    <i class="fa fa-fw fa-user"></i> Users</a>
-            </li>
-            <li>
-                <a href="/admin/test">
-                    <i class="fa fa-fw fa-user"></i> Testimonials</a>
-            </li>
-            <li>
-                <a href="/admin/stores">
-                    <i class="fa fa-fw fa-map-marker"></i>Events Map</a>
-            </li>
-            {{!--
-            <li>
-                <a href="/admin/relations">
-                    <i class="fa fa-fw fa-map-marker"></i> Relations</a>
-            </li> --}}
-            <li>
-                <a href="/admin/activities">
-                    <i class="fa fa-users"></i> Users Log</a>
-            </li>
-            <li>
-                <a href="/admin/events">
-                    <i class="fa fa-user-circle"></i>Account</a>
-            </li>
-            <li>
-                <a href="/admin/add-product">
-                    <i class="fa fa-fw fa-table"></i> Add Event</a>
-            </li>
-            <li>
-                <a href="/admin/setup">
-                    <i class="fa fa-wrench"></i> Settings</a>
+    <ul class="list-unstyled components">
+        <li>
+            <a href="/admin">
+                <i class="material-icons fit">dashboard</i>DASHBOARD</a>
+        </li>
+        <li class="active">
+            <a href="/admin/orders">
+                <i class="material-icons fit">event_note</i>Booking</a>
+        </li>
+        <li>
+            <a href="/admin/products">
+                <i class="material-icons fit">Property</i> Details</a>
+        </li>
+        <li>
+            <a href="/admin/availability">
+                <i class="material-icons fit"></i>Availability</a>
+        </li>
+        <li>
+            <a href="/admin/messages">
+                <i class="material-icons fit"></i>Messages</a>
+        </li>
+        <li>
+            <a href="/admin/categories">
+                <i class="material-icons fit">notifications</i>Categories</a>
+        </li>
+        <li>
+            <a href="/admin/users">
+                <i class="material-icons fit"></i>Users</a>
+        </li>
+        <li>
+            <a href="/admin/stores">
+                <i class="material-icons fit"></i>Events Map</a>
+        </li>
+        <li>
+            <a href="/admin/setup">
+                <i class="material-icons fit">settings</i>Settings</a>
+        </li>
+        <li>
+            <a href="#">
+                <i class="material-icons fit">error</i>ABOUT </a>
+        </li>
+    </ul>
 
-                <li>
-                    <li>
-                        <a href="javascript:;" data-toggle="collapse" data-target="#export" class="" aria-expanded="true">
-                            <i class="fa fa-fw fa-arrows-v"></i> Export
-                            <i class="fa fa-fw fa-caret-down"></i>
-                        </a>
-                        <ul id="export" class="collapse in" aria-expanded="true" style="">
-                            <li>
-                                <a href="/exporter/products">
-                                    <i class="fa fa-fw fa-file-excel-o"></i> Events</a>
-                            </li>
-                            <li>
-                                <a href="/exporter/categories">
-                                    <i class="fa fa-fw fa-file-excel-o"></i> Categories</a>
-                            </li>
-                            <li>
-                                <a href="/exporter/orders">
-                                    <i class="fa fa-fw fa-file-excel-o"></i> Bookings</a>
-                            </li>
-                            <li>
-                                <a href="/exporter/users">
-                                    <i class="fa fa-fw fa-file-excel-o"></i> Users</a>
-                            </li>
-                        </ul>
-                    </li>
-
-
-        </ul>
-
-    </div>
-    <!-- /.navbar-collapse -->
+ 
 </nav>
