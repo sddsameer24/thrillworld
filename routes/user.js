@@ -399,7 +399,7 @@ router.get('/signin', csrfProtection, function (req, res, next) {
 	req.session.oldUrl = req.get('referer');
 	var messages = req.flash('error');
 	res.render('user/signin', {
-		layout: 'eshop/blank',
+		layout: 'eshop/blankall',
 		// csrfToken: req.csrfToken(),
 		authFacebook: authFacebook,
 		authGoogle: authGoogle,
