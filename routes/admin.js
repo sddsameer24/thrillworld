@@ -16,7 +16,6 @@ var sigma = require('sigma');
 var passport = require('passport');
 var moment = require('moment');
 var mongoose = require('mongoose');
-var User = require('../models/user');
 var Payment = require('../models/payment');
 var Insta = require('instamojo-nodejs');
 var fileUpload = require('express-fileupload');

@@ -65,13 +65,14 @@
             <div class="topnav hidden-xs">
                 <div class="container">
                     {{#if isLoggedIn}}
-                    <ul class="quick-menu pull-left">
-                        <h3>Welcome, {{user.first_name}}</h3>
+                    <h3>Welcome, {{user.first_name}}</h3>
+                    <ul class="quick-menu pull-right">
+                        
                         <li>
-                            <a href="#">My Account</a>
+                            <a href="/user/profile">My Account</a>
                         </li>
                         <li class="ribbon">
-                            <a href="#">English</a>
+                            <a href="/user/logout">Logout</a>
                         </li>
                     </ul>
                     {{else}}
