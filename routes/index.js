@@ -444,7 +444,7 @@ router.get('/hostsignup', function (req, res, next) {
 	var errorMsg = req.flash('error')[0];
 	res.render('user/hostsignup', {
 		layout: 'eshop/blankall',
-		csrfToken: req.csrfToken(),
+		// csrfToken: req.csrfToken(),
 		"successMsg": successMsg,
 		"noMessage": !successMsg,
 		"message": messages,
