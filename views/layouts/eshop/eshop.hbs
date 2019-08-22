@@ -64,12 +64,21 @@
         <header id="header" class="navbar-static-top">
             <div class="topnav hidden-xs">
                 <div class="container">
-                    {{#if isLoggedIn}}
                     <h3>Welcome, {{user.first_name}}</h3>
+                    {{#if isLoggedIn}}
+                    
                     <ul class="quick-menu pull-right">
-                        
+
                         <li>
                             <a href="/user/profile">My Account</a>
+                        </li>
+                        <li class="ribbon">
+                            
+                            <a id="shopping-cart" href="/wishlist">
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>&nbsp;Shopping Cart {{#if session.cart.totalQty }}
+                                <span class="badge btn-success">{{ session.cart.totalQty }}</span>
+                                {{/if}}
+                            </a>
                         </li>
                         <li class="ribbon">
                             <a href="/user/logout">Logout</a>
@@ -115,20 +124,20 @@
                             </li>
                             <li class="menu-item-has-children">
                                 <a href="/hostsignup">List Your property</a>
-                              
+
                             </li>
                             <li class="menu-item-has-children">
                                 <a href="/Contact">Contact us</a>
-                               
+
                             </li>
                             <li class="menu-item-has-children">
                                 <a href="/shop">Events Around</a>
-                               
+
                             </li>
-                            
-                            
-                            
-                            
+
+
+
+
                         </ul>
                     </nav>
                 </div>
@@ -137,20 +146,20 @@
                     <ul id="mobile-primary-menu" class="menu">
                         <li class="menu-item-has-children">
                             <a href="/">Home</a>
-                           
+
                         </li>
                         <li class="menu-item-has-children">
                             <a href="/user/hostsignup">List your property</a>
-                           
+
                         </li>
                         <li class="menu-item-has-children">
                             <a href="/shop">Events Around</a>
-                           
+
                         </li>
-                        
-                       
-                        
-                   
+
+
+
+
                         <li class="menu-item-has-children">
                             <a href="#">Bonus</a>
                             <ul>
@@ -266,9 +275,9 @@
                         <li>
                             <a href="/user/profile">MY ACCOUNT</a>
                         </li>
-                       
-                            </ul>
-                        
+
+                    </ul>
+
                 </nav>
             </div>
             <div id="travelo-signup" class="travelo-signup-box travelo-box">
@@ -281,10 +290,10 @@
                 <div class="seperator">
                     <label>OR</label>
                 </div>
-                
-                    <a href="/user/signup">
-                        <i class="soap-icon-letter"></i>Sign up with Email</a>
-               
+
+                <a href="/user/signup">
+                    <i class="soap-icon-letter"></i>Sign up with Email</a>
+
                 {{!--
                 <div class="simple-signup">
                     <div class="text-center signup-email-section">
@@ -980,8 +989,7 @@
                 <div class="container">
                     <h2>Popular Destinations</h2>
                     <div class="row image-box style1 add-clearfix">
-                        {{#each category}}
-                         {{#each this.details}}
+                        {{#each category}} {{#each this.details}}
                         <div class="col-sms-6 col-sm-6 col-md-3">
                             <article class="box">
                                 <figure class="animated" data-animation-type="fadeInDown" data-animation-duration="1">
@@ -1000,9 +1008,8 @@
                                 </div>
                             </article>
                         </div>
-                        {{/each}}   
-                      {{/each}}
-                        {{!-- <div class="col-sms-6 col-sm-6 col-md-3">
+                        {{/each}} {{/each}} {{!--
+                        <div class="col-sms-6 col-sm-6 col-md-3">
                             <article class="box">
                                 <figure class="animated" data-animation-type="fadeInDown" data-animation-duration="1" data-animation-delay="0.3">
                                     <a href="ajax/slideshow-popup.html" title="" class="hover-effect popup-gallery">
@@ -1019,8 +1026,8 @@
                                     </h4>
                                 </div>
                             </article>
-                        </div> --}}
-                        {{!-- <div class="col-sms-6 col-sm-6 col-md-3">
+                        </div> --}} {{!--
+                        <div class="col-sms-6 col-sm-6 col-md-3">
                             <article class="box">
                                 <figure class="animated" data-animation-type="fadeInDown" data-animation-duration="1" data-animation-delay="0.6">
                                     <a href="ajax/slideshow-popup.html" title="" class="hover-effect popup-gallery">
@@ -1037,8 +1044,8 @@
                                     </h4>
                                 </div>
                             </article>
-                        </div> --}}
-                        {{!-- <div class="col-sms-6 col-sm-6 col-md-3">
+                        </div> --}} {{!--
+                        <div class="col-sms-6 col-sm-6 col-md-3">
                             <article class="box">
                                 <figure class="animated" data-animation-type="fadeInDown" data-animation-duration="1" data-animation-delay="0.9">
                                     <a href="ajax/slideshow-popup.html" title="" class="hover-effect popup-gallery">
@@ -1134,12 +1141,16 @@
                         <div class="col-md-6">
                             <article class="box">
                                 <figure class="animated" data-animation-type="fadeInLeft" data-animation-duration="1">
-                                   {{#if ../../isLoggedIn}}
-                    <a href="/product/{{featured1._id}}"><h4>{{featured1.title}}</h4></a>
-                        {{else}}
-                        <a href="/product1/{{featured1._id}}"><h4>{{featured1.title}}</h4></a>
-                        {{/if}}
-                                        <img src="{{ featured1.imagePath }}" alt="" width="270" height="192" />
+                                    {{#if ../../isLoggedIn}}
+                                    <a href="/product/{{featured1._id}}">
+                                        <h4>{{featured1.title}}</h4>
+                                    </a>
+                                    {{else}}
+                                    <a href="/product1/{{featured1._id}}">
+                                        <h4>{{featured1.title}}</h4>
+                                    </a>
+                                    {{/if}}
+                                    <img src="{{ featured1.imagePath }}" alt="" width="270" height="192" />
                                     </a>
                                 </figure>
                                 <div class="details">
@@ -1154,11 +1165,15 @@
                             <article class="box">
                                 <figure class="animated" data-animation-type="fadeInLeft" data-animation-duration="1" data-animation-delay="0.4">
                                     {{#if ../../isLoggedIn}}
-                    <a href="/product/{{featured3._id}}"><h4>{{featured3.title}}</h4></a>
-                        {{else}}
-                        <a href="/product1/{{featured3._id}}"><h4>{{featured3.title}}</h4></a>
-                        {{/if}}
-                                        <img src="{{ featured2.imagePath }}" alt="" width="270" height="192" />
+                                    <a href="/product/{{featured3._id}}">
+                                        <h4>{{featured3.title}}</h4>
+                                    </a>
+                                    {{else}}
+                                    <a href="/product1/{{featured3._id}}">
+                                        <h4>{{featured3.title}}</h4>
+                                    </a>
+                                    {{/if}}
+                                    <img src="{{ featured2.imagePath }}" alt="" width="270" height="192" />
                                     </a>
                                 </figure>
                                 <div class="details">
@@ -1172,12 +1187,16 @@
                         <div class="col-md-6">
                             <article class="box">
                                 <figure class="animated" data-animation-type="fadeInLeft" data-animation-duration="1">
-                                     {{#if ../../isLoggedIn}}
-                    <a href="/product/{{featured4._id}}"><h4>{{featured4.title}}</h4></a>
-                        {{else}}
-                        <a href="/product1/{{featured4._id}}"><h4>{{featured4.title}}</h4></a>
-                        {{/if}}
-                                        <img src="{{ featured3.imagePath }}" alt="" width="270" height="192" />
+                                    {{#if ../../isLoggedIn}}
+                                    <a href="/product/{{featured4._id}}">
+                                        <h4>{{featured4.title}}</h4>
+                                    </a>
+                                    {{else}}
+                                    <a href="/product1/{{featured4._id}}">
+                                        <h4>{{featured4.title}}</h4>
+                                    </a>
+                                    {{/if}}
+                                    <img src="{{ featured3.imagePath }}" alt="" width="270" height="192" />
                                     </a>
                                 </figure>
                                 <div class="details">
