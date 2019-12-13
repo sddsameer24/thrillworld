@@ -77,7 +77,7 @@
     "nodalytics": "1.1.0",
     "nodeice": "^3.0.9",
     "nodemailer": "4.6.7",
-    "npm": "4.6.1",
+    "npm": "6.13.4",
     "passport": "0.4.0",
     "passport-facebook": "2.1.1",
     "passport-google-oauth": "1.0.0",
