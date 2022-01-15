@@ -63,7 +63,7 @@
     "js-datepicker": "^3.3.7",
     "json2csv": "^3.11.5",
     "lodash": "^4.17.11",
-    "marked": "0.4.0",
+    "marked": "4.0.10",
     "moment": "2.22.2",
     "mongo-sanitize": "1.0.0",
     "mongodb": "2.2.33",
